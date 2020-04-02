@@ -2,7 +2,7 @@ using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
 
-namespace ScriptParser
+namespace SimpleScript.Ast
 {
     public static class ExtraParsers
     {

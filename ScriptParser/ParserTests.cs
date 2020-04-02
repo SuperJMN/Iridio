@@ -1,3 +1,4 @@
+using SimpleScript.Ast;
 using Superpower;
 using Xunit;
 
@@ -50,6 +51,7 @@ namespace ScriptParser
         [InlineData(@"a = 1;
 // Hola tío
 b = Call(a,b,c);
+<Section>
 Call(""C:\Windows"",1);
 Partition(""Hola"",1);")]
         [InlineData("a = 4;")]

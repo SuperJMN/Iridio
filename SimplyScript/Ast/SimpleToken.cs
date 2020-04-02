@@ -1,4 +1,4 @@
-namespace ScriptParser
+namespace SimpleScript.Ast
 {
     public enum SimpleToken
     {

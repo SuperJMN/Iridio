@@ -1,4 +1,5 @@
 using System;
+using SimpleScript.Ast;
 using Xunit;
 
 namespace ScriptParser

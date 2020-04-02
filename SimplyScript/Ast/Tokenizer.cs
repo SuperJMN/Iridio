@@ -3,7 +3,7 @@ using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
 
-namespace ScriptParser
+namespace SimpleScript.Ast
 {
     public static class Tokenizer
     {
