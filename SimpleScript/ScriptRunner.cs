@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using SimpleScript.Ast;
@@ -10,7 +8,7 @@ using Superpower;
 
 namespace SimpleScript
 {
-    public class ScriptRunner
+    public class ScriptRunner : IScriptRunner
     {
         private readonly IInstanceBuilder builder;
         private readonly IEnumerable<Type> types;
@@ -22,14 +20,14 @@ namespace SimpleScript
             this.types = types;
         }
 
-        public Task Run(string source, IDictionary<string, object> variables)
+        public Task Run(string source, IDictionary<string, object> variables = null)
         {
             var tokenizer = Tokenizer.Create().Tokenize(source);
             var script = SimpleParser.SimpleScript.Parse(tokenizer);
-            return Run(script, variables);
+            return Run(script, variables ?? new Dictionary<string, object>());
         }
 
-        public async Task Run(Script script, IDictionary<string, object> variables)
+        private async Task Run(Script script, IDictionary<string, object> variables)
         {
             dict = variables;
 
@@ -77,7 +75,13 @@ namespace SimpleScript
 
         private Type GetFuncType(string name)
         {
-            return types.First(type => type.Name == name);
+            var type = types.FirstOrDefault(t => t.Name == name);
+            if (type == null)
+            {
+                throw new RuntimeException($"Cannot find the type {name}");
+            }
+
+            return type;
         }
 
         private async Task<object> Evaluate(Expression assignmentExpression)
