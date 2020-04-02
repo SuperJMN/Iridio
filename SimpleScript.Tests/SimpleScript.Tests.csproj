@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimplyScript\SimpleScript.csproj" />
+    <ProjectReference Include="..\SimpleScript\SimpleScript.csproj" />
   </ItemGroup>
 
 </Project>

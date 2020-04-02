@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SimpleScript.Ast;
 using SimpleScript.Ast.Model;
+using Superpower;
 
 namespace SimpleScript
 {
@@ -21,9 +22,16 @@ namespace SimpleScript
             this.types = types;
         }
 
+        public Task Run(string source, IDictionary<string, object> variables)
+        {
+            var tokenizer = Tokenizer.Create().Tokenize(source);
+            var script = SimpleParser.SimpleScript.Parse(tokenizer);
+            return Run(script, variables);
+        }
+
         public async Task Run(Script script, IDictionary<string, object> variables)
         {
-            this.dict = variables;
+            dict = variables;
 
             foreach (var sentence in script.Sentences)
             {
@@ -62,9 +70,9 @@ namespace SimpleScript
         {
             var type = GetFuncType(callExpression.FuncName);
             var instance = builder.Build(type);
-            var waitAll = await Task.WhenAll(callExpression.Parameters.Select(Evaluate));
-            var p = await instance.ExecuteTask("Execute", waitAll);
-            return 123;
+            var parameters = await Task.WhenAll(callExpression.Parameters.Select(Evaluate));
+            var retValue = await instance.ExecuteTask("Execute", parameters);
+            return retValue;
         }
 
         private Type GetFuncType(string name)
@@ -79,21 +87,29 @@ namespace SimpleScript
                 case CallExpression expression:
                     return await Evaluate(expression);
                 case StringExpression strExpr:
-                    return strExpr.String;
+                    return ReplaceVariables(strExpr.String);
                 case NumericExpression numericExpr:
                     return numericExpr.Number;
+                case IdentifierExpression ie:
+                    return dict[ie.Identifier];
             }
 
             throw new ArgumentOutOfRangeException();
         }
 
+        private object ReplaceVariables(string str)
+        {
+            foreach (var variable in dict)
+            {
+                var token = "{" + variable.Key + "}";
+                str = str.Replace(token, variable.Value.ToString());
+            }
+
+            return str;
+        }
+
         private void Echo(string msg)
         {
         }
-    }
-
-    public interface IInstanceBuilder
-    {
-        object Build(Type type, params object[] parameters);
     }
 }

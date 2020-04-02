@@ -2,7 +2,7 @@ using SimpleScript.Ast;
 using Superpower;
 using Xunit;
 
-namespace ScriptParser
+namespace Tests
 {
     public class ParserTests
     {
