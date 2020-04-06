@@ -1,7 +1,7 @@
 using SimpleScript.Ast;
 using Xunit;
 
-namespace Tests
+namespace SimpleScript.Tests
 {
     public class TokenizationTests
     {

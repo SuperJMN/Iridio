@@ -1,10 +1,10 @@
 namespace SimpleScript.Ast.Model
 {
-    public class Script
+    public class ScriptSyntax
     {
         public Statement[] Sentences { get; }
 
-        public Script(Statement[] sentences)
+        public ScriptSyntax(Statement[] sentences)
         {
             Sentences = sentences;
         }

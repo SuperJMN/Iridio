@@ -1,7 +1,6 @@
 ﻿using System;
-using SimpleScript;
 
-namespace Tests
+namespace SimpleScript.Tests
 {
     public class InstanceCreator : IInstanceBuilder
     {

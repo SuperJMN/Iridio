@@ -48,7 +48,7 @@ namespace SimpleScript.Ast
 
         public static readonly TokenListParser<SimpleToken, Statement> Line = Sentence.Try().Or(EchoSentence);
 
-        public static TokenListParser<SimpleToken, Script> SimpleScript =>
-            Line.Many().AtEnd().Select(x => new Script(x));
+        public static TokenListParser<SimpleToken, ScriptSyntax> SimpleScript =>
+            Line.Many().AtEnd().Select(x => new ScriptSyntax(x));
     }
 }

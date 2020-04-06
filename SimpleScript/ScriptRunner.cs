@@ -1,33 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using SimpleScript.Ast;
 using SimpleScript.Ast.Model;
-using Superpower;
 
 namespace SimpleScript
 {
     public class ScriptRunner : IScriptRunner
     {
-        private readonly IInstanceBuilder builder;
-        private readonly IEnumerable<Type> types;
         private IDictionary<string, object> dict;
+        private readonly ISubject<string> messagesSubject = new Subject<string>();
+        private readonly Dictionary<string, IFunction> functionsDict;
 
-        public ScriptRunner(IInstanceBuilder builder, IEnumerable<Type> types)
+        public ScriptRunner(IEnumerable<IFunction> functions)
         {
-            this.builder = builder;
-            this.types = types;
+            functionsDict = functions.ToDictionary(x => x.Name, x => x);
         }
 
-        public Task Run(string source, IDictionary<string, object> variables = null)
-        {
-            var tokenizer = Tokenizer.Create().Tokenize(source);
-            var script = SimpleParser.SimpleScript.Parse(tokenizer);
-            return Run(script, variables ?? new Dictionary<string, object>());
-        }
-
-        private async Task Run(Script script, IDictionary<string, object> variables)
+        public async Task Run(ScriptSyntax script, IDictionary<string, object> variables)
         {
             dict = variables;
 
@@ -66,22 +58,11 @@ namespace SimpleScript
 
         private async Task<object> Evaluate(CallExpression callExpression)
         {
-            var type = GetFuncType(callExpression.FuncName);
-            var instance = builder.Build(type);
             var parameters = await Task.WhenAll(callExpression.Parameters.Select(Evaluate));
-            var retValue = await instance.ExecuteTask("Execute", parameters);
-            return retValue;
-        }
+            var func = functionsDict[callExpression.FuncName];
+            var invoke = await func.Invoke(parameters);
 
-        private Type GetFuncType(string name)
-        {
-            var type = types.FirstOrDefault(t => t.Name == name);
-            if (type == null)
-            {
-                throw new RuntimeException($"Cannot find the type {name}");
-            }
-
-            return type;
+            return invoke;
         }
 
         private async Task<object> Evaluate(Expression assignmentExpression)
@@ -114,6 +95,9 @@ namespace SimpleScript
 
         private void Echo(string msg)
         {
+            messagesSubject.OnNext(msg);
         }
+
+        public IObservable<string> Messages => messagesSubject.AsObservable();
     }
 }
