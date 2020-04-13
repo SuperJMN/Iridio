@@ -8,22 +8,22 @@ using SimpleScript.Ast.Model;
 
 namespace SimpleScript
 {
-    public class ScriptRunner : IScriptRunner
+    public class Runner : IRunner
     {
         private IDictionary<string, object> dict;
         private readonly ISubject<string> messagesSubject = new Subject<string>();
         private readonly Dictionary<string, IFunction> functionsDict;
 
-        public ScriptRunner(IEnumerable<IFunction> functions)
+        public Runner(IEnumerable<IFunction> functions)
         {
             functionsDict = functions.ToDictionary(x => x.Name, x => x);
         }
 
-        public async Task Run(ScriptSyntax script, IDictionary<string, object> variables)
+        public async Task Run(Script script, IDictionary<string, object> variables)
         {
             dict = variables;
 
-            foreach (var sentence in script.Sentences)
+            foreach (var sentence in script.Statements)
             {
                 await Execute(sentence);
             }
@@ -59,7 +59,11 @@ namespace SimpleScript
         private async Task<object> Evaluate(CallExpression callExpression)
         {
             var parameters = await Task.WhenAll(callExpression.Parameters.Select(Evaluate));
-            var func = functionsDict[callExpression.FuncName];
+            if (!functionsDict.TryGetValue(callExpression.FuncName, out var func))
+            {
+                throw new RuntimeException($"Cannot find function {callExpression.FuncName}");
+            }
+
             var invoke = await func.Invoke(parameters);
 
             return invoke;
@@ -76,10 +80,16 @@ namespace SimpleScript
                 case NumericExpression numericExpr:
                     return numericExpr.Number;
                 case IdentifierExpression ie:
-                    return dict[ie.Identifier];
+
+                    if (!dict.TryGetValue(ie.Identifier, out var value))
+                    {
+                        throw new RuntimeException($"The variable '{ie.Identifier}' doesn't exist");
+                    }
+
+                    return value;
             }
 
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException($"Unexpected expression of type {assignmentExpression.GetType()}");
         }
 
         private object ReplaceVariables(string str)

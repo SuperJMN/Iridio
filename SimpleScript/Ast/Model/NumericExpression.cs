@@ -8,5 +8,10 @@ namespace SimpleScript.Ast.Model
         }
 
         public int Number { get; }
+
+        public override string ToString()
+        {
+            return $"{Number}";
+        }
     }
 }

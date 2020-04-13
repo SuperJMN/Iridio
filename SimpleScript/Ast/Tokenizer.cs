@@ -1,4 +1,3 @@
-using System.Collections;
 using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
@@ -15,10 +14,14 @@ namespace SimpleScript.Ast
                 .Match(ExtraParsers.SpanBetween('\"'), SimpleToken.Text)
                 .Match(ExtraParsers.SpanBetween('<', '>'), SimpleToken.Echo)
                 .Ignore(Span.WhiteSpace)
+                .Match(Character.EqualTo(':'), SimpleToken.Colon)
+                .Match(Character.EqualTo('!'), SimpleToken.Exclamation)
                 .Match(Character.EqualTo(','), SimpleToken.Comma)
                 .Match(Character.EqualTo('='), SimpleToken.Equal)
                 .Match(Character.EqualTo('('), SimpleToken.OpenParen)
                 .Match(Character.EqualTo(')'), SimpleToken.CloseParent)
+                .Match(Character.EqualTo('['), SimpleToken.OpenBracket)
+                .Match(Character.EqualTo(']'), SimpleToken.CloseBracket)
                 .Match(Character.EqualTo(';'), SimpleToken.Semicolon)
                 .Match(Numerics.Integer, SimpleToken.Number)
                 

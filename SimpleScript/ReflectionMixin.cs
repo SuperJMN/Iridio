@@ -12,7 +12,7 @@ namespace SimpleScript
         public static async Task<object> InvokeTask(this MethodInfo method, object instance, object[] parameters)
         {
             var ctorParams = method.GetParameters();
-            var injectableParameters = ctorParams.ZipLongest(parameters, (info, o) => SelectValue(info, o));
+            var injectableParameters = ctorParams.ZipLongest(parameters, SelectValue);
 
             if (method.ReturnType.IsGenericType)
             {

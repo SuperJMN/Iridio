@@ -8,5 +8,10 @@ namespace SimpleScript.Ast.Model
         {
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            return $"Call: {Expression}";
+        }
     }
 }

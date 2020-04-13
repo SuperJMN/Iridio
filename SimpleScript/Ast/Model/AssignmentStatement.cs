@@ -10,5 +10,10 @@ namespace SimpleScript.Ast.Model
             Variable = variable;
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            return $"{Variable}={Expression}";
+        }
     }
 }

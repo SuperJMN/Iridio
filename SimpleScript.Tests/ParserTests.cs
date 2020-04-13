@@ -31,9 +31,19 @@ namespace SimpleScript.Tests
         //}
 
         [Theory]
+        [InlineData("Flipe(a,b);")]
+        [InlineData("A = 123;")]
+        [InlineData(@"!""c:\myscript.txt"";")]
+        public void Sentence(string source)
+        {
+            var tokenList = Tokenizer.Create().Tokenize(source);
+            SimpleParser.Sentence.Parse(tokenList);
+        }
+
+        [Theory]
         [InlineData("Flipe(a,b)")]
         [InlineData("A = 123")]
-        public void Sentence(string source)
+        public void Expression(string source)
         {
             var tokenList = Tokenizer.Create().Tokenize(source);
             SimpleParser.Expression.Parse(tokenList);

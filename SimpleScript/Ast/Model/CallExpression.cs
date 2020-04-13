@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace SimpleScript.Ast.Model
 {
     public class CallExpression : Expression
@@ -9,6 +11,11 @@ namespace SimpleScript.Ast.Model
         {
             FuncName = funcName;
             Parameters = parameters;
+        }
+
+        public override string ToString()
+        {
+            return $"{FuncName}({string.Join(",", Parameters.Select(x => x.ToString()))})";
         }
     }
 }

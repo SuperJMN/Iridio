@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SimpleScript.Ast.Model;
 
 namespace SimpleScript
 {
-    public interface IScriptRunner
+    public interface IRunner
     {
-        Task Run(ScriptSyntax syntax, IDictionary<string, object> variables = null);
+        Task Run(Script syntax, IDictionary<string, object> variables = null);
         IObservable<string> Messages { get; }
     }
 }

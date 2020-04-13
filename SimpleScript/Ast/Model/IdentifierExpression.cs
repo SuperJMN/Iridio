@@ -8,5 +8,10 @@ namespace SimpleScript.Ast.Model
         {
             Identifier = identifier;
         }
+
+        public override string ToString()
+        {
+            return $"{Identifier}";
+        }
     }
 }

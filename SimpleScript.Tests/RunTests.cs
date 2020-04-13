@@ -21,11 +21,16 @@ namespace SimpleScript.Tests
         public async Task Run()
         {
             IEnumerable<Function> funcs = new[]{ new Function(typeof(IntTask)), new Function(typeof(StringTask)), };
-            var runner = new ScriptRunner(funcs);
+            var runner = new Runner(funcs);
+            var compiler = new Compiler(new TestFileOperations(""), new Parser());
+            var source = @"a = IntTask(1);
+b = ""Johnny was a good man"";
+StringTask(""{b}"");
+!""c:\myscript.txt"";";
+
+            var script = compiler.Compile(source);
             var dictionary = new Dictionary<string, object>();
-            var taskFactory = new ScriptFactory(new ScriptParser(), runner, funcs);
-            var script = taskFactory.Load("a = IntTask(1);\nb = \"Johnny was a good man\";\nStringTask(\"{b}\");");
-            await script.Run(dictionary);
+            await runner.Run(script, dictionary);
         }
     }
 }

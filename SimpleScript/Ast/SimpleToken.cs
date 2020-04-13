@@ -11,6 +11,10 @@ namespace SimpleScript.Ast
         Echo,
         Text,
         CloseParent,
-        OpenParen
+        OpenParen,
+        Exclamation,
+        Colon,
+        OpenBracket,
+        CloseBracket
     }
 }

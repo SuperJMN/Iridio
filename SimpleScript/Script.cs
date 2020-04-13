@@ -1,28 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
 using SimpleScript.Ast.Model;
 
 namespace SimpleScript
 {
     public class Script
     {
-        public IEnumerable<IFunction> Functions { get; }
-        private readonly ScriptSyntax syntax;
-        private readonly IScriptRunner runner;
+        public ICollection<Declaration> Declarations { get; }
+        public ICollection<Statement> Statements { get; }
 
-        public Script(ScriptSyntax syntax, IScriptRunner runner, IEnumerable<IFunction> functions)
+        public Script(ICollection<Declaration> declarations, ICollection<Statement> statements)
         {
-            Functions = functions;
-            this.syntax = syntax;
-            this.runner = runner;
+            Declarations = declarations;
+            Statements = statements;
         }
 
-        public Task Run(IDictionary<string, object> dict)
+        public override string ToString()
         {
-            return runner.Run(syntax, dict);
+            var declarations = $"{string.Join("\n", Declarations.Select(x => x.ToString()))}";
+            var statements = $"{string.Join("\n", Statements.Select(x => x.ToString()))}";
+            return $"Header:\n{declarations}\nStatements:\n{statements}";
         }
-
-        public IObservable<string> Messages => runner.Messages;
     }
 }

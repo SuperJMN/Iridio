@@ -2,7 +2,7 @@
 
 namespace SimpleScript
 {
-    public interface IScriptParser
+    public interface IParser
     {
         ScriptSyntax Parse(string source);
     }

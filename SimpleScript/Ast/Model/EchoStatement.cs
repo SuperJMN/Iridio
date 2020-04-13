@@ -8,5 +8,10 @@ namespace SimpleScript.Ast.Model
         {
             Message = message;
         }
+
+        public override string ToString()
+        {
+            return $"Echo: {Message}";
+        }
     }
 }

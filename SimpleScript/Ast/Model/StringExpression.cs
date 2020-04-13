@@ -8,5 +8,10 @@ namespace SimpleScript.Ast.Model
         {
             String = str;
         }
+
+        public override string ToString()
+        {
+            return $@"""{String}""";
+        }
     }
 }

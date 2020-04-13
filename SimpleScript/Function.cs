@@ -14,7 +14,6 @@ namespace SimpleScript
         public Function(Type type)
         {
             Name = type.Name;
-            Metadata = type.GetCustomAttributes<MetadataAttribute>().Select(attr => (attr.Key, attr.Value));
             instance = Activator.CreateInstance(type);
             method = type.GetMethod("Execute");
         }
@@ -25,6 +24,5 @@ namespace SimpleScript
         }
 
         public string Name { get; }
-        public IEnumerable<(string Key, object Value)> Metadata { get; }
     }
 }

@@ -4,7 +4,7 @@ using Superpower;
 
 namespace SimpleScript
 {
-    public class ScriptParser : IScriptParser
+    public class Parser : IParser
     {
         public ScriptSyntax Parse(string source)
         {
