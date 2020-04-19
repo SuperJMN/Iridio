@@ -1,57 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using MoreLinq;
-using SimpleScript.Ast;
 using SimpleScript.Ast.Model;
+using Zafiro.Core.FileSystem;
 
 namespace SimpleScript
 {
     public class Compiler : ICompiler
     {
         private readonly IParser parser;
-        private readonly Func<string, string> loadSourceFromPath;
+        private readonly IFileSystemOperations fileSystem;
 
-        public Compiler(IParser parser, Func<string, string> loadSourceFromPath)
+        public Compiler(IParser parser, IFileSystemOperations fileSystem)
         {
             this.parser = parser;
-            this.loadSourceFromPath = loadSourceFromPath;
+            this.fileSystem = fileSystem;
         }
 
-        public Script Compile(string source)
+        public Script Compile(string path)
         {
-            var syntax = parser.Parse(source);
-            var statementNodes = ToNode(syntax);
-            var declarations = GetDeclarations(syntax).Distinct().ToList();
-
-            var treeNode = new TreeNode<Statement>(null, statementNodes);
-            var statements = MoreEnumerable.TraverseDepthFirst(treeNode, node => node.Children)
-                .Where(node => !(node.Value is ScriptCallStatement))
-                .Select(x => x.Value);
-            return new Script(declarations, statements.Skip(1).ToList());
+            return new Script(GetDeclarations(path).ToList(), GetStatements(path).Where(x => !(x is ScriptCallStatement)).ToList());
         }
 
-        private IEnumerable<Declaration> GetDeclarations(ScriptSyntax syntax)
+        private IEnumerable<Declaration> GetDeclarations(string path)
         {
-            var declarations = syntax.Header.Declarations;
-            var calls = syntax.Sentences.OfType<ScriptCallStatement>();
-            var scripts = calls.Select(statement => parser.Parse(loadSourceFromPath(statement.Path)));
-            var childDecl = scripts.SelectMany(GetDeclarations);
-            return declarations.Concat(childDecl);
+            var parsed = parser.Parse(fileSystem.ReadAllText(path));
+
+            using (new DirectorySwitch(fileSystem, Path.GetDirectoryName(path)))
+            {
+                var fromChildren = parsed.Statements
+                    .OfType<ScriptCallStatement>()
+                    .SelectMany(statement => GetDeclarations(statement.Path));
+                return parsed.Header.Declarations.Select(d => d).Concat(fromChildren.ToList());
+            }
         }
 
-        private IEnumerable<TreeNode<Statement>> ToNode(ScriptSyntax scriptSyntax)
+        private IEnumerable<Statement> GetStatements(string path)
         {
-            return scriptSyntax.Sentences.Select(ToNode);
-        }
+            var syntax = parser.Parse(fileSystem.ReadAllText(path));
 
-        private TreeNode<Statement> ToNode(Statement statement)
-        {
-            var children = statement is ScriptCallStatement call
-                ? ToNode(parser.Parse(loadSourceFromPath(call.Path)))
-                : Enumerable.Empty<TreeNode<Statement>>();
-
-            return new TreeNode<Statement>(statement, children.ToList());
+            using (new DirectorySwitch(fileSystem, Path.GetDirectoryName(path)))
+            {
+                var fromChildren = syntax.Statements
+                    .OfType<ScriptCallStatement>()
+                    .SelectMany(statement => GetStatements(statement.Path));
+                return syntax.Statements.Select(d => d).Concat(fromChildren.ToList());
+            }
         }
     }
 }

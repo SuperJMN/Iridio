@@ -5,7 +5,7 @@ namespace SimpleScript
 {
     internal class TreeNode<T>
     {
-        public TreeNode()
+        public TreeNode(T value) : this(value, Enumerable.Empty<TreeNode<T>>())
         {
         }
 
@@ -15,7 +15,7 @@ namespace SimpleScript
             Children = children;
         }
 
-        public T Value { get; set; }
-        public IEnumerable<TreeNode<T>> Children { get; set; } = Enumerable.Empty<TreeNode<T>>();
+        public T Value { get; }
+        public IEnumerable<TreeNode<T>> Children { get; }
     }
 }

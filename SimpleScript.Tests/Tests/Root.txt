@@ -1,0 +1,2 @@
+﻿[Key:Value1]
+!"Subfolder\Subscript.txt";

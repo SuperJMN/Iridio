@@ -5,12 +5,12 @@ namespace SimpleScript.Ast.Model
     public class ScriptSyntax
     {
         public Header Header { get; }
-        public IEnumerable<Statement> Sentences { get; }
+        public IEnumerable<Statement> Statements { get; }
 
-        public ScriptSyntax(Header header, IEnumerable<Statement> sentences)
+        public ScriptSyntax(Header header, IEnumerable<Statement> statements)
         {
             Header = header;
-            Sentences = sentences;
+            Statements = statements;
         }
     }
 }

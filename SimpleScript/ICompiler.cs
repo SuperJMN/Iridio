@@ -2,6 +2,6 @@
 {
     public interface ICompiler
     {
-        Script Compile(string source);
+        Script Compile(string path);
     }
 }
