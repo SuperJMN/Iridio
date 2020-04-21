@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleScript.Tests", "Simpl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{208B63F8-DEB5-4F91-B823-DB00994AEB10}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zafiro.Core", "Zafiro\Source\Zafiro.Core\Zafiro.Core.csproj", "{DD798434-CAE6-411C-9005-9F6270EE876E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{6C0F0F0C-2373-49D3-BD6A-79F3EFE3B2D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C0F0F0C-2373-49D3-BD6A-79F3EFE3B2D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C0F0F0C-2373-49D3-BD6A-79F3EFE3B2D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD798434-CAE6-411C-9005-9F6270EE876E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD798434-CAE6-411C-9005-9F6270EE876E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD798434-CAE6-411C-9005-9F6270EE876E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD798434-CAE6-411C-9005-9F6270EE876E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

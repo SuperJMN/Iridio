@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleScript\SimpleScript.csproj" />
+    <ProjectReference Include="..\Zafiro\Source\Zafiro.Core\Zafiro.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
