@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using SimpleScript.Ast.Model;
 using Zafiro.Core.FileSystem;
@@ -41,11 +42,18 @@ namespace SimpleScript
 
             using (new DirectorySwitch(fileSystem, Path.GetDirectoryName(path)))
             {
-                var fromChildren = syntax.Statements
-                    .OfType<ScriptCallStatement>()
-                    .SelectMany(statement => GetStatements(statement.Path));
-                return syntax.Statements.Select(d => d).Concat(fromChildren.ToList());
+                return syntax.Statements.SelectMany(Deflate).ToList();
             }
+        }
+
+        private IEnumerable<Statement> Deflate(Statement statement)
+        {
+            if (statement is ScriptCallStatement e)
+            {
+                return GetStatements(e.Path);
+            }
+
+            return new[] { statement };
         }
     }
 }
