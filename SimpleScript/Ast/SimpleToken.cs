@@ -6,7 +6,6 @@ namespace SimpleScript.Ast
         Equal,
         Number,
         Semicolon,
-        Value,
         Identifier,
         Echo,
         Text,
@@ -15,6 +14,15 @@ namespace SimpleScript.Ast
         Exclamation,
         Colon,
         OpenBracket,
-        CloseBracket
+        CloseBracket,
+        CloseBrace,
+        OpenBrace,
+        EqualEqual,
+        Greater,
+        Less,
+        GreaterOrEqual,
+        LessOrEqual,
+        If,
+        Else
     }
 }

@@ -5,7 +5,7 @@ using Superpower.Parsers;
 
 namespace SimpleScript.Ast
 {
-    public class SimpleParser
+    public class EnhancedParsers
     {
         private static readonly TokenListParser<SimpleToken, string> Identifier = Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
 
@@ -22,7 +22,7 @@ namespace SimpleScript.Ast
             (from id in Identifier
                 from colon in Token.EqualTo(SimpleToken.Colon)
                 from text in Identifier
-                select new {id, text})
+                select new { id, text })
             .Between(Token.EqualTo(SimpleToken.OpenBracket), Token.EqualTo(SimpleToken.CloseBracket))
             .Select(arg => new Declaration(arg.id, arg.text));
 
@@ -37,11 +37,38 @@ namespace SimpleScript.Ast
             from parameters in Parameters
             select (Expression)new CallExpression(funcName, parameters);
 
+        private static readonly TokenListParser<SimpleToken, Statement[]>
+            Else = from keyworkd in Token.EqualTo(SimpleToken.Else)
+                from statement in Block
+                select statement;
+
+        private static readonly TokenListParser<SimpleToken, BooleanOperator> BooleanOperators =
+            Token.EqualTo(SimpleToken.EqualEqual)
+                .Or(Token.EqualTo(SimpleToken.Greater))
+                .Or(Token.EqualTo(SimpleToken.Less))
+                .Or(Token.EqualTo(SimpleToken.LessOrEqual))
+                .Or(Token.EqualTo(SimpleToken.GreaterOrEqual))
+                .Select(token => new BooleanOperator(token.ToStringValue()));
+
+        private static readonly TokenListParser<SimpleToken, Condition> Condition =
+            (from left in Parse.Ref(() => Expression)
+                from op in BooleanOperators
+                from right in Expression
+             select new Condition(left, op, right))
+            .Between(Token.EqualTo(SimpleToken.OpenParen), Token.EqualTo(SimpleToken.CloseParent));
+
+        public static readonly TokenListParser<SimpleToken, Statement> IfStatement = 
+            from keyword in Token.EqualTo(SimpleToken.If)
+            from cond in Condition
+            from ifStatements in Block
+            from elseStatement in Else.OptionalOrDefault()
+            select (Statement)new IfStatement(cond, ifStatements, elseStatement);
+
         public static readonly TokenListParser<SimpleToken, Statement>
             CallSentence = from expression in Parse.Ref(() => Expression)
-                select (Statement) new CallStatement(expression);
+                select (Statement)new CallStatement(expression);
 
-        public static readonly TokenListParser<SimpleToken, Statement> AssignmentSentence = 
+        public static readonly TokenListParser<SimpleToken, Statement> AssignmentSentence =
             from identifier in Identifier
             from eq in Token.EqualTo(SimpleToken.Equal)
             from expr in Expression
@@ -54,18 +81,28 @@ namespace SimpleScript.Ast
 
         public static readonly TokenListParser<SimpleToken, Expression> Expression = CallExpression.Try().Or(NumberParameter).Or(TextParameter).Or(IdentifierParameter);
 
-        private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo).Apply(ExtraParsers.SpanBetween('<', '>')).Select(span => (Statement)new EchoStatement(span.ToStringValue()) );
+        private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo).Apply(ExtraParsers.SpanBetween('<', '>')).Select(span => (Statement)new EchoStatement(span.ToStringValue()));
 
-        public static readonly TokenListParser<SimpleToken, Statement> Sentence = from s in AssignmentSentence.Try().Or(CallSentence).Try().Or(ScriptCallSentence)
+        public static readonly TokenListParser<SimpleToken, Statement> SingleSentence =
+            from s in AssignmentSentence.Try().Or(CallSentence).Try().Or(ScriptCallSentence)
             from semicolon in Token.EqualTo(SimpleToken.Semicolon)
             select s;
 
+        public static readonly TokenListParser<SimpleToken, Statement> Sentence = SingleSentence.Try().Or(IfStatement);
+
         public static readonly TokenListParser<SimpleToken, Statement> Statement = Sentence.Try().Or(EchoSentence);
 
-        public static TokenListParser<SimpleToken, ScriptSyntax> SimpleScript =>
+        public static readonly TokenListParser<SimpleToken, Statement[]> Block = 
+            Statement.Many().Between(Token.EqualTo(SimpleToken.OpenBrace), Token.EqualTo(SimpleToken.CloseBrace));
+
+        public static TokenListParser<SimpleToken, Function> Function => from i in Identifier
+            from statements in Block
+            select new Function(i, statements);
+
+        public static TokenListParser<SimpleToken, EnhancedScript> Parser =>
             (from header in Header.Try().OptionalOrDefault()
-                from statements in Statement.Many()
-                select new ScriptSyntax(header ?? new Header(Enumerable.Empty<Declaration>()), statements))
+                from functions in Function.Many()
+                select new EnhancedScript(header ?? new Header(Enumerable.Empty<Declaration>()), functions))
             .AtEnd();
     }
 }

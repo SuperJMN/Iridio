@@ -5,8 +5,6 @@ namespace SimpleScript.Tests
 {
     public class TokenizationTests
     {
-        private readonly ParserTests parserTests = new ParserTests();
-
         [Fact]
         public void Test2()
         {

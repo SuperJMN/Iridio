@@ -1,9 +1,44 @@
+using System.Collections.Generic;
+using System.IO;
+using FluentAssertions;
 using SimpleScript.Ast;
 using Superpower;
 using Xunit;
 
 namespace SimpleScript.Tests
 {
+    public class EnhancedParserTests
+    {
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public void Verify(string input, string expected)
+        {
+            var sut = new EnhancedParser();
+            var parse = sut.Parse(input);
+            var result = parse
+                .MapSuccess(script => script.ToString())
+                .Handle(error => error.Message);
+
+            result.Should().Be(expected);
+        }
+
+        public static IEnumerable<object[]> TestData()
+        {
+            yield return new object[]
+            {
+                File.ReadAllText("TestData\\Inputs\\TextFile1.txt"),
+                File.ReadAllText("TestData\\Expectations\\TextFile1.txt")
+            };
+
+            yield return new object[]
+            {
+                File.ReadAllText("TestData\\Inputs\\TextFile2.txt"),
+                File.ReadAllText("TestData\\Expectations\\TextFile2.txt")
+            };
+
+        }
+    }
+
     public class ParserTests
     {
         [Fact]
