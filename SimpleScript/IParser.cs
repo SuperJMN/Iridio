@@ -1,4 +1,4 @@
-﻿using SimpleScript.Ast.Model;
+﻿using SimpleScript.Parsing.Model;
 
 namespace SimpleScript
 {

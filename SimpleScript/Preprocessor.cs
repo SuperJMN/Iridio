@@ -37,9 +37,4 @@ namespace SimpleScript
             return line;
         }
     }
-
-    public interface IPreprocessor
-    {
-        string Process(string input);
-    }
 }

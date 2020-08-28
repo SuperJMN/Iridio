@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using SimpleScript.Parsing.Model;
 using Xunit;
 
 namespace SimpleScript.Tests

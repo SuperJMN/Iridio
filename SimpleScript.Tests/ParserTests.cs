@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
-using SimpleScript.Ast;
+using SimpleScript.Parsing;
+using SimpleScript.Tokenization;
 using Superpower;
 using Xunit;
 

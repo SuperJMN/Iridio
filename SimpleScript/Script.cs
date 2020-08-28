@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SimpleScript.Ast.Model;
+using SimpleScript.Parsing.Model;
 
 namespace SimpleScript
 {

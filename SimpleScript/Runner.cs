@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using SimpleScript.Ast.Model;
+using SimpleScript.Parsing.Model;
 
 namespace SimpleScript
 {
