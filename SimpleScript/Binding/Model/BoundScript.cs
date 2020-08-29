@@ -1,6 +1,14 @@
-﻿namespace SimpleScript.Binding
+﻿using System.Collections.Generic;
+
+namespace SimpleScript.Binding.Model
 {
-    internal class BoundScript
+    public class BoundScript
     {
+        public IEnumerable<BoundFunction> Functions { get; }
+
+        public BoundScript(IEnumerable<BoundFunction> functions)
+        {
+            Functions = functions;
+        }
     }
 }

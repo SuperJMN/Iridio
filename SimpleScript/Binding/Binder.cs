@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using Optional;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Optional.Collections;
-using Optional.Unsafe;
+using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
 using Zafiro.Core.Patterns;
-using Expression = SimpleScript.Parsing.Model.Expression;
 
 namespace SimpleScript.Binding
 {
@@ -14,14 +14,14 @@ namespace SimpleScript.Binding
 
         public Binder(BindingContext context)
         {
-            this.context = context;
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        Either<ErrorList, BoundScript> Bind(EnhancedScript script)
+        public Either<ErrorList, BoundScript> Bind(EnhancedScript script)
         {
             var funcs = script.Functions.Select(Bind);
 
-            return new BoundScript();
+            return Either.Combine(funcs, functions => (Either<ErrorList, BoundScript>) new BoundScript(functions));
         }
 
         private Either<ErrorList, BoundFunction> Bind(Function func)
@@ -32,9 +32,9 @@ namespace SimpleScript.Binding
                         Either.Success<ErrorList, Function>(func),
                     () => Either.Error<ErrorList, Function>(new ErrorList($"Cannot find function '{func}'")));
 
-            var instructions = func.Statements.Select(i => Bind(i));
+            var instructions = func.Statements.Select(Bind);
 
-            return Either.Summarize(function, (Either<ErrorList, int>)1, (boundFunction, i) => (Either<ErrorList, BoundFunction>)new BoundFunction(func));
+            return Either.Combine(function, Either.Combine(instructions, Either.Success<ErrorList, IEnumerable<BoundStatement>>), (boundFunction, i) => (Either<ErrorList, BoundFunction>)new BoundFunction(func, Either.Combine(instructions, Either.Success<ErrorList, IEnumerable<BoundStatement>>)), MergeErrors);
         }
 
         private Either<ErrorList, BoundStatement> Bind(Statement statement)
@@ -57,7 +57,7 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(AssignmentStatement assignmentStatement)
         {
             return Either
-                .Summarize(Bind(assignmentStatement.Expression), (Either<ErrorList, string>) assignmentStatement.Variable, (expression, variable) => (Either<ErrorList, BoundStatement>)new BoundAssignmentStatement(variable, expression));
+                .Combine(Bind(assignmentStatement.Expression), (Either<ErrorList, string>) assignmentStatement.Variable, (expression, variable) => (Either<ErrorList, BoundStatement>)new BoundAssignmentStatement(variable, expression), MergeErrors);
         }
 
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
@@ -78,7 +78,12 @@ namespace SimpleScript.Binding
             var op = condition.Op;
             var right = Bind(condition.Right);
 
-            return Either.Summarize(left, right, (a, b) => (Either<ErrorList, BoundCondition>) new BoundCondition(a, op, b));
+            return Either.Combine<ErrorList, BoundExpression, BoundExpression, BoundCondition>(left, right, (a, b) => new BoundCondition(a, op, b), MergeErrors);
+        }
+
+        private static ErrorList MergeErrors(ErrorList list, ErrorList errorList)
+        {
+            return new ErrorList(list.Concat(errorList));
         }
 
         private Either<ErrorList, BoundExpression> Bind(Expression expression)
@@ -139,7 +144,7 @@ namespace SimpleScript.Binding
     {
     }
 
-    internal class BoundStatement
+    public class BoundStatement
     {
     }
 }
