@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData.Kernel;
+using MoreLinq.Extensions;
 using Optional.Collections;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
@@ -11,6 +13,32 @@ namespace SimpleScript.Binding
     public class Binder
     {
         private readonly BindingContext context;
+
+        /// <summary>
+        /// Delete this
+        /// </summary>
+        /// <typeparam name="TLeft"></typeparam>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="eithers"></param>
+        /// <param name="combineError"></param>
+        /// <returns></returns>
+        public static Either<TLeft, IEnumerable<TResult>> Combine<TLeft, TResult>(IEnumerable<Either<TLeft, TResult>> eithers, Func<TLeft, TLeft, TLeft> combineError)
+        {
+            var errors = eithers.Partition(x => x.IsRight);
+
+            if (errors.False.Any())
+            {
+                var aggregate = errors.False
+                    .SelectMany(either => either.LeftValue.ToEnumerable())
+                    .Aggregate(combineError);
+
+                return Either.Error<TLeft, IEnumerable<TResult>>(aggregate);
+            }
+
+            var p = errors.True.SelectMany(either => either.RightValue.ToEnumerable());
+            return Either.Success<TLeft, IEnumerable<TResult>>(p);
+        }
 
         public Binder(BindingContext context)
         {
@@ -26,15 +54,11 @@ namespace SimpleScript.Binding
 
         private Either<ErrorList, BoundFunction> Bind(Function func)
         {
-            var function = context.Functions
-                .FirstOrNone(f => f.Name == func.Name)
-                .Match(f =>
-                        Either.Success<ErrorList, Function>(func),
-                    () => Either.Error<ErrorList, Function>(new ErrorList($"Cannot find function '{func}'")));
-
-            var instructions = func.Statements.Select(Bind);
-
-            return Either.Combine(function, Either.Combine(instructions, Either.Success<ErrorList, IEnumerable<BoundStatement>>), (boundFunction, i) => (Either<ErrorList, BoundFunction>)new BoundFunction(func, Either.Combine(instructions, Either.Success<ErrorList, IEnumerable<BoundStatement>>)), MergeErrors);
+            var statementsEither = Combine(func.Statements.Select(Bind), MergeErrors);
+            var either = Either.Combine<ErrorList, string, IEnumerable<BoundStatement>, BoundFunction>(
+                Either.Success<ErrorList, string>(func.Name), statementsEither,
+                (name, statements) => new BoundFunction(name, new BoundBlock(statements)), MergeErrors);
+            return either;
         }
 
         private Either<ErrorList, BoundStatement> Bind(Statement statement)
@@ -68,8 +92,17 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)
         {
             var cond = Bind(ifStatement.Cond);
+            var trueStatements = Bind(ifStatement.IfStatements);
+            var falseStatements = Bind(ifStatement.ElseStatements);
 
-            return new BoundIfStatement();
+            return Either.Combine(cond, trueStatements, falseStatements,
+                (condition, ts, fs) => (Either<ErrorList, BoundStatement>)new BoundIfStatement(condition, new BoundBlock(ts), new BoundBlock(fs)),
+                MergeErrors);
+        }
+
+        private Either<ErrorList, IEnumerable<BoundStatement>> Bind(Statement[] statements)
+        {
+            return Combine(statements.Select(Bind), MergeErrors);
         }
 
         private Either<ErrorList, BoundCondition> Bind(Condition condition)
@@ -108,43 +141,5 @@ namespace SimpleScript.Binding
         {
             return new BoundEchoStatement(echoStatement.Message);
         }
-    }
-
-    internal class BoundAssignmentStatement : BoundStatement
-    {
-        public string Variable { get; }
-        public BoundExpression Expression { get; }
-
-        public BoundAssignmentStatement(string variable, BoundExpression expression)
-        {
-            Variable = variable;
-            Expression = expression;
-        }
-    }
-
-    internal class BoundExpression
-    {
-    }
-
-    internal class BoundCondition : BoundStatement
-    {
-        public BoundExpression Left { get; }
-        public BooleanOperator Op { get; }
-        public BoundExpression Right { get; }
-
-        public BoundCondition(BoundExpression left, BooleanOperator op, BoundExpression right)
-        {
-            Left = left;
-            Op = op;
-            Right = right;
-        }
-    }
-
-    internal class BoundIfStatement : BoundStatement
-    {
-    }
-
-    public class BoundStatement
-    {
     }
 }

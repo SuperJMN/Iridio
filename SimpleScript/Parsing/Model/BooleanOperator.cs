@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    internal class BooleanOperator
+    public class BooleanOperator
     {
         public string Op { get; }
 

@@ -1,30 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using FluentAssertions;
 using SimpleScript.Binding;
 using Xunit;
+using Xunit.Abstractions;
+using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Tests
 {
     public class BinderTests
     {
-        [Fact]
-        public void Test()
+        private readonly ITestOutputHelper testOutputHelper;
+
+        public BinderTests(ITestOutputHelper testOutputHelper)
+        {
+            this.testOutputHelper = testOutputHelper;
+        }
+
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Test(string input, string expected)
         {
             var sut = new Binder(new BindingContext(new List<IFunction>()));
             var parser = new EnhancedParser();
-            var result = 
-                parser.Parse("Main { }")
+
+            var result = parser
+                .Parse(input)
+                .MapError(pr => new ErrorList(pr.Message)).MapSuccess(enhancedScript => sut.Bind(enhancedScript))
                 .MapSuccess(script =>
                 {
-                    return sut.Bind(script).MapError(list => list)
-                        .MapSuccess(boundScript => boundScript.ToString())
-                        .Handle(s => string.Join(",", s));
+                    var visitor = new StringifyVisitor();
+                    script.Accept(visitor);
+                    return visitor.ToString();
                 })
-                .MapError(error => "Parse error")
-                .Handle(s => "");
+                .Handle(Flatten);
+                
+            testOutputHelper.WriteLine(result);
+            testOutputHelper.WriteLine("_________________");
+            testOutputHelper.WriteLine(expected);
 
-            var expected = "something";
             result.Should().Be(expected);
+        }
+
+        public static IEnumerable<object[]> Data()
+        {
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File3.txt"), File.ReadAllText("TestData\\Expectations\\File3.txt") };
+        }
+
+        private string Flatten(ErrorList list)
+        {
+            return string.Join(",", list);
         }
     }
 }

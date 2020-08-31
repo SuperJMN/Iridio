@@ -1,16 +1,28 @@
-﻿using System.Collections.Generic;
-using SimpleScript.Parsing.Model;
+﻿using System;
 using Zafiro.Core.Patterns;
 
-namespace SimpleScript.Binding
+namespace SimpleScript.Binding.Model
 {
-    public class BoundFunction
+    public class BoundFunction : IBoundNode
     {
-        public Function Func { get; }
+        public string Name { get; }
+        public BoundBlock Block { get; }
 
-        public BoundFunction(Function func, Either<ErrorList, IEnumerable<BoundStatement>> either)
+        public BoundFunction(string name, BoundBlock block)
         {
-            Func = func;
+            Name = name;
+            Block = block;
+        }
+
+        public override string ToString()
+        {
+            var statements = string.Join(Environment.NewLine, Block);
+            return $"{Name}\r\n{{\r\n{statements}\r\n}}";
+        }
+
+        public void Accept(IBoundNodeVisitor visitor)
+        {
+            visitor.Visit(this);   
         }
     }
 }

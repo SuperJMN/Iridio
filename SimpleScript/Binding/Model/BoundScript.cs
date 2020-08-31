@@ -2,7 +2,7 @@
 
 namespace SimpleScript.Binding.Model
 {
-    public class BoundScript
+    public class BoundScript : IBoundNode
     {
         public IEnumerable<BoundFunction> Functions { get; }
 
@@ -10,5 +10,20 @@ namespace SimpleScript.Binding.Model
         {
             Functions = functions;
         }
+
+        public override string ToString()
+        {
+            return string.Join("\n", Functions);
+        }
+
+        public void Accept(IBoundNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+
+    public interface IBoundNode
+    {
+        void Accept(IBoundNodeVisitor visitor);
     }
 }
