@@ -126,6 +126,7 @@ namespace SimpleScript.Binding
                 case CallExpression callExpression:
                     break;
                 case IdentifierExpression identifierExpression:
+                    return new BoundIdentifier(identifierExpression.Identifier);
                     break;
                 case NumericExpression constant:
                     return new BoundNumericExpression(constant.Number);
@@ -140,6 +141,21 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)
         {
             return new BoundEchoStatement(echoStatement.Message);
+        }
+    }
+
+    public class BoundIdentifier : BoundExpression
+    {
+        public string Identifier { get; }
+
+        public BoundIdentifier(string identifier)
+        {
+            Identifier = identifier;
+        }
+
+        public override void Accept(IBoundNodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

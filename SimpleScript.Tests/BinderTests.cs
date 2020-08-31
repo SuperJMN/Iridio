@@ -45,7 +45,10 @@ namespace SimpleScript.Tests
 
         public static IEnumerable<object[]> Data()
         {
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File1.txt"), File.ReadAllText("TestData\\Expectations\\File1.txt") };
             yield return new object[] { File.ReadAllText("TestData\\Inputs\\File3.txt"), File.ReadAllText("TestData\\Expectations\\File3.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File4.txt"), File.ReadAllText("TestData\\Expectations\\File4.txt") };
+
         }
 
         private string Flatten(ErrorList list)

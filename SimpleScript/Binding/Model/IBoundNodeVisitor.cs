@@ -12,5 +12,6 @@
         void Visit(BoundNumericExpression numericExpression);
         void Visit(BoundCallExpression callExpression);
         void Visit(BoundCallStatement boundScript);
+        void Visit(BoundIdentifier boundIdentifier);
     }
 }

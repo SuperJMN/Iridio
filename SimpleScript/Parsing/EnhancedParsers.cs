@@ -63,7 +63,7 @@ namespace SimpleScript.Parsing
             from cond in Condition
             from ifStatements in Block
             from elseStatement in Else.OptionalOrDefault()
-            select (Statement)new IfStatement(cond, ifStatements, elseStatement);
+            select (Statement)new IfStatement(cond, ifStatements, elseStatement ?? new Statement[0]);
 
         public static readonly TokenListParser<SimpleToken, Statement>
             CallSentence = from expression in Parse.Ref(() => Expression)

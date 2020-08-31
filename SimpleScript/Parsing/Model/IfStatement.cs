@@ -1,3 +1,5 @@
+using System;
+
 namespace SimpleScript.Parsing.Model
 {
     internal class IfStatement : Statement
@@ -8,9 +10,9 @@ namespace SimpleScript.Parsing.Model
 
         public IfStatement(Condition cond, Statement[] ifStatements, Statement[] elseStatements)
         {
-            Cond = cond;
-            IfStatements = ifStatements;
-            ElseStatements = elseStatements;
+            Cond = cond ?? throw new ArgumentNullException(nameof(cond));
+            IfStatements = ifStatements ?? throw new ArgumentNullException(nameof(ifStatements));
+            ElseStatements = elseStatements ?? throw new ArgumentNullException(nameof(elseStatements));
         }
     }
 }
