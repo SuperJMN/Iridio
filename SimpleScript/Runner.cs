@@ -53,7 +53,7 @@ namespace SimpleScript
 
         private Task<object> Evaluate(CallStatement call)
         {
-            return Evaluate(call.Expression);
+            return Evaluate(call.Call);
         }
 
         private async Task<object> Evaluate(CallExpression callExpression)

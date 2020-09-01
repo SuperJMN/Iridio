@@ -1,4 +1,6 @@
-﻿namespace SimpleScript.Binding.Model
+﻿using SimpleScript.Parsing.Model;
+
+namespace SimpleScript.Binding.Model
 {
     public interface IBoundNodeVisitor
     {
@@ -11,7 +13,8 @@
         void Visit(BoundBlock block);
         void Visit(BoundNumericExpression numericExpression);
         void Visit(BoundCallExpression callExpression);
-        void Visit(BoundCallStatement boundScript);
+        void Visit(BoundCallStatement call);
         void Visit(BoundIdentifier boundIdentifier);
+        void Visit(BoundStringExpression identifier);
     }
 }

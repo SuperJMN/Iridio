@@ -1,4 +1,5 @@
-﻿using SimpleScript.Parsing.Model;
+﻿using Optional;
+using SimpleScript.Parsing.Model;
 
 namespace SimpleScript.Binding.Model
 {
@@ -6,9 +7,9 @@ namespace SimpleScript.Binding.Model
     {
         public BoundCondition Condition { get; }
         public BoundBlock TrueBlock { get; }
-        public BoundBlock FalseBlock { get; }
+        public Option<BoundBlock> FalseBlock { get; }
 
-        public BoundIfStatement(BoundCondition condition, BoundBlock trueBlock, BoundBlock falseBlock)
+        public BoundIfStatement(BoundCondition condition, BoundBlock trueBlock, Option<BoundBlock> falseBlock)
         {
             Condition = condition;
             TrueBlock = trueBlock;

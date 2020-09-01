@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DynamicData.Kernel;
-using MoreLinq.Extensions;
-using Optional.Collections;
+using System.Reactive.Linq;
+using Optional;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
 using Zafiro.Core.Patterns;
@@ -13,32 +12,7 @@ namespace SimpleScript.Binding
     public class Binder
     {
         private readonly BindingContext context;
-
-        /// <summary>
-        /// Delete this
-        /// </summary>
-        /// <typeparam name="TLeft"></typeparam>
-        /// <typeparam name="T1"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="eithers"></param>
-        /// <param name="combineError"></param>
-        /// <returns></returns>
-        public static Either<TLeft, IEnumerable<TResult>> Combine<TLeft, TResult>(IEnumerable<Either<TLeft, TResult>> eithers, Func<TLeft, TLeft, TLeft> combineError)
-        {
-            var errors = eithers.Partition(x => x.IsRight);
-
-            if (errors.False.Any())
-            {
-                var aggregate = errors.False
-                    .SelectMany(either => either.LeftValue.ToEnumerable())
-                    .Aggregate(combineError);
-
-                return Either.Error<TLeft, IEnumerable<TResult>>(aggregate);
-            }
-
-            var p = errors.True.SelectMany(either => either.RightValue.ToEnumerable());
-            return Either.Success<TLeft, IEnumerable<TResult>>(p);
-        }
+        private readonly IDictionary<string, BoundFunction> declaredFunctions = new Dictionary<string, BoundFunction>();
 
         public Binder(BindingContext context)
         {
@@ -47,14 +21,18 @@ namespace SimpleScript.Binding
 
         public Either<ErrorList, BoundScript> Bind(EnhancedScript script)
         {
-            var funcs = script.Functions.Select(Bind);
-
-            return Either.Combine(funcs, functions => (Either<ErrorList, BoundScript>) new BoundScript(functions));
+            var funcs = script.Functions
+                .ToObservable()
+                .Select(Bind)
+                .Do(func => func.WhenRight(bf => declaredFunctions.Add(bf.Name, bf)))
+                .ToEnumerable();
+            
+            return funcs.Combine(MergeErrors).MapSuccess(enumerable => new BoundScript(enumerable));
         }
 
         private Either<ErrorList, BoundFunction> Bind(Function func)
         {
-            var statementsEither = Combine(func.Statements.Select(Bind), MergeErrors);
+            var statementsEither = Either.Combine(func.Block.Statements.Select(Bind), MergeErrors);
             var either = Either.Combine<ErrorList, string, IEnumerable<BoundStatement>, BoundFunction>(
                 Either.Success<ErrorList, string>(func.Name), statementsEither,
                 (name, statements) => new BoundFunction(name, new BoundBlock(statements)), MergeErrors);
@@ -86,23 +64,33 @@ namespace SimpleScript.Binding
 
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
         {
-            throw new System.NotImplementedException();
+            if (declaredFunctions.TryGetValue(callStatement.Call.FuncName, out var func))
+            {
+                var eitherParameters = callStatement.Call.Parameters.Select(Bind).Combine(MergeErrors);
+
+                return eitherParameters.MapSuccess(parameters => (BoundStatement)new BoundCallStatement(func, parameters));
+            }
+
+            return new ErrorList($"Function '{callStatement.Call.FuncName}' isn't declared");
         }
 
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)
         {
             var cond = Bind(ifStatement.Cond);
             var trueStatements = Bind(ifStatement.IfStatements);
-            var falseStatements = Bind(ifStatement.ElseStatements);
+            var falseStatements = ifStatement.ElseStatements.Map(block => Bind(block));
 
-            return Either.Combine(cond, trueStatements, falseStatements,
-                (condition, ts, fs) => (Either<ErrorList, BoundStatement>)new BoundIfStatement(condition, new BoundBlock(ts), new BoundBlock(fs)),
-                MergeErrors);
+            return falseStatements.Match(f => Either.Combine(cond, trueStatements, f,
+                (condition, ts, fs) => (Either<ErrorList, BoundStatement>) new BoundIfStatement(condition, ts, fs.Some()),
+                MergeErrors), () => Either.Combine(cond, trueStatements,
+                (condition, ts) => (Either<ErrorList, BoundStatement>)new BoundIfStatement(condition, ts, Option.None<BoundBlock>()),
+                MergeErrors));
         }
 
-        private Either<ErrorList, IEnumerable<BoundStatement>> Bind(Statement[] statements)
+        private Either<ErrorList, BoundBlock> Bind(Block block)
         {
-            return Combine(statements.Select(Bind), MergeErrors);
+            var stataments = block.Statements.Select(Bind).Combine(MergeErrors);
+            return stataments.MapSuccess(statements => new BoundBlock(statements));
         }
 
         private Either<ErrorList, BoundCondition> Bind(Condition condition)
@@ -124,38 +112,29 @@ namespace SimpleScript.Binding
             switch (expression)
             {
                 case CallExpression callExpression:
-                    break;
+                    return Bind(callExpression);
                 case IdentifierExpression identifierExpression:
                     return new BoundIdentifier(identifierExpression.Identifier);
-                    break;
                 case NumericExpression constant:
                     return new BoundNumericExpression(constant.Number);
                 case StringExpression stringExpression:
-                    break;
-
+                    return new BoundStringExpression(stringExpression.String);
             }
 
-            return new ErrorList($"Expression {expression} cannot be bound");
+            return new ErrorList($"Expression '{expression}' could not be bound");
+        }
+
+        private Either<ErrorList, BoundExpression> Bind(CallExpression callExpression)
+        {
+            Func<ErrorList, ErrorList, ErrorList> combineError = MergeErrors;
+            var parameters = Either.Combine(callExpression.Parameters.Select(Bind), combineError);
+            return Either.Combine((Either<ErrorList, string>)callExpression.FuncName, parameters,
+                (name, p) => (Either<ErrorList, BoundExpression>)new BoundCallExpression(callExpression.FuncName, p), MergeErrors);
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)
         {
             return new BoundEchoStatement(echoStatement.Message);
-        }
-    }
-
-    public class BoundIdentifier : BoundExpression
-    {
-        public string Identifier { get; }
-
-        public BoundIdentifier(string identifier)
-        {
-            Identifier = identifier;
-        }
-
-        public override void Accept(IBoundNodeVisitor visitor)
-        {
-            visitor.Visit(this);
         }
     }
 }

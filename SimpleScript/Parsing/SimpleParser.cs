@@ -39,8 +39,8 @@ namespace SimpleScript.Parsing
             select (Expression)new CallExpression(funcName, parameters);
 
         public static readonly TokenListParser<SimpleToken, Statement>
-            CallSentence = from expression in Parse.Ref(() => Expression)
-                select (Statement) new CallStatement(expression);
+            CallSentence = from expression in Parse.Ref(() => CallExpression)
+                select (Statement) new CallStatement((CallExpression)expression);
 
         public static readonly TokenListParser<SimpleToken, Statement> AssignmentSentence = 
             from identifier in Identifier

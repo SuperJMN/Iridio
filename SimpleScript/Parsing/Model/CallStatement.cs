@@ -2,16 +2,16 @@ namespace SimpleScript.Parsing.Model
 {
     public class CallStatement : Statement
     {
-        public Expression Expression { get; }
+        public CallExpression Call { get; }
 
-        public CallStatement(Expression expression)
+        public CallStatement(CallExpression call)
         {
-            Expression = expression;
+            Call = call;
         }
 
         public override string ToString()
         {
-            return $"Call: {Expression}";
+            return $"Call: {Call}";
         }
     }
 }

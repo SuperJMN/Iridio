@@ -2,6 +2,7 @@
 using System.Linq;
 using MoreLinq;
 using SimpleScript.Binding.Model;
+using SimpleScript.Parsing.Model;
 using SimpleScript.Zafiro;
 
 namespace SimpleScript.Binding
@@ -42,11 +43,11 @@ namespace SimpleScript.Binding
             boundScript.Condition.Accept(this);
             stringAssistant.AppendLine("");
             boundScript.TrueBlock.Accept(this);
-            if (boundScript.FalseBlock.BoundStatements.Any())
+            boundScript.FalseBlock.MatchSome(block =>
             {
                 stringAssistant.IndentedAppendLine("else");
-            }
-            boundScript.FalseBlock.Accept(this);
+                block.Accept(this);
+            });
         }
 
         public void Visit(BoundFunction function)
@@ -57,11 +58,6 @@ namespace SimpleScript.Binding
 
         public void Visit(BoundBlock block)
         {
-            if (!block.BoundStatements.Any())
-            {
-                return;
-            }
-
             stringAssistant.IndentedAppendLine("{");
             stringAssistant.IncreaseIndent();
             block.BoundStatements.ForEach(statement =>
@@ -83,14 +79,26 @@ namespace SimpleScript.Binding
             stringAssistant.Append($"Call to {callExpression}");
         }
 
-        public void Visit(BoundCallStatement boundScript)
+        public void Visit(BoundCallStatement call)
         {
-            throw new NotImplementedException();
+            stringAssistant.IndentedAppend(call.Function.Name + "(");
+            call.Parameters.ForEach(expr => expr.Accept(this));
+            stringAssistant.AppendLine(");");
         }
 
         public void Visit(BoundIdentifier boundIdentifier)
         {
             stringAssistant.Append(boundIdentifier.Identifier);
+        }
+
+        public void Visit(BoundStringExpression identifier)
+        {
+            stringAssistant.Append(identifier.String);
+        }
+
+        public void Visit(Block block)
+        {
+            throw new NotImplementedException();
         }
 
         public override string ToString()

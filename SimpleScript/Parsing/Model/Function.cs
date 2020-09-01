@@ -3,12 +3,12 @@ namespace SimpleScript.Parsing.Model
     public class Function
     {
         public string Name { get; }
-        public Statement[] Statements { get; }
+        public Block Block { get; }
 
-        public Function(string name, Statement[] statements)
+        public Function(string name, Block block)
         {
             Name = name;
-            Statements = statements;
+            Block = block;
         }
     }
 }
