@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using DynamicData.Kernel;
 using MoreLinq.Extensions;
 using Optional;
+using Optional.Collections;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
 using Zafiro.Core.Patterns;
@@ -68,7 +70,7 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
         {
             var either = Bind(callStatement.Call);
-            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
+            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCustomCallExpression) expression));
         }
 
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)
@@ -121,16 +123,18 @@ namespace SimpleScript.Binding
             return new ErrorList($"Expression '{expression}' could not be bound");
         }
 
-        private Either<ErrorList, BoundExpression> Bind(CallExpression callStatement)
+        private Either<ErrorList, BoundExpression> Bind(CallExpression call)
         {
-            if (declaredFunctions.TryGetValue(callStatement.FuncName, out var func))
-            {
-                var eitherParameters = callStatement.Parameters.Select(Bind).Combine(MergeErrors);
+            var eitherParameters = call.Parameters.Select(Bind).Combine(MergeErrors);
 
-                return eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundCallExpression(func, parameters));
+            if (declaredFunctions.TryGetValue(call.FuncName, out var func))
+            {
+                return eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundCustomCallExpression(func, parameters));
             }
 
-            return new ErrorList($"FunctionDeclaration '{callStatement.FuncName}' isn't declared");
+            return context.Functions.FirstOrNone(function => function.Name == call.FuncName)
+                .Match(function => eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
+                    () => new ErrorList($"FunctionDeclaration '{call.FuncName}' isn't declared"));
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)

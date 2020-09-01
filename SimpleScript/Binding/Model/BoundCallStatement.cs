@@ -2,9 +2,9 @@
 {
     public class BoundCallStatement : BoundStatement
     {
-        public BoundCallExpression Call { get; }
+        public BoundCustomCallExpression Call { get; }
 
-        public BoundCallStatement(BoundCallExpression call)
+        public BoundCallStatement(BoundCustomCallExpression call)
         {
             Call = call;
         }

@@ -73,9 +73,14 @@ namespace SimpleScript.Binding
             stringAssistant.Append(numericExpression.Value.ToString());
         }
 
-        public void Visit(BoundCallExpression callExpression)
+        public void Visit(BoundBuiltInFunctionCallExpression functionDeclaration)
         {
-            stringAssistant.Append($"Call to {callExpression}");
+            stringAssistant.Append($"Call to {functionDeclaration.Function.Name}");
+        }
+
+        public void Visit(BoundCustomCallExpression callExpression)
+        {
+            stringAssistant.Append($"Call to {callExpression.FunctionDeclaration.Name}");
         }
 
         public void Visit(BoundCallStatement st)
