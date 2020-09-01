@@ -4,9 +4,9 @@ namespace SimpleScript.Binding.Model
 {
     public class BoundScript : IBoundNode
     {
-        public IEnumerable<BoundFunction> Functions { get; }
+        public IEnumerable<BoundFunctionDeclaration> Functions { get; }
 
-        public BoundScript(IEnumerable<BoundFunction> functions)
+        public BoundScript(IEnumerable<BoundFunctionDeclaration> functions)
         {
             Functions = functions;
         }

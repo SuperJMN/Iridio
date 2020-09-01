@@ -4,12 +4,12 @@ namespace SimpleScript.Binding.Model
 {
     public class BoundCallExpression : BoundExpression
     {
-        public BoundFunction Function { get; }
+        public BoundFunctionDeclaration FunctionDeclaration { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundCallExpression(BoundFunction function, IEnumerable<BoundExpression> parameters)
+        public BoundCallExpression(BoundFunctionDeclaration functionDeclaration, IEnumerable<BoundExpression> parameters)
         {
-            Function = function;
+            FunctionDeclaration = functionDeclaration;
             Parameters = parameters;
         }
 

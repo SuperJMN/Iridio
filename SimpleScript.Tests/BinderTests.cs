@@ -22,7 +22,11 @@ namespace SimpleScript.Tests
         [MemberData(nameof(Data))]
         public void Test(string input, string expected)
         {
-            var sut = new Binder(new BindingContext(new List<IFunction>()));
+            var sut = new Binder(new BindingContext(new List<IFunction>()
+            {
+                new Function("Call"),
+            }));
+
             var parser = new EnhancedParser();
 
             var result = parser
@@ -48,7 +52,8 @@ namespace SimpleScript.Tests
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File1.txt"), File.ReadAllText("TestData\\Expectations\\File1.txt") };
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File3.txt"), File.ReadAllText("TestData\\Expectations\\File3.txt") };
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File4.txt"), File.ReadAllText("TestData\\Expectations\\File4.txt") };
-            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
+            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File6.txt"), File.ReadAllText("TestData\\Expectations\\File6.txt") };
         }
 
         private string Flatten(ErrorList list)

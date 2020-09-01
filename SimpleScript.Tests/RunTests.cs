@@ -21,7 +21,7 @@ namespace SimpleScript.Tests
         //[Fact]
         //public async Task Run()
         //{
-        //    IEnumerable<Function> funcs = new[] { new Function(typeof(IntTask)), new Function(typeof(StringTask)), };
+        //    IEnumerable<FunctionDeclaration> funcs = new[] { new FunctionDeclaration(typeof(IntTask)), new FunctionDeclaration(typeof(StringTask)), };
         //    var runner = new Runner(funcs);
         //    var compiler = new Compiler(new Parser(), new FileSystemOperations());
         //    var script = compiler.Compile("Root.txt");
@@ -32,6 +32,11 @@ namespace SimpleScript.Tests
 
     public class Function : IFunction
     {
+        public Function(string name)
+        {
+            Name = name;
+        }
+
         public Task<object> Invoke(object[] parameters)
         {
             throw new NotImplementedException();

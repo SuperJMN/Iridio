@@ -1,11 +1,11 @@
 namespace SimpleScript.Parsing.Model
 {
-    public class Function
+    public class FunctionDeclaration
     {
         public string Name { get; }
         public Block Block { get; }
 
-        public Function(string name, Block block)
+        public FunctionDeclaration(string name, Block block)
         {
             Name = name;
             Block = block;

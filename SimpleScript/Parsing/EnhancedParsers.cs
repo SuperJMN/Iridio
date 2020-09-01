@@ -110,10 +110,10 @@ namespace SimpleScript.Parsing
                 .Between(Token.EqualTo(SimpleToken.OpenBrace), Token.EqualTo(SimpleToken.CloseBrace))
             select new Block(statements);
 
-        public static TokenListParser<SimpleToken, Function> Function => 
+        public static TokenListParser<SimpleToken, FunctionDeclaration> Function => 
             from i in Identifier
             from block in Block
-            select new Function(i, block);
+            select new FunctionDeclaration(i, block);
 
         public static TokenListParser<SimpleToken, EnhancedScript> Parser =>
             (from header in Header.Try().OptionalOrDefault()

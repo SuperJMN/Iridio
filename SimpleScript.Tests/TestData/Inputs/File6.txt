@@ -1,0 +1,12 @@
+﻿Function 
+{
+	a = 123;
+	b = "hello";	
+}
+
+Main 
+{ 
+	c = Call("this", "and", "this", a);
+	d = "I say {a}";
+	Function();
+}

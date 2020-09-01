@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using MoreLinq.Extensions;
 using Optional;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
@@ -12,11 +13,13 @@ namespace SimpleScript.Binding
     public class Binder
     {
         private readonly BindingContext context;
-        private readonly IDictionary<string, BoundFunction> declaredFunctions = new Dictionary<string, BoundFunction>();
+        private readonly IDictionary<string, BoundFunctionDeclaration> declaredFunctions = new Dictionary<string, BoundFunctionDeclaration>();
 
         public Binder(BindingContext context)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
+
+            //RegisterFunctions(context);
         }
 
         public Either<ErrorList, BoundScript> Bind(EnhancedScript script)
@@ -30,12 +33,12 @@ namespace SimpleScript.Binding
             return funcs.Combine(MergeErrors).MapSuccess(enumerable => new BoundScript(enumerable));
         }
 
-        private Either<ErrorList, BoundFunction> Bind(Function func)
+        private Either<ErrorList, BoundFunctionDeclaration> Bind(FunctionDeclaration func)
         {
             var statementsEither = Either.Combine(func.Block.Statements.Select(Bind), MergeErrors);
-            var either = Either.Combine<ErrorList, string, IEnumerable<BoundStatement>, BoundFunction>(
+            var either = Either.Combine<ErrorList, string, IEnumerable<BoundStatement>, BoundFunctionDeclaration>(
                 Either.Success<ErrorList, string>(func.Name), statementsEither,
-                (name, statements) => new BoundFunction(name, new BoundBlock(statements)), MergeErrors);
+                (name, statements) => new BoundFunctionDeclaration(name, new BoundBlock(statements)), MergeErrors);
             return either;
         }
 
@@ -127,7 +130,7 @@ namespace SimpleScript.Binding
                 return eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundCallExpression(func, parameters));
             }
 
-            return new ErrorList($"Function '{callStatement.FuncName}' isn't declared");
+            return new ErrorList($"FunctionDeclaration '{callStatement.FuncName}' isn't declared");
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)

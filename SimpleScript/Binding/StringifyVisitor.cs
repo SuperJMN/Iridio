@@ -49,10 +49,10 @@ namespace SimpleScript.Binding
             });
         }
 
-        public void Visit(BoundFunction function)
+        public void Visit(BoundFunctionDeclaration functionDeclaration)
         {
-            stringAssistant.IndentedAppendLine(function.Name);
-            function.Block.Accept(this);
+            stringAssistant.IndentedAppendLine(functionDeclaration.Name);
+            functionDeclaration.Block.Accept(this);
         }
 
         public void Visit(BoundBlock block)
@@ -80,7 +80,7 @@ namespace SimpleScript.Binding
 
         public void Visit(BoundCallStatement st)
         {
-            stringAssistant.IndentedAppend(st.Call.Function.Name + "(");
+            stringAssistant.IndentedAppend(st.Call.FunctionDeclaration.Name + "(");
             st.Call.Parameters.ForEach(expr => expr.Accept(this));
             stringAssistant.AppendLine(");");
         }

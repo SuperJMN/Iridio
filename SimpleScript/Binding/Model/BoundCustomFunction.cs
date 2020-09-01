@@ -1,14 +1,13 @@
 ﻿using System;
-using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Binding.Model
 {
-    public class BoundFunction : IBoundNode
+    public class BoundFunctionDeclaration : IBoundNode
     {
         public string Name { get; }
         public BoundBlock Block { get; }
 
-        public BoundFunction(string name, BoundBlock block)
+        public BoundFunctionDeclaration(string name, BoundBlock block)
         {
             Name = name;
             Block = block;
