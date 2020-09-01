@@ -1,18 +1,21 @@
 ﻿using System.Collections.Generic;
-using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Binding.Model
 {
     public class BoundCallExpression : BoundExpression
     {
-        public BoundCallExpression(string name, IEnumerable<BoundExpression> parameters)
+        public BoundFunction Function { get; }
+        public IEnumerable<BoundExpression> Parameters { get; }
+
+        public BoundCallExpression(BoundFunction function, IEnumerable<BoundExpression> parameters)
         {
-            throw new System.NotImplementedException();
+            Function = function;
+            Parameters = parameters;
         }
 
         public override void Accept(IBoundNodeVisitor visitor)
         {
-            throw new System.NotImplementedException();
+            visitor.Visit(this);
         }
     }
 }

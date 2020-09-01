@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using MoreLinq;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
@@ -79,10 +78,10 @@ namespace SimpleScript.Binding
             stringAssistant.Append($"Call to {callExpression}");
         }
 
-        public void Visit(BoundCallStatement call)
+        public void Visit(BoundCallStatement st)
         {
-            stringAssistant.IndentedAppend(call.Function.Name + "(");
-            call.Parameters.ForEach(expr => expr.Accept(this));
+            stringAssistant.IndentedAppend(st.Call.Function.Name + "(");
+            st.Call.Parameters.ForEach(expr => expr.Accept(this));
             stringAssistant.AppendLine(");");
         }
 

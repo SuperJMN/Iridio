@@ -64,14 +64,8 @@ namespace SimpleScript.Binding
 
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
         {
-            if (declaredFunctions.TryGetValue(callStatement.Call.FuncName, out var func))
-            {
-                var eitherParameters = callStatement.Call.Parameters.Select(Bind).Combine(MergeErrors);
-
-                return eitherParameters.MapSuccess(parameters => (BoundStatement)new BoundCallStatement(func, parameters));
-            }
-
-            return new ErrorList($"Function '{callStatement.Call.FuncName}' isn't declared");
+            var either = Bind(callStatement.Call);
+            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
         }
 
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)
@@ -124,12 +118,16 @@ namespace SimpleScript.Binding
             return new ErrorList($"Expression '{expression}' could not be bound");
         }
 
-        private Either<ErrorList, BoundExpression> Bind(CallExpression callExpression)
+        private Either<ErrorList, BoundExpression> Bind(CallExpression callStatement)
         {
-            Func<ErrorList, ErrorList, ErrorList> combineError = MergeErrors;
-            var parameters = Either.Combine(callExpression.Parameters.Select(Bind), combineError);
-            return Either.Combine((Either<ErrorList, string>)callExpression.FuncName, parameters,
-                (name, p) => (Either<ErrorList, BoundExpression>)new BoundCallExpression(callExpression.FuncName, p), MergeErrors);
+            if (declaredFunctions.TryGetValue(callStatement.FuncName, out var func))
+            {
+                var eitherParameters = callStatement.Parameters.Select(Bind).Combine(MergeErrors);
+
+                return eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundCallExpression(func, parameters));
+            }
+
+            return new ErrorList($"Function '{callStatement.FuncName}' isn't declared");
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)

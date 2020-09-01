@@ -21,9 +21,4 @@ namespace SimpleScript.Binding.Model
             visitor.Visit(this);
         }
     }
-
-    public interface IBoundNode
-    {
-        void Accept(IBoundNodeVisitor visitor);
-    }
 }

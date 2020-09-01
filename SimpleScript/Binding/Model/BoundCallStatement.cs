@@ -1,16 +1,12 @@
-﻿using System.Collections.Generic;
-
-namespace SimpleScript.Binding.Model
+﻿namespace SimpleScript.Binding.Model
 {
     public class BoundCallStatement : BoundStatement
     {
-        public BoundFunction Function { get; }
-        public IEnumerable<BoundExpression> Parameters { get; }
+        public BoundCallExpression Call { get; }
 
-        public BoundCallStatement(BoundFunction function, IEnumerable<BoundExpression> parameters)
+        public BoundCallStatement(BoundCallExpression call)
         {
-            Function = function;
-            Parameters = parameters;
+            Call = call;
         }
 
         public override void Accept(IBoundNodeVisitor visitor)
