@@ -4,10 +4,12 @@ namespace SimpleScript.Binding.Model
 {
     public class BoundScript : IBoundNode
     {
+        public BoundFunctionDeclaration StartupFunction { get; }
         public IEnumerable<BoundFunctionDeclaration> Functions { get; }
 
-        public BoundScript(IEnumerable<BoundFunctionDeclaration> functions)
+        public BoundScript(BoundFunctionDeclaration startupFunction, IEnumerable<BoundFunctionDeclaration> functions)
         {
+            StartupFunction = startupFunction;
             Functions = functions;
         }
 
