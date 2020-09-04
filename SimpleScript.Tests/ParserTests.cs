@@ -95,7 +95,6 @@ namespace SimpleScript.Tests
 
         [Theory]
         [InlineData(@"a = 1;
-// Hola tío
 b = Call(a,b,c);
 <Section>
 Call(""C:\Windows"",1);

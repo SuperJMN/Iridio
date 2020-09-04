@@ -54,6 +54,7 @@ namespace SimpleScript.Parsing
 
         private static readonly TokenListParser<SimpleToken, BooleanOperator> BooleanOperators =
             Token.EqualTo(SimpleToken.EqualEqual)
+                .Or(Token.EqualTo(SimpleToken.NotEqual))
                 .Or(Token.EqualTo(SimpleToken.Greater))
                 .Or(Token.EqualTo(SimpleToken.Less))
                 .Or(Token.EqualTo(SimpleToken.LessOrEqual))

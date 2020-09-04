@@ -73,7 +73,7 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
         {
             var either = Bind(callStatement.Call);
-            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCustomCallExpression) expression));
+            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
         }
 
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)

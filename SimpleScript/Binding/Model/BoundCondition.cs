@@ -2,7 +2,7 @@
 
 namespace SimpleScript.Binding.Model
 {
-    public class BoundCondition : BoundStatement
+    public class BoundCondition : BoundExpression
     {
         public BoundExpression Left { get; }
         public BooleanOperator Op { get; }

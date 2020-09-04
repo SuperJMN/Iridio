@@ -2,57 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
-using FluentAssertions.Execution;
-using Optional.Unsafe;
 using SimpleScript.Binding;
 using SimpleScript.Binding.Model;
-using Xunit;
+using SimpleScript.Parsing.Model;
 using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Tests
 {
-    public class ScriptRunnerTests
-    {
-        [Fact]
-        public async Task Variable_should_be_set()
-        {
-            var execution = await VerifyExecution("Main { a=125; }");
-            execution.Variables["a"].Should().Be(125);
-        }
-
-        [Fact]
-        public async Task No_main_function_produces_error()
-        {
-            var execution = await VerifyExecution("Function { }");
-            execution.Errors.Should().Contain("Main function not defined");
-        }
-
-        [Fact]
-        public async Task Variable_set_to_function_call()
-        {
-            var execution = await VerifyExecution(@"Main { a = Suma(1, 5); }");
-            execution.Variables["a"].Should().Be(6);
-        }
-
-        private async Task<ExecutionSummary> VerifyExecution(string input)
-        {
-            var variables = new Dictionary<string, object>();
-            var sut = CreateSut();
-            var result = await sut.Run(input, variables);
-
-            return result
-                .MapSuccess(s => new ExecutionSummary(true, variables, new ErrorList(new List<string>())))
-                .Handle(errors => new ExecutionSummary(false, variables, errors)); ;
-        }
-
-        private IScriptRunner CreateSut()
-        {
-            var functions = new IFunction[] {new Function("Func1"), new LambdaFunction<int, int, int>("Suma", (a, b) => a + b),  };
-            return new ScriptRunner(functions, new EnhancedParser(), new Binder(new BindingContext(functions)));
-        }
-    }
-
     internal class ScriptRunner : IScriptRunner
     {
         private readonly IFunction[] functions;
@@ -82,14 +38,7 @@ namespace SimpleScript.Tests
                     return new Success();
                 });
 
-            if (mapSuccess.IsRight)
-            {
-                return await mapSuccess.RightValue.ValueOrFailure();
-            }
-            else
-            {
-                return mapSuccess.LeftValue.ValueOrFailure();
-            }
+            return await mapSuccess.AwaitRight();
         }
 
         private Task<Either<ErrorList, Success>> Execute(BoundScript bound)
@@ -104,7 +53,7 @@ namespace SimpleScript.Tests
 
         private async Task<Either<ErrorList, Success>> Execute(BoundBlock block)
         {
-            var asyncSelect = await block.BoundStatements.AsyncSelect(statement => Execute(statement));
+            var asyncSelect = await block.BoundStatements.AsyncSelect(Execute);
 
             var combine = Either
                 .Combine(asyncSelect, Errors.Concat)
@@ -118,16 +67,13 @@ namespace SimpleScript.Tests
             switch (statement)
             {
                 case BoundAssignmentStatement boundAssignmentStatement:
-                    await Execute(boundAssignmentStatement);
-                    break;
+                    return await Execute(boundAssignmentStatement);
                 case BoundCallStatement boundCallStatement:
-                    break;
-                case BoundCondition boundCondition:
-                    break;
+                    return await Execute(boundCallStatement);
                 case BoundEchoStatement boundEchoStatement:
                     break;
                 case BoundIfStatement boundIfStatement:
-                    break;
+                    return await Execute(boundIfStatement);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(statement));
             }
@@ -135,32 +81,151 @@ namespace SimpleScript.Tests
             return new Success();
         }
 
-        private async Task Execute(BoundAssignmentStatement boundAssignmentStatement)
+        private async Task<Either<ErrorList, Success>> Execute(BoundCallStatement boundCallStatement)
         {
-            variables[boundAssignmentStatement.Variable] = await Evaluate(boundAssignmentStatement.Expression);
+            var either = await Evaluate(boundCallStatement.Call);
+            return either.MapSuccess(o => new Success());
         }
 
-        private async Task<object> Evaluate(BoundExpression expression)
+        private async Task<Either<ErrorList, Success>> Execute(BoundIfStatement boundIfStatement)
+        {
+            var eitherComparison = await IsMet(boundIfStatement.Condition);
+
+            var result = eitherComparison.MapSuccess(async isMet =>
+            {
+                if (isMet)
+                {
+                    var executeResult = await Execute(boundIfStatement.TrueBlock);
+
+                    return executeResult;
+                }
+                else
+                {
+                    var optionalTask = boundIfStatement.FalseBlock.Map(Execute);
+                    var task = (Task<Either<ErrorList, Success>>) optionalTask.Match(t => t, () => Task.CompletedTask);
+                    return await task;
+                }
+            });
+
+            var right = await result.AwaitRight();
+
+            return right.MapSuccess(x => x.MapSuccess(success => success));
+        }
+
+        private async Task<Either<ErrorList, bool>> IsMet(BoundCondition condition)
+        {
+            var left = await Evaluate(condition.Left);
+            var right = await Evaluate(condition.Right);
+            return Either.Combine(left, right, (x, y) => Compare(x, y, condition.Op), Errors.Concat);
+        }
+
+        private Either<ErrorList, bool> Compare(object a, object b, BooleanOperator op)
+        {
+            if (a is string strA && b is string strB)
+            {
+                if (op.Op == "==")
+                {
+                    return strB.Equals(strA);
+                }
+
+                if (op.Op == "!=")
+                {
+                    return !strB.Equals(strA);
+                }
+            }
+
+            if (a is int x && b is int y)
+            {
+                if (op.Op == ">")
+                {
+                    return x > y;
+                }
+
+                if (op.Op == "<")
+                {
+                    return x < y;
+                }
+
+                if (op.Op == "==")
+                {
+                    return x == y;
+                }
+
+                if (op.Op == "!=")
+                {
+                    return x != y;
+                }
+
+                if (op.Op == ">=")
+                {
+                    return x >= y;
+                }
+
+                if (op.Op == "<=")
+                {
+                    return x <= y;
+                }
+            }
+
+            return new ErrorList($"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}");
+        }
+
+        private async Task<Either<ErrorList, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
+        {
+            var evaluation = await Evaluate(boundAssignmentStatement.Expression);
+            evaluation.WhenRight(o => variables[boundAssignmentStatement.Variable] = o);
+            return evaluation.MapSuccess(o => new Success());
+        }
+
+        private async Task<Either<ErrorList, object>> Evaluate(BoundExpression expression)
         {
             switch (expression)
             {
                 case BoundIdentifier boundIdentifier:
-                    break;
+                    return await Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
-                    var parameters = await boundBuiltInFunctionCallExpression.Parameters.AsyncSelect(Evaluate);
-                    var invoke = await boundBuiltInFunctionCallExpression.Function.Invoke(parameters.ToArray());
-                    return invoke;
+                    return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
                     return boundStringExpression.String;
                 case BoundCustomCallExpression boundCustomCallExpression:
-
-                    break;
-                
+                    return await Evaluate(boundCustomCallExpression);
                 case BoundNumericExpression boundNumericExpression:
                     return boundNumericExpression.Value;
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private async Task<Either<ErrorList, object>> Evaluate(BoundCustomCallExpression call)
+        {
+            return await Execute(call.FunctionDeclaration.Block);
+        }
+
+        private async Task<Either<ErrorList, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
+        {
+            var eitherParameters = await call.Parameters.AsyncSelect(Evaluate);
+            var eitherParameter = eitherParameters.Combine(Errors.Concat);
+
+            try
+            {
+                var mapSuccess = eitherParameter.MapSuccess(async parameters => await call.Function.Invoke(parameters.ToArray()));
+                var right = await mapSuccess.AwaitRight();
+                return right;
+            }
+            catch (Exception ex)
+            {
+                return new ErrorList($"Function failed with exception {ex.Message}");
+            }
+        }
+
+        private async Task<Either<ErrorList, object>> Evaluate(BoundIdentifier identifier)
+        {
+            if (variables.TryGetValue(identifier.Identifier, out var val))
+            {
+                return val;
+            }
+
+            return new ErrorList($"Could not find variable '{identifier.Identifier}'");
         }
     }
 }

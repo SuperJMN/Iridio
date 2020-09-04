@@ -23,6 +23,7 @@ namespace SimpleScript.Tokenization
         GreaterOrEqual,
         LessOrEqual,
         If,
-        Else
+        Else,
+        NotEqual
     }
 }

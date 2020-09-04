@@ -35,11 +35,14 @@ namespace SimpleScript.Tokenization
 
         private static TokenizerBuilder<SimpleToken> BooleanOperators(this TokenizerBuilder<SimpleToken> builder)
         {
-            builder.Match(Span.EqualTo("=="), SimpleToken.EqualEqual)
+            builder
+                .Match(Span.EqualTo("=="), SimpleToken.EqualEqual)
+                .Match(Span.EqualTo("!="), SimpleToken.NotEqual)
+                .Match(Span.EqualTo(">="), SimpleToken.GreaterOrEqual)
+                .Match(Span.EqualTo("<="), SimpleToken.LessOrEqual)
                 .Match(Character.EqualTo('>'), SimpleToken.Greater)
                 .Match(Character.EqualTo('<'), SimpleToken.Less)
-                .Match(Span.EqualTo(">="), SimpleToken.GreaterOrEqual)
-                .Match(Span.EqualTo("<="), SimpleToken.LessOrEqual);
+                ;
 
             return builder;
         }

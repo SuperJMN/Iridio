@@ -10,10 +10,10 @@ namespace SimpleScript
     {
         public Either<ParsingError, EnhancedScript> Parse(string source)
         {
-            var tokenizer = Tokenizer.Create().Tokenize(source);
+            var tokenization = Tokenizer.Create().Tokenize(source);
             try
             {
-                return EnhancedParsers.Parser.Parse(tokenizer);
+                return EnhancedParsers.Parser.Parse(tokenization);
             }
             catch (ParseException e)
             {

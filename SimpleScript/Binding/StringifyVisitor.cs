@@ -1,7 +1,5 @@
-﻿using System;
-using MoreLinq;
+﻿using MoreLinq;
 using SimpleScript.Binding.Model;
-using SimpleScript.Parsing.Model;
 using SimpleScript.Zafiro;
 
 namespace SimpleScript.Binding
@@ -85,9 +83,8 @@ namespace SimpleScript.Binding
 
         public void Visit(BoundCallStatement st)
         {
-            stringAssistant.IndentedAppend(st.Call.FunctionDeclaration.Name + "(");
-            st.Call.Parameters.ForEach(expr => expr.Accept(this));
-            stringAssistant.AppendLine(");");
+            stringAssistant.IndentedAppendLine("Call statement: ");
+            st.Call.Accept(this);
         }
 
         public void Visit(BoundIdentifier boundIdentifier)
@@ -98,11 +95,6 @@ namespace SimpleScript.Binding
         public void Visit(BoundStringExpression identifier)
         {
             stringAssistant.Append(identifier.String);
-        }
-
-        public void Visit(Block block)
-        {
-            throw new NotImplementedException();
         }
 
         public override string ToString()
