@@ -80,7 +80,7 @@ namespace SimpleScript.Tests
         public async Task Token_replacement_unset_variable()
         {
             var execution = await Execute(@"Main { greeting=""Hi {name}!""; }");
-            execution.Errors.Should().Contain("Usage*");
+            execution.Errors.Should().ContainMatch("Usage*");
         }
 
         [Theory]

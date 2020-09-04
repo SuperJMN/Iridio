@@ -35,14 +35,13 @@ namespace SimpleScript.Tests
                 .Parse(input)
                 .MapError(pr => new ErrorList(pr.Message))
                 .MapSuccess(parsed => binder.Bind(parsed)
-                    .MapSuccess(Execute))
-                .MapSuccess(async t =>
-                {
-                    var r = await t;
-                    return r;
-                });
+                    .MapSuccess(async bound =>
+                    {
+                        var execute = await Execute(bound);
+                        return execute;
+                    }));
 
-            var awaitRight = await mapSuccess.AwaitRight();
+            var awaitRight = await mapSuccess.RightTask();
             return awaitRight.MapSuccess(either => new Success());
         }
 
@@ -112,9 +111,7 @@ namespace SimpleScript.Tests
                 }
             });
 
-            var right = await result.AwaitRight();
-
-            return right.MapSuccess(x => x.MapSuccess(success => success));
+            return await result.RightTask();
         }
 
         private async Task<Either<ErrorList, bool>> IsMet(BoundCondition condition)
@@ -267,7 +264,7 @@ namespace SimpleScript.Tests
             try
             {
                 var mapSuccess = eitherParameter.MapSuccess(async parameters => await call.Function.Invoke(parameters.ToArray()));
-                var right = await mapSuccess.AwaitRight();
+                var right = await mapSuccess.RightTask();
                 return right;
             }
             catch (Exception ex)
