@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MoreLinq;
+using Optional.Collections;
 using SimpleScript.Binding;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
+using SimpleScript.Tokenization;
 using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Tests
@@ -34,11 +38,12 @@ namespace SimpleScript.Tests
                     .MapSuccess(Execute))
                 .MapSuccess(async t =>
                 {
-                    await t;
-                    return new Success();
+                    var r = await t;
+                    return r;
                 });
 
-            return await mapSuccess.AwaitRight();
+            var awaitRight = await mapSuccess.AwaitRight();
+            return awaitRight.MapSuccess(either => new Success());
         }
 
         private Task<Either<ErrorList, Success>> Execute(BoundScript bound)
@@ -186,7 +191,7 @@ namespace SimpleScript.Tests
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
                     return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
-                    return boundStringExpression.String;
+                    return await Evaluate(boundStringExpression);
                 case BoundCustomCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
                 case BoundNumericExpression boundNumericExpression:
@@ -194,6 +199,59 @@ namespace SimpleScript.Tests
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private async Task<Either<ErrorList, object>> Evaluate(BoundStringExpression boundStringExpression)
+        {
+            var undefinedVariables = GetUnsetReferences(boundStringExpression.String);
+            if (undefinedVariables.Any())
+            {
+                return new ErrorList(undefinedVariables.Select(u => $"Usage of undefined variable '{u}'" ));
+            }
+
+            return Replace(boundStringExpression.String);
+        }
+
+        private List<string> GetUnsetReferences(string str)
+        {
+            var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
+            var references = matches.Select(match => match.Groups[1].Value);
+
+            var query = from variable in references
+                let value = DictionaryExtensions.GetValueOrNone(variables, variable)
+                select new {variable, value};
+
+            return query.Where(arg => !arg.value.HasValue).Select(x => x.variable).ToList();
+        }
+
+        private Either<ErrorList, object> Replace(string str)
+        {
+            var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
+            var references = matches.Select(match => match.Groups[1].Value);
+
+            var refsAndValues = from variable in references
+                from value in DictionaryExtensions.GetValueOrNone(variables, variable).ToEnumerable()
+                select new {variable, value};
+
+            var refsAndValuesList = refsAndValues.ToList();
+
+            var pattern = string.Join("|", refsAndValuesList.Select(arg => $"{{{arg.variable}}}"));
+            if (pattern == "")
+            {
+                return str;
+            }
+
+            var regex = new Regex(pattern);
+            var valuesDict = refsAndValuesList
+                .ToDictionary(x => x.variable, x => x.value);
+            var result = regex.Replace(str, match =>
+            {
+                var skipLast = MoreLinq.MoreEnumerable.SkipLast(match.Value.Skip(1), 1);
+                var key = new string(skipLast.ToArray());
+                return valuesDict[key].ToString();
+            });
+
+            return result;
         }
 
         private async Task<Either<ErrorList, object>> Evaluate(BoundCustomCallExpression call)

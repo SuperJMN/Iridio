@@ -28,10 +28,12 @@ namespace SimpleScript.Tokenization
                 .Match(Span.EqualTo("if"), SimpleToken.If, true)
                 .Match(Span.EqualTo("else"), SimpleToken.Else, true)
                 .Match(Numerics.Integer, SimpleToken.Number)
-                .Match(Span.Regex(@"\w+[\d\w_]*"), SimpleToken.Identifier)
+                .Match(Span.Regex(IdentifierRegex), SimpleToken.Identifier)
                 .Build();
             return builder;
         }
+
+        public static string IdentifierRegex => @"[A-Za-z_]+[\dA-Za-z_]*";
 
         private static TokenizerBuilder<SimpleToken> BooleanOperators(this TokenizerBuilder<SimpleToken> builder)
         {

@@ -1,14 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SimpleScript.Binding;
 using Xunit;
+using Xunit.Abstractions;
 using Zafiro.Core.Patterns;
 
 namespace SimpleScript.Tests
 {
     public class ScriptRunnerTests
     {
+        private readonly ITestOutputHelper testOutputHelper;
+
+        public ScriptRunnerTests(ITestOutputHelper testOutputHelper)
+        {
+            this.testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public async Task Variable_should_be_set()
         {
@@ -60,6 +69,20 @@ namespace SimpleScript.Tests
             execution.Variables["b"].Should().Be(1);
         }
 
+        [Fact]
+        public async Task Token_replacement()
+        {
+            var execution = await Execute(@"Main { name=""JMN""; greeting=""Hi {name}!""; }");
+            execution.Variables["greeting"].Should().Be("Hi JMN!");
+        }
+
+        [Fact]
+        public async Task Token_replacement_unset_variable()
+        {
+            var execution = await Execute(@"Main { greeting=""Hi {name}!""; }");
+            execution.Errors.Should().Contain("Usage*");
+        }
+
         [Theory]
         [InlineData(0, 0, "==", true)]
         [InlineData(-1, 0, "<", true)]
@@ -89,9 +112,13 @@ namespace SimpleScript.Tests
             var sut = CreateSut();
             var result = await sut.Run(input, variables);
 
-            return result
+            var executionSummary = result
                 .MapSuccess(s => new ExecutionSummary(true, variables, new ErrorList(new List<string>())))
-                .Handle(errors => new ExecutionSummary(false, variables, errors)); ;
+                .Handle(errors => new ExecutionSummary(false, variables, errors));
+
+            executionSummary.Errors.ForEach(s => testOutputHelper.WriteLine(s));
+
+            return executionSummary;
         }
 
         private IScriptRunner CreateSut()
