@@ -3,6 +3,7 @@ using SimpleScript.Parsing.Model;
 using SimpleScript.Tokenization;
 using Superpower;
 using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript
 {

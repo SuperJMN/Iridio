@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
 {

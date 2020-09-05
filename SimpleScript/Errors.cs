@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript
 {

@@ -10,6 +10,7 @@ using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
 using SimpleScript.Tokenization;
 using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
 {
@@ -59,7 +60,7 @@ namespace SimpleScript.Tests
         {
             var asyncSelect = await block.BoundStatements.AsyncSelect(Execute);
 
-            var combine = Either
+            var combine = CombineExtensions
                 .Combine(asyncSelect, Errors.Concat)
                 .MapSuccess(successes => new Success());
 
@@ -110,7 +111,7 @@ namespace SimpleScript.Tests
                     return await task;
                 }
             });
-
+            
             return await result.RightTask();
         }
 
@@ -118,7 +119,7 @@ namespace SimpleScript.Tests
         {
             var left = await Evaluate(condition.Left);
             var right = await Evaluate(condition.Right);
-            return Either.Combine(left, right, (x, y) => Compare(x, y, condition.Op), Errors.Concat);
+            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), Errors.Concat);
         }
 
         private Either<ErrorList, bool> Compare(object a, object b, BooleanOperator op)
@@ -259,7 +260,7 @@ namespace SimpleScript.Tests
         private async Task<Either<ErrorList, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
         {
             var eitherParameters = await call.Parameters.AsyncSelect(Evaluate);
-            var eitherParameter = eitherParameters.Combine(Errors.Concat);
+            var eitherParameter = CombineExtensions.Combine(eitherParameters, Errors.Concat);
 
             try
             {

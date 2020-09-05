@@ -1,5 +1,5 @@
 ﻿using SimpleScript.Parsing.Model;
-using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript
 {

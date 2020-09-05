@@ -6,6 +6,7 @@ using SimpleScript.Binding;
 using Xunit;
 using Xunit.Abstractions;
 using Zafiro.Core.Patterns;
+using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
 {
