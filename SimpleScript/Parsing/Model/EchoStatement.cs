@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    internal class EchoStatement : Statement
+    public class EchoStatement : Statement
     {
         public string Message { get; }
 
@@ -12,6 +12,11 @@ namespace SimpleScript.Parsing.Model
         public override string ToString()
         {
             return $"Echo: {Message}";
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

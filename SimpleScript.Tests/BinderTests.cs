@@ -32,14 +32,9 @@ namespace SimpleScript.Tests
 
             var result = parser
                 .Parse(input)
-                .MapError(pr => new ErrorList(pr.Message)).MapSuccess(enhancedScript => sut.Bind(enhancedScript))
-                .MapSuccess(script =>
-                {
-                    var visitor = new StringifyVisitor();
-                    script.Accept(visitor);
-                    return visitor.ToString();
-                })
-                .Handle(Flatten);
+                .MapLeft(pr => new ErrorList(pr.Message)).MapRight(enhancedScript => sut.Bind(enhancedScript))
+                .MapRight(script => script.AsString())
+                .Handle(list => list.Flatten());
                 
             testOutputHelper.WriteLine(result);
             testOutputHelper.WriteLine("_________________");
@@ -59,9 +54,6 @@ namespace SimpleScript.Tests
 
         }
 
-        private string Flatten(ErrorList list)
-        {
-            return string.Join(",", list);
-        }
+       
     }
 }

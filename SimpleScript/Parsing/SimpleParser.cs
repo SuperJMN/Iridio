@@ -48,16 +48,11 @@ namespace SimpleScript.Parsing
             from expr in Expression
             select (Statement)new AssignmentStatement(identifier, expr);
 
-        public static readonly TokenListParser<SimpleToken, Statement> ScriptCallSentence =
-            from eq in Token.EqualTo(SimpleToken.Exclamation)
-            from path in Text
-            select (Statement)new ScriptCallStatement(path);
-
         public static readonly TokenListParser<SimpleToken, Expression> Expression = CallExpression.Try().Or(NumberParameter).Or(TextParameter).Or(IdentifierParameter);
 
         private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo).Apply(ExtraParsers.SpanBetween('<', '>')).Select(span => (Statement)new EchoStatement(span.ToStringValue()) );
 
-        public static readonly TokenListParser<SimpleToken, Statement> Sentence = from s in AssignmentSentence.Try().Or(CallSentence).Try().Or(ScriptCallSentence)
+        public static readonly TokenListParser<SimpleToken, Statement> Sentence = from s in AssignmentSentence.Try().Or(CallSentence).Try()
             from semicolon in Token.EqualTo(SimpleToken.Semicolon)
             select s;
 

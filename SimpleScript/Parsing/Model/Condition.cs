@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    internal class Condition
+    public class Condition : ISyntax
     {
         public Expression Left { get; }
         public BooleanOperator Op { get; }
@@ -11,6 +11,11 @@ namespace SimpleScript.Parsing.Model
             Left = left;
             Op = op;
             Right = right;
+        }
+
+        public void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

@@ -4,14 +4,19 @@ namespace SimpleScript.Parsing.Model
     {
         public NumericExpression(in int n)
         {
-            Number = n;
+            Value = n;
         }
 
-        public int Number { get; }
+        public int Value { get; }
 
         public override string ToString()
         {
-            return $"{Number}";
+            return $"{Value}";
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

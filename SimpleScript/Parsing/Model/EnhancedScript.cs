@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    public class EnhancedScript
+    public class EnhancedScript : ISyntax
     {
         public Header Header { get; }
         public FunctionDeclaration[] Functions { get; }
@@ -9,6 +9,11 @@ namespace SimpleScript.Parsing.Model
         {
             Header = header;
             Functions = functions;
+        }
+
+        public void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

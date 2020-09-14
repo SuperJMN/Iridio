@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    internal class AssignmentStatement : Statement
+    public class AssignmentStatement : Statement
     {
         public string Variable { get; }
         public Expression Expression { get; }
@@ -14,6 +14,11 @@ namespace SimpleScript.Parsing.Model
         public override string ToString()
         {
             return $"{Variable}={Expression}";
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

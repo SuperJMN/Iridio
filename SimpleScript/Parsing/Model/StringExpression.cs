@@ -13,5 +13,10 @@ namespace SimpleScript.Parsing.Model
         {
             return $@"""{String}""";
         }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

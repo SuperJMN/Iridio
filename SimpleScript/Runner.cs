@@ -59,9 +59,9 @@ namespace SimpleScript
         private async Task<object> Evaluate(CallExpression callExpression)
         {
             var parameters = await Task.WhenAll(callExpression.Parameters.Select(Evaluate));
-            if (!functionsDict.TryGetValue(callExpression.FuncName, out var func))
+            if (!functionsDict.TryGetValue(callExpression.Name, out var func))
             {
-                throw new RuntimeException($"Cannot find function {callExpression.FuncName}");
+                throw new RuntimeException($"Cannot find function {callExpression.Name}");
             }
 
             var invoke = await func.Invoke(parameters);
@@ -78,7 +78,7 @@ namespace SimpleScript
                 case StringExpression strExpr:
                     return ReplaceVariables(strExpr.String);
                 case NumericExpression numericExpr:
-                    return numericExpr.Number;
+                    return numericExpr.Value;
                 case IdentifierExpression ie:
 
                     if (!dict.TryGetValue(ie.Identifier, out var value))

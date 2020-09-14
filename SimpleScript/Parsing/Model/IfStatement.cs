@@ -3,17 +3,22 @@ using Optional;
 
 namespace SimpleScript.Parsing.Model
 {
-    internal class IfStatement : Statement
+    public class IfStatement : Statement
     {
-        public Condition Cond { get; }
-        public Block IfStatements { get; }
-        public Option<Block> ElseStatements { get; }
+        public Condition Condition { get; }
+        public Block TrueBlock { get; }
+        public Option<Block> FalseBlock { get; }
 
-        public IfStatement(Condition cond, Block ifStatements, Option<Block> elseStatements)
+        public IfStatement(Condition cond, Block trueBlock, Option<Block> falseBlock)
         {
-            Cond = cond ?? throw new ArgumentNullException(nameof(cond));
-            IfStatements = ifStatements ?? throw new ArgumentNullException(nameof(ifStatements));
-            ElseStatements = elseStatements;
+            Condition = cond ?? throw new ArgumentNullException(nameof(cond));
+            TrueBlock = trueBlock ?? throw new ArgumentNullException(nameof(trueBlock));
+            FalseBlock = falseBlock;
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

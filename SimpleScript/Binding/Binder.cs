@@ -76,14 +76,14 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundStatement> Bind(CallStatement callStatement)
         {
             var either = Bind(callStatement.Call);
-            return either.MapSuccess(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
+            return either.MapRight(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
         }
 
         private Either<ErrorList, BoundStatement> Bind(IfStatement ifStatement)
         {
-            var cond = Bind(ifStatement.Cond);
-            var trueStatements = Bind(ifStatement.IfStatements);
-            var falseStatements = ifStatement.ElseStatements.Map(block => Bind(block));
+            var cond = Bind(ifStatement.Condition);
+            var trueStatements = Bind(ifStatement.TrueBlock);
+            var falseStatements = ifStatement.FalseBlock.Map(block => Bind(block));
 
             return falseStatements.Match(f => CombineExtensions.Combine(cond, trueStatements, f,
                 (condition, ts, fs) => (Either<ErrorList, BoundStatement>) new BoundIfStatement(condition, ts, fs.Some()),
@@ -95,7 +95,7 @@ namespace SimpleScript.Binding
         private Either<ErrorList, BoundBlock> Bind(Block block)
         {
             var stataments = block.Statements.Select(Bind).Combine((list, errorList) => Errors.Concat(errorList, errorList));
-            return stataments.MapSuccess(statements => new BoundBlock(statements));
+            return stataments.MapRight(statements => new BoundBlock(statements));
         }
 
         private Either<ErrorList, BoundCondition> Bind(Condition condition)
@@ -116,7 +116,7 @@ namespace SimpleScript.Binding
                 case IdentifierExpression identifierExpression:
                     return new BoundIdentifier(identifierExpression.Identifier);
                 case NumericExpression constant:
-                    return new BoundNumericExpression(constant.Number);
+                    return new BoundNumericExpression(constant.Value);
                 case StringExpression stringExpression:
                     return new BoundStringExpression(stringExpression.String);
             }
@@ -128,14 +128,14 @@ namespace SimpleScript.Binding
         {
             var eitherParameters = call.Parameters.Select(Bind).Combine((list, errorList) => Errors.Concat(errorList, errorList));
 
-            if (declaredFunctions.TryGetValue(call.FuncName, out var func))
+            if (declaredFunctions.TryGetValue(call.Name, out var func))
             {
-                return eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundCustomCallExpression(func, parameters));
+                return eitherParameters.MapRight(parameters => (BoundExpression)new BoundCustomCallExpression(func, parameters));
             }
 
-            return context.Functions.FirstOrNone(function => function.Name == call.FuncName)
-                .Match(function => eitherParameters.MapSuccess(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
-                    () => new ErrorList($"FunctionDeclaration '{call.FuncName}' isn't declared"));
+            return context.Functions.FirstOrNone(function => function.Name == call.Name)
+                .Match(function => eitherParameters.MapRight(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
+                    () => new ErrorList($"FunctionDeclaration '{call.Name}' isn't declared"));
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)

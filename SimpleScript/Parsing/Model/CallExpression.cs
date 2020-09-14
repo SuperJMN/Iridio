@@ -4,18 +4,23 @@ namespace SimpleScript.Parsing.Model
 {
     public class CallExpression : Expression
     {
-        public string FuncName { get; }
+        public string Name { get; }
         public Expression[] Parameters { get; }
 
-        public CallExpression(string funcName, Expression[] parameters)
+        public CallExpression(string name, Expression[] parameters)
         {
-            FuncName = funcName;
+            Name = name;
             Parameters = parameters;
         }
 
         public override string ToString()
         {
-            return $"{FuncName}({string.Join(",", Parameters.Select(x => x.ToString()))})";
+            return $"{Name}({string.Join(",", Parameters.Select(x => x.ToString()))})";
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

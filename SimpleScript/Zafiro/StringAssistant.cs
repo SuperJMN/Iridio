@@ -10,14 +10,25 @@ namespace SimpleScript.Zafiro
 
         private string Indent => GetIndent(indentLevel);
 
-        public void IndentedAppend(AppendableString str)
+        public void Append(AppendableString str)
         {
             stringBuilder.Append($"{Indent}{str}");
         }
 
-        public void IndentedAppendLine(AppendableString str)
+        public void AppendLine(AppendableString str)
         {
             stringBuilder.AppendLine($"{Indent}{str}");
+        }
+
+        public void Add(AppendableString str)
+        {
+            stringBuilder.Append(str);
+        }
+
+        public void NewLineWith(AppendableString str)
+        {
+            stringBuilder.AppendLine();
+            stringBuilder.Append($"{Indent}{str}");
         }
 
         public void IncreaseIndent()
@@ -33,16 +44,6 @@ namespace SimpleScript.Zafiro
         public void DecreaseIndent()
         {
             Check(indentLevel--);
-        }
-
-        public void AppendLine(AppendableString str)
-        {
-            stringBuilder.AppendLine(str.ToString());
-        }
-
-        public void Append(string s)
-        {
-            stringBuilder.Append(s);
         }
 
         private static string GetIndent(int i)

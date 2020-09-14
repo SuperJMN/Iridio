@@ -1,6 +1,6 @@
 namespace SimpleScript.Parsing.Model
 {
-    public class FunctionDeclaration
+    public class FunctionDeclaration : ISyntax
     {
         public string Name { get; }
         public Block Block { get; }
@@ -9,6 +9,11 @@ namespace SimpleScript.Parsing.Model
         {
             Name = name;
             Block = block;
+        }
+
+        public void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

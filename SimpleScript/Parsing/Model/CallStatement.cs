@@ -13,5 +13,10 @@ namespace SimpleScript.Parsing.Model
         {
             return $"Call: {Call}";
         }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

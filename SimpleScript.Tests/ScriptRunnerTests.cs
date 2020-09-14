@@ -114,7 +114,7 @@ namespace SimpleScript.Tests
             var result = await sut.Run(input, variables);
 
             var executionSummary = result
-                .MapSuccess(s => new ExecutionSummary(true, variables, new ErrorList(new List<string>())))
+                .MapRight(s => new ExecutionSummary(true, variables, new ErrorList(new List<string>())))
                 .Handle(errors => new ExecutionSummary(false, variables, errors));
 
             executionSummary.Errors.ForEach(s => testOutputHelper.WriteLine(s));

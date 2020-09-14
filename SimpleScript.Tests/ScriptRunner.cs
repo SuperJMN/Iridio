@@ -34,16 +34,16 @@ namespace SimpleScript.Tests
 
             var mapSuccess = parser
                 .Parse(input)
-                .MapError(pr => new ErrorList(pr.Message))
-                .MapSuccess(parsed => binder.Bind(parsed)
-                    .MapSuccess(async bound =>
+                .MapLeft(pr => new ErrorList(pr.Message))
+                .MapRight(parsed => binder.Bind(parsed)
+                    .MapRight(async bound =>
                     {
                         var execute = await Execute(bound);
                         return execute;
                     }));
 
             var awaitRight = await mapSuccess.RightTask();
-            return awaitRight.MapSuccess(either => new Success());
+            return awaitRight.MapRight(either => new Success());
         }
 
         private Task<Either<ErrorList, Success>> Execute(BoundScript bound)
@@ -62,7 +62,7 @@ namespace SimpleScript.Tests
 
             var combine = CombineExtensions
                 .Combine(asyncSelect, Errors.Concat)
-                .MapSuccess(successes => new Success());
+                .MapRight(successes => new Success());
 
             return combine;
         }
@@ -89,14 +89,14 @@ namespace SimpleScript.Tests
         private async Task<Either<ErrorList, Success>> Execute(BoundCallStatement boundCallStatement)
         {
             var either = await Evaluate(boundCallStatement.Call);
-            return either.MapSuccess(o => new Success());
+            return either.MapRight(o => new Success());
         }
 
         private async Task<Either<ErrorList, Success>> Execute(BoundIfStatement boundIfStatement)
         {
             var eitherComparison = await IsMet(boundIfStatement.Condition);
 
-            var result = eitherComparison.MapSuccess(async isMet =>
+            var result = eitherComparison.MapRight(async isMet =>
             {
                 if (isMet)
                 {
@@ -177,7 +177,7 @@ namespace SimpleScript.Tests
         {
             var evaluation = await Evaluate(boundAssignmentStatement.Expression);
             evaluation.WhenRight(o => variables[boundAssignmentStatement.Variable] = o);
-            return evaluation.MapSuccess(o => new Success());
+            return evaluation.MapRight(o => new Success());
         }
 
         private async Task<Either<ErrorList, object>> Evaluate(BoundExpression expression)
@@ -264,7 +264,7 @@ namespace SimpleScript.Tests
 
             try
             {
-                var mapSuccess = eitherParameter.MapSuccess(async parameters => await call.Function.Invoke(parameters.ToArray()));
+                var mapSuccess = eitherParameter.MapRight(async parameters => await call.Function.Invoke(parameters.ToArray()));
                 var right = await mapSuccess.RightTask();
                 return right;
             }
