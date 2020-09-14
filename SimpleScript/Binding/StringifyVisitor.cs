@@ -14,91 +14,54 @@ namespace SimpleScript.Binding
 
         public void Visit(BoundScript boundScript)
         {
-            boundScript.Functions.ForEach(function => function.Accept(this));
         }
 
         public void Visit(BoundAssignmentStatement assignment)
         {
-            stringAssistant.Append((AppendableString)$"{assignment.Variable} = ");
-            assignment.Expression.Accept(this);
-            stringAssistant.Append(";");
         }
 
         public void Visit(BoundCondition boundScript)
         {
-            stringAssistant.Append("(");
-            boundScript.Left.Accept(this);
-            stringAssistant.Append(" " + boundScript.Op.Op + " ");
-            boundScript.Right.Accept(this);
-            stringAssistant.Append(")");
         }
 
         public void Visit(BoundEchoStatement echo)
         {
-            stringAssistant.AppendLine($"<{echo.Message}>");
         }
 
         public void Visit(BoundIfStatement boundScript)
         {
-            stringAssistant.Append((AppendableString)"if ");
-            boundScript.Condition.Accept(this);
-
-            boundScript.TrueBlock.Accept(this);
-            boundScript.FalseBlock.MatchSome(block =>
-            {
-                stringAssistant.NewLineWith("else");
-                block.Accept(this);
-            });
         }
 
         public void Visit(BoundFunctionDeclaration functionDeclaration)
         {
-            stringAssistant.Append(functionDeclaration.Name);
-            functionDeclaration.Block.Accept(this);
         }
 
         public void Visit(BoundBlock block)
         {
-            stringAssistant.NewLineWith("{");
-            stringAssistant.IncreaseIndent();
-            block.BoundStatements.ForEach(statement =>
-            {
-                statement.Accept(this);
-            });
-            stringAssistant.DecreaseIndent();
-            stringAssistant.AppendLine("");
-            stringAssistant.NewLineWith("}");
         }
 
         public void Visit(BoundNumericExpression numericExpression)
         {
-            stringAssistant.Append(numericExpression.Value.ToString());
         }
 
         public void Visit(BoundBuiltInFunctionCallExpression functionDeclaration)
         {
-            stringAssistant.Append($"Call to {functionDeclaration.Function.Name}");
         }
 
         public void Visit(BoundCustomCallExpression callExpression)
         {
-            stringAssistant.Append($"Call to {callExpression.FunctionDeclaration.Name}");
         }
 
         public void Visit(BoundCallStatement st)
         {
-            stringAssistant.AppendLine("Call statement: ");
-            st.Call.Accept(this);
         }
 
         public void Visit(BoundIdentifier boundIdentifier)
         {
-            stringAssistant.Append(boundIdentifier.Identifier);
         }
 
         public void Visit(BoundStringExpression identifier)
         {
-            stringAssistant.Append(identifier.String);
         }
 
         public override string ToString()
@@ -109,87 +72,96 @@ namespace SimpleScript.Binding
 
     public class SyntaxStringifyVisitor : IExpressionVisitor
     {
-        private readonly StringAssistant stringAssistant = new StringAssistant();
+        private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
         public void Visit(EnhancedScript boundScript)
         {
             boundScript.Functions.ForEach(function => function.Accept(this));
         }
 
-        public void Visit(AssignmentStatement assignment)
+        public void Visit(AssignmentStatement a)
         {
-            stringAssistant.Begin();
-            stringAssistant.
-            assignment.Expression.Accept(this);
-            stringAssistant.End(";");
+            sa.TabPrint(a.Variable + " = ");
+            a.Expression.Accept(this);
+            sa.Print(";");
         }
 
-        public void Visit(Condition boundScript)
+        public void Visit(Condition c)
         {
-            stringAssistant.Add("(");
-            boundScript.Left.Accept(this);
-            stringAssistant.Add(" " + boundScript.Op.Op + " ");
-            boundScript.Right.Accept(this);
-            stringAssistant.Add(")");
+            sa.Print("(");
+            c.Left.Accept(this);
+            sa.Print(" " + c.Op.Op + " ");
+            c.Right.Accept(this);
+            sa.Print(")");
         }
 
         public void Visit(EchoStatement echo)
         {
-            stringAssistant.AppendLine($"<{echo.Message}>");
         }
 
-        public void Visit(IfStatement boundScript)
+        public void Visit(IfStatement ifs)
         {
-           
+            sa.TabPrint("if ");
+            ifs.Condition.Accept(this);
+            ifs.TrueBlock.Accept(this);
+            ifs.FalseBlock.MatchSome(b =>
+            {
+                sa.NewLine();
+                sa.TabPrint("else");
+                sa.NewLine();
+                b.Accept(this);
+            });
         }
 
-        public void Visit(FunctionDeclaration functionDeclaration)
+        public void Visit(FunctionDeclaration fd)
         {
-            stringAssistant.Append(functionDeclaration.Name);
-            functionDeclaration.Block.Accept(this);
+            sa.Print(fd.Name);
+            fd.Block.Accept(this);
         }
 
         public void Visit(Block block)
         {
-            stringAssistant.NewLineWith("{");
-            stringAssistant.IncreaseIndent();
-            block.Statements.ForEach(statement =>
-            {
-                statement.Accept(this);
-            });
-            stringAssistant.DecreaseIndent();
-            stringAssistant.NewLineWith("}");
+            sa.NewLine();
+            sa.TabPrint("{");
+            sa.NewLine();
+
+            sa.IncreaseIndent();
+            block.Statements.ForEach(st => st.Accept(this));
+            sa.DecreaseIndent();
+
+            sa.NewLine();
+            sa.TabPrint("}");
+            sa.NewLine();
         }
 
-        public void Visit(NumericExpression numericExpression)
+        public void Visit(NumericExpression ne)
         {
-            stringAssistant.Append(numericExpression.Value.ToString());
+            sa.Print(ne.Value.ToString());
         }
 
         public void Visit(CallExpression callExpression)
         {
-            stringAssistant.Append($"Call to {callExpression.Name}");
         }
 
         public void Visit(CallStatement st)
         {
-            stringAssistant.AppendLine("Call statement: ");
-            st.Call.Accept(this);
         }
 
-        public void Visit(StringExpression identifier)
+        public void Visit(StringExpression strExpr)
         {
-            stringAssistant.Append(identifier.String);
+            sa.Print(strExpr.String);
+
         }
 
-        public void Visit(IdentifierExpression boundIdentifier)
+        public void Visit(IdentifierExpression identifier)
         {
-            stringAssistant.Append(boundIdentifier.Identifier);
+            sa.Print(identifier.Identifier);
+
         }
 
         public override string ToString()
         {
-            return stringAssistant.ToString();
+            return sa.ToString();
         }
     }
 }

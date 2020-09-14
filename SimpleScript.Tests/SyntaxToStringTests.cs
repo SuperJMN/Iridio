@@ -11,9 +11,9 @@ namespace SimpleScript.Tests
         [Fact]
         public void Block()
         {
-            var formatter = new Formatter();
-            var result = formatter.Format(CreateBlock(), 0);
-            result.Should().Be("{\r\n}");
+            var sut = new SyntaxStringifyVisitor();
+            sut.Visit(CreateBlock());
+            sut.ToString().Should().Be("{\r\n}");
         }
 
         [Fact]

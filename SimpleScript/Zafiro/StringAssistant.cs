@@ -3,33 +3,12 @@ using System.Text;
 
 namespace SimpleScript.Zafiro
 {
-    public class StringAssistant
+    public class StringAssistant : IStringAssistant
     {
         private readonly StringBuilder stringBuilder = new StringBuilder();
         private int indentLevel;
 
         private string Indent => GetIndent(indentLevel);
-
-        public void Append(AppendableString str)
-        {
-            stringBuilder.Append($"{Indent}{str}");
-        }
-
-        public void AppendLine(AppendableString str)
-        {
-            stringBuilder.AppendLine($"{Indent}{str}");
-        }
-
-        public void Add(AppendableString str)
-        {
-            stringBuilder.Append(str);
-        }
-
-        public void NewLineWith(AppendableString str)
-        {
-            stringBuilder.AppendLine();
-            stringBuilder.Append($"{Indent}{str}");
-        }
 
         public void IncreaseIndent()
         {
@@ -58,6 +37,28 @@ namespace SimpleScript.Zafiro
         public override string ToString()
         {
             return stringBuilder.ToString();
+        }
+
+        public void Print(AppendableString str)
+        {
+            stringBuilder.Append(str);
+        }
+
+        public void TabPrint(AppendableString str)
+        {
+            stringBuilder.Append($"{Indent}{str}");
+        }
+
+        public void Indentate(Action action)
+        {
+            IncreaseIndent();
+            action();
+            DecreaseIndent();
+        }
+
+        public void NewLine()
+        {
+            stringBuilder.AppendLine();
         }
     }
 }
