@@ -32,7 +32,7 @@ namespace SimpleScript.Tests
 
             var result = parser
                 .Parse(input)
-                .MapLeft(pr => new ErrorList(pr.Message)).MapRight(enhancedScript => sut.Bind(enhancedScript))
+                .MapLeft(pr => new ErrorList(ErrorKind.UnableToParse)).MapRight(enhancedScript => sut.Bind(enhancedScript))
                 .MapRight(script => script.AsString())
                 .Handle(list => list.Flatten());
                 
@@ -51,7 +51,6 @@ namespace SimpleScript.Tests
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File6.txt"), File.ReadAllText("TestData\\Expectations\\File6.txt") };
             yield return new object[] { File.ReadAllText("TestData\\Inputs\\File7.txt"), File.ReadAllText("TestData\\Expectations\\File7.txt") };
-
         }
     }
 }

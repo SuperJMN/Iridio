@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
+using MoreLinq.Extensions;
 using SimpleScript.Binding;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,7 +32,12 @@ namespace SimpleScript.Tests
         public async Task No_main_function_produces_error()
         {
             var execution = await Execute("Function { }");
-            execution.Errors.Should().Contain("Main function not defined");
+            execution.Errors.Should().ContainEquivalentOf(new Error(ErrorKind.UndefinedMainFunction), ErrorComparisonConfig());
+        }
+
+        private static Func<EquivalencyAssertionOptions<Error>, EquivalencyAssertionOptions<Error>> ErrorComparisonConfig()
+        {
+            return options => options.Excluding(error => error.AdditionalData);
         }
 
         [Fact]
@@ -81,7 +88,7 @@ namespace SimpleScript.Tests
         public async Task Token_replacement_unset_variable()
         {
             var execution = await Execute(@"Main { greeting=""Hi {name}!""; }");
-            execution.Errors.Should().ContainMatch("Usage*");
+            execution.Errors.Should().ContainEquivalentOf(new Error(ErrorKind.UndefinedVariable), ErrorComparisonConfig());
         }
 
         [Theory]
@@ -114,10 +121,10 @@ namespace SimpleScript.Tests
             var result = await sut.Run(input, variables);
 
             var executionSummary = result
-                .MapRight(s => new ExecutionSummary(true, variables, new ErrorList(new List<string>())))
+                .MapRight(s => new ExecutionSummary(true, variables, new ErrorList()))
                 .Handle(errors => new ExecutionSummary(false, variables, errors));
 
-            executionSummary.Errors.ForEach(s => testOutputHelper.WriteLine(s));
+            executionSummary.Errors.ForEach(s => testOutputHelper.WriteLine(s.ToString()));
 
             return executionSummary;
         }

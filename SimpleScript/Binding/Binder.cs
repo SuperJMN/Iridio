@@ -31,7 +31,7 @@ namespace SimpleScript.Binding
                 .ToEnumerable();
 
             var eitherMain = script.Functions.FirstOrNone(f => f.Name == "Main").Match(
-                _ => Either.Success<ErrorList, bool>(true), () => new ErrorList("Main function not defined"));
+                _ => Either.Success<ErrorList, bool>(true), () => new ErrorList(ErrorKind.UndefinedMainFunction, "Main function not defined"));
 
             var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
             return CombineExtensions.Combine(combine, eitherMain, (a, _) =>
@@ -64,7 +64,7 @@ namespace SimpleScript.Binding
                     return Bind(assignment);
             }
 
-            return new ErrorList($"Cannot bind {statement}");
+            return new ErrorList(ErrorKind.BindError, $"Cannot bind {statement}");
         }
 
         private Either<ErrorList, BoundStatement> Bind(AssignmentStatement assignmentStatement)
@@ -121,7 +121,7 @@ namespace SimpleScript.Binding
                     return new BoundStringExpression(stringExpression.String);
             }
 
-            return new ErrorList($"Expression '{expression}' could not be bound");
+            return new ErrorList(ErrorKind.BindError, $"Expression '{expression}' could not be bound");
         }
 
         private Either<ErrorList, BoundExpression> Bind(CallExpression call)
@@ -135,7 +135,7 @@ namespace SimpleScript.Binding
 
             return context.Functions.FirstOrNone(function => function.Name == call.Name)
                 .Match(function => eitherParameters.MapRight(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
-                    () => new ErrorList($"FunctionDeclaration '{call.Name}' isn't declared"));
+                    () => new ErrorList(ErrorKind.UndeclaredFunction, $"FunctionDeclaration '{call.Name}' isn't declared"));
         }
 
         private Either<ErrorList, BoundStatement> Bind(EchoStatement echoStatement)

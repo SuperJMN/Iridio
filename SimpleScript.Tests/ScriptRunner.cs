@@ -34,7 +34,7 @@ namespace SimpleScript.Tests
 
             var mapSuccess = parser
                 .Parse(input)
-                .MapLeft(pr => new ErrorList(pr.Message))
+                .MapLeft(pr => new ErrorList(ErrorKind.UnableToParse))
                 .MapRight(parsed => binder.Bind(parsed)
                     .MapRight(async bound =>
                     {
@@ -170,7 +170,7 @@ namespace SimpleScript.Tests
                 }
             }
 
-            return new ErrorList($"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}");
+            return new ErrorList(ErrorKind.TypeMismatch, $"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}");
         }
 
         private async Task<Either<ErrorList, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
@@ -204,7 +204,7 @@ namespace SimpleScript.Tests
             var undefinedVariables = GetUnsetReferences(boundStringExpression.String);
             if (undefinedVariables.Any())
             {
-                return new ErrorList(undefinedVariables.Select(u => $"Usage of undefined variable '{u}'" ));
+                return new ErrorList(undefinedVariables.Select(u => new Error(ErrorKind.UndefinedVariable, $"Usage of undefined variable '{u}'") ));
             }
 
             return Replace(boundStringExpression.String);
@@ -270,7 +270,7 @@ namespace SimpleScript.Tests
             }
             catch (Exception ex)
             {
-                return new ErrorList($"Function failed with exception {ex.Message}");
+                return new ErrorList(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}");
             }
         }
 
@@ -281,7 +281,7 @@ namespace SimpleScript.Tests
                 return val;
             }
 
-            return new ErrorList($"Could not find variable '{identifier.Identifier}'");
+            return new ErrorList(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'");
         }
     }
 }
