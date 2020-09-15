@@ -1,5 +1,5 @@
-﻿Function 
+﻿Function
 {
 	a = 123;
-	b = "hello";	
+	b = "hello";
 }

@@ -1,4 +1,4 @@
-﻿Main 
-{ 
-    Call("this", "and", "this");
+﻿Main
+{
+	Call("this", "and", "this");
 }

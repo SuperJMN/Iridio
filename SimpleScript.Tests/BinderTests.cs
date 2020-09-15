@@ -53,7 +53,5 @@ namespace SimpleScript.Tests
             yield return new object[] { File.ReadAllText("TestData\\Inputs\\File7.txt"), File.ReadAllText("TestData\\Expectations\\File7.txt") };
 
         }
-
-       
     }
 }

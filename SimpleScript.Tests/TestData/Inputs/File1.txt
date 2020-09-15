@@ -1,10 +1,10 @@
-﻿Main 
-{ 
-	if (a > b) 
+﻿Main
+{
+	if (a > b)
 	{
 		c = 123;
-	} 
-	else 
+	}
+	else
 	{
 		d = 444;
 	}
