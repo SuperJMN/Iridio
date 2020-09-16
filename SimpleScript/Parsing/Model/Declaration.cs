@@ -4,18 +4,18 @@ namespace SimpleScript.Parsing.Model
 {
     public class Declaration : ISyntax
     {
-        public string Identifier { get; }
+        public string Key { get; }
         public string Value { get; }
 
         public Declaration(string identifier, string value)
         {
-            Identifier = identifier ?? throw new ArgumentNullException(nameof(identifier));
+            Key = identifier ?? throw new ArgumentNullException(nameof(identifier));
             Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         protected bool Equals(Declaration other)
         {
-            return Identifier == other.Identifier && Value == other.Value;
+            return Key == other.Key && Value == other.Value;
         }
 
         public override bool Equals(object obj)
@@ -42,13 +42,13 @@ namespace SimpleScript.Parsing.Model
         {
             unchecked
             {
-                return (Identifier.GetHashCode() * 397) ^ Value.GetHashCode();
+                return (Key.GetHashCode() * 397) ^ Value.GetHashCode();
             }
         }
 
         public override string ToString()
         {
-            return $"{nameof(Identifier)}: {Identifier}, {nameof(Value)}: {Value}";
+            return $"{nameof(Key)}: {Key}, {nameof(Value)}: {Value}";
         }
 
         public void Accept(IExpressionVisitor visitor)

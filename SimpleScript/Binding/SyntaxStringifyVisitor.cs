@@ -11,6 +11,7 @@ namespace SimpleScript.Binding
 
         public void Visit(EnhancedScript boundScript)
         {
+            boundScript.Header.Accept(this);
             boundScript.Functions.ForEach(function =>
             {
                 function.Accept(this);
@@ -39,11 +40,12 @@ namespace SimpleScript.Binding
             {
                 declaration.Accept(this);
             });
+            sa.NewLine();
         }
 
         public void Visit(Declaration declaration)
         {
-            sa.Print($"[{declaration.Identifier}:{declaration.Value}]");
+            sa.Print($"[{declaration.Key}:{declaration.Value}]");
         }
 
         public void Visit(EchoStatement echo)

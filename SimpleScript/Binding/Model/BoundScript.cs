@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 
 namespace SimpleScript.Binding.Model
 {
@@ -6,6 +7,7 @@ namespace SimpleScript.Binding.Model
     {
         public BoundFunctionDeclaration StartupFunction { get; }
         public IEnumerable<BoundFunctionDeclaration> Functions { get; }
+        public BoundHeader Header { get; set; }
 
         public BoundScript(BoundFunctionDeclaration startupFunction, IEnumerable<BoundFunctionDeclaration> functions)
         {

@@ -1,4 +1,4 @@
 ﻿[Declaration:Something]
-Main 
+Main
 {
 }

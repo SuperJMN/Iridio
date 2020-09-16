@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using DynamicData.Kernel;
 using Optional;
 using Optional.Collections;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
-using Zafiro.Core.Patterns;
 using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Binding
@@ -30,6 +28,8 @@ namespace SimpleScript.Binding
                 .Do(func => func.WhenRight(bf => declaredFunctions.Add(bf.Name, bf)))
                 .ToEnumerable();
 
+            var declarations = Bind(script.Header);
+
             var eitherMain = script.Functions.FirstOrNone(f => f.Name == "Main").Match(
                 _ => Either.Success<Errors, bool>(true), () => new Errors(new Error(ErrorKind.UndefinedMainFunction, "Main function not defined")));
 
@@ -39,6 +39,16 @@ namespace SimpleScript.Binding
                 var main = a.First(d => d.Name == "Main");
                 return (Either<Errors, BoundScript>) new BoundScript(main, a);
             }, Errors.Concat);
+        }
+
+        private BoundHeader Bind(Header header)
+        {
+            return new BoundHeader(header.Declarations.Select(Bind));
+        }
+
+        private BoundDeclaration Bind(Declaration decl)
+        {
+            return new BoundDeclaration(decl.Key, decl.Value);
         }
 
         private Either<Errors, BoundFunctionDeclaration> Bind(FunctionDeclaration func)
@@ -54,8 +64,8 @@ namespace SimpleScript.Binding
         {
             switch (statement)
             {
-                case IfStatement @if:
-                    return Bind(@if);
+                case IfStatement ifs:
+                    return Bind(ifs);
                 case CallStatement call:
                     return Bind(call);
                 case EchoStatement echo:
