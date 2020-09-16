@@ -5,7 +5,7 @@ using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
 {
-    internal interface IScriptRunner
+    public interface IScriptRunner
     {
         Task<Either<Errors, Success>> Run(string input, Dictionary<string, object> variables);
     }

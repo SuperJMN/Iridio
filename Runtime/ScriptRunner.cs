@@ -9,12 +9,13 @@ using SimpleScript.Binding;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
 using SimpleScript.Tokenization;
+using Zafiro.Core;
 using Zafiro.Core.Patterns;
 using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
 {
-    internal class ScriptRunner : IScriptRunner
+    public class ScriptRunner : IScriptRunner
     {
         private readonly IFunction[] functions;
         private readonly IEnhancedParser parser;
@@ -61,7 +62,7 @@ namespace SimpleScript.Tests
             var asyncSelect = await block.Statements.AsyncSelect(Execute);
 
             var combine = CombineExtensions
-                .Combine(asyncSelect, ErrorUtils.Concat)
+                .Combine(asyncSelect, Errors.Concat)
                 .MapRight(successes => new Success());
 
             return combine;
@@ -119,7 +120,7 @@ namespace SimpleScript.Tests
         {
             var left = await Evaluate(condition.Left);
             var right = await Evaluate(condition.Right);
-            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), ErrorUtils.Concat);
+            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), Errors.Concat);
         }
 
         private Either<Errors, bool> Compare(object a, object b, BooleanOperator op)
@@ -213,7 +214,7 @@ namespace SimpleScript.Tests
         private List<string> GetUnsetReferences(string str)
         {
             var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
-            var references = matches.Select(match => match.Groups[1].Value);
+            var references = matches.Cast<Match>().Select(match => match.Groups[1].Value);
 
             var query = from variable in references
                 let value = DictionaryExtensions.GetValueOrNone(variables, variable)
@@ -225,7 +226,7 @@ namespace SimpleScript.Tests
         private Either<Errors, object> Replace(string str)
         {
             var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
-            var references = matches.Select(match => match.Groups[1].Value);
+            var references = matches.Cast<Match>().Select(match => match.Groups[1].Value);
 
             var refsAndValues = from variable in references
                 from value in DictionaryExtensions.GetValueOrNone(variables, variable).ToEnumerable()
@@ -240,8 +241,7 @@ namespace SimpleScript.Tests
             }
 
             var regex = new Regex(pattern);
-            var valuesDict = refsAndValuesList
-                .ToDictionary(x => x.variable, x => x.value);
+            var valuesDict = System.Linq.Enumerable.ToDictionary(refsAndValuesList, x => x.variable, x => x.value);
             var result = regex.Replace(str, match =>
             {
                 var skipLast = MoreLinq.MoreEnumerable.SkipLast(match.Value.Skip(1), 1);
@@ -260,7 +260,7 @@ namespace SimpleScript.Tests
         private async Task<Either<Errors, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
         {
             var eitherParameters = await call.Parameters.AsyncSelect(Evaluate);
-            var eitherParameter = CombineExtensions.Combine(eitherParameters, ErrorUtils.Concat);
+            var eitherParameter = CombineExtensions.Combine(eitherParameters, Errors.Concat);
 
             try
             {

@@ -1,6 +1,6 @@
 ﻿namespace SimpleScript.Tests
 {
-    internal class Success
+    public class Success
     {
     }
 }

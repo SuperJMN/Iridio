@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.csproj" />
     <ProjectReference Include="..\SimpleScript\SimpleScript.csproj" />
   </ItemGroup>
 

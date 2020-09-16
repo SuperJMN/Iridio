@@ -33,20 +33,20 @@ namespace SimpleScript.Binding
             var eitherMain = script.Functions.FirstOrNone(f => f.Name == "Main").Match(
                 _ => Either.Success<Errors, bool>(true), () => new Errors(new Error(ErrorKind.UndefinedMainFunction, "Main function not defined")));
 
-            var combine = CombineExtensions.Combine(eitherFuncs, ErrorUtils.Concat);
+            var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
             return CombineExtensions.Combine(combine, eitherMain, (a, _) =>
             {
                 var main = a.First(d => d.Name == "Main");
                 return (Either<Errors, BoundScript>) new BoundScript(main, a);
-            }, ErrorUtils.Concat);
+            }, Errors.Concat);
         }
 
         private Either<Errors, BoundFunctionDeclaration> Bind(FunctionDeclaration func)
         {
-            var statementsEither = CombineExtensions.Combine(func.Block.Statements.Select(Bind), (list, errorList) => ErrorUtils.Concat(errorList, errorList));
+            var statementsEither = CombineExtensions.Combine(func.Block.Statements.Select(Bind), (list, errorList) => Errors.Concat(errorList, errorList));
             var either = CombineExtensions.Combine<Errors, string, IEnumerable<BoundStatement>, BoundFunctionDeclaration>(
                 Either.Success<Errors, string>(func.Name), statementsEither,
-                (name, statements) => new BoundFunctionDeclaration(name, new BoundBlock(statements)), (list, errorList) => ErrorUtils.Concat(errorList, errorList));
+                (name, statements) => new BoundFunctionDeclaration(name, new BoundBlock(statements)), (list, errorList) => Errors.Concat(errorList, errorList));
             return either;
         }
 
@@ -70,7 +70,7 @@ namespace SimpleScript.Binding
         private Either<Errors, BoundStatement> Bind(AssignmentStatement assignmentStatement)
         {
             return CombineExtensions
-                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>) assignmentStatement.Variable, (expression, variable) => (Either<Errors, BoundStatement>)new BoundAssignmentStatement(variable, expression), (list, errorList) => ErrorUtils.Concat(errorList, errorList));
+                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>) assignmentStatement.Variable, (expression, variable) => (Either<Errors, BoundStatement>)new BoundAssignmentStatement(variable, expression), (list, errorList) => Errors.Concat(errorList, errorList));
         }
 
         private Either<Errors, BoundStatement> Bind(CallStatement callStatement)
@@ -87,14 +87,14 @@ namespace SimpleScript.Binding
 
             return falseStatements.Match(f => CombineExtensions.Combine(cond, trueStatements, f,
                 (condition, ts, fs) => (Either<Errors, BoundStatement>) new BoundIfStatement(condition, ts, fs.Some()),
-                (list, errorList) => ErrorUtils.Concat(errorList, errorList)), () => CombineExtensions.Combine(cond, trueStatements,
+                (list, errorList) => Errors.Concat(errorList, errorList)), () => CombineExtensions.Combine(cond, trueStatements,
                 (condition, ts) => (Either<Errors, BoundStatement>)new BoundIfStatement(condition, ts, Option.None<BoundBlock>()),
-                (list, errorList) => ErrorUtils.Concat(errorList, errorList)));
+                (list, errorList) => Errors.Concat(errorList, errorList)));
         }
 
         private Either<Errors, BoundBlock> Bind(Block block)
         {
-            var stataments = block.Statements.Select(Bind).Combine((list, errorList) => ErrorUtils.Concat(errorList, errorList));
+            var stataments = block.Statements.Select(Bind).Combine((list, errorList) => Errors.Concat(errorList, errorList));
             return stataments.MapRight(statements => new BoundBlock(statements));
         }
 
@@ -104,7 +104,7 @@ namespace SimpleScript.Binding
             var op = condition.Op;
             var right = Bind(condition.Right);
 
-            return CombineExtensions.Combine<Errors, BoundExpression, BoundExpression, BoundCondition>(left, right, (a, b) => new BoundCondition(a, op, b), (list, errorList) => ErrorUtils.Concat(errorList, errorList));
+            return CombineExtensions.Combine<Errors, BoundExpression, BoundExpression, BoundCondition>(left, right, (a, b) => new BoundCondition(a, op, b), (list, errorList) => Errors.Concat(errorList, errorList));
         }
 
         private Either<Errors, BoundExpression> Bind(Expression expression)
@@ -126,7 +126,7 @@ namespace SimpleScript.Binding
 
         private Either<Errors, BoundExpression> Bind(CallExpression call)
         {
-            var eitherParameters = call.Parameters.Select(Bind).Combine((list, errorList) => ErrorUtils.Concat(errorList, errorList));
+            var eitherParameters = call.Parameters.Select(Bind).Combine((list, errorList) => Errors.Concat(errorList, errorList));
 
             if (declaredFunctions.TryGetValue(call.Name, out var func))
             {
