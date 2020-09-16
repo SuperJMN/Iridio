@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
+using Optional;
+using Optional.Unsafe;
 using SimpleScript.Binding;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,7 +24,7 @@ namespace SimpleScript.Tests
 
         [Theory]
         [MemberData(nameof(Data))]
-        public void Test(string input, string expected)
+        public void Test(string input, Either<ErrorList, string> expected)
         {
             var sut = new Binder(new BindingContext(new List<IFunction>()
             {
@@ -32,15 +35,18 @@ namespace SimpleScript.Tests
 
             var result = parser
                 .Parse(input)
-                .MapLeft(pr => new ErrorList(ErrorKind.UnableToParse)).MapRight(enhancedScript => sut.Bind(enhancedScript))
-                .MapRight(script => script.AsString())
-                .Handle(list => list.Flatten());
-                
-            testOutputHelper.WriteLine(result);
-            testOutputHelper.WriteLine("_________________");
-            testOutputHelper.WriteLine(expected);
+                .MapLeft(pr => new ErrorList(ErrorKind.UnableToParse))
+                .MapRight(enhancedScript => sut.Bind(enhancedScript))
+                .MapRight(script => script.AsString());
 
-            result.Should().Be(expected);
+
+            result.Should().BeEquivalentTo(expected,
+                options => options.Using<ErrorList>(context =>
+                    context.Expectation.Should().BeEquivalentTo(context.Expectation,
+                        x => x.Using<Error>(assertionContext =>
+                                assertionContext.Expectation.ErrorKind.Should()
+                                    .Be(assertionContext.Expectation.ErrorKind))
+                            .WhenTypeIs<Error>())).WhenTypeIs<ErrorList>());
         }
 
         public static IEnumerable<object[]> Data()
@@ -50,7 +56,7 @@ namespace SimpleScript.Tests
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File4.txt"), File.ReadAllText("TestData\\Expectations\\File4.txt") };
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
             //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File6.txt"), File.ReadAllText("TestData\\Expectations\\File6.txt") };
-            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File7.txt"), File.ReadAllText("TestData\\Expectations\\File7.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File7.txt"), new ErrorList(ErrorKind.UndefinedMainFunction) };
         }
     }
 }

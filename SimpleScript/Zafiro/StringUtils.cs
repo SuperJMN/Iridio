@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace SimpleScript
+namespace SimpleScript.Zafiro
 {
     public static class StringUtils
     {

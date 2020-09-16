@@ -13,12 +13,12 @@ namespace SimpleScript.Zafiro
             this.inner = inner;
         }
 
-        public void Print(AppendableString str)
+        public void Print(FormatlessString str)
         {
             Do(() => inner.Print(str));
         }
 
-        public void TabPrint(AppendableString str)
+        public void TabPrint(FormatlessString str)
         {
             Do(() => inner.TabPrint(str));
         }

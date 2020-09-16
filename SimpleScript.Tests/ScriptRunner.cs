@@ -58,7 +58,7 @@ namespace SimpleScript.Tests
 
         private async Task<Either<ErrorList, Success>> Execute(BoundBlock block)
         {
-            var asyncSelect = await block.BoundStatements.AsyncSelect(Execute);
+            var asyncSelect = await block.Statements.AsyncSelect(Execute);
 
             var combine = CombineExtensions
                 .Combine(asyncSelect, Errors.Concat)
@@ -170,7 +170,7 @@ namespace SimpleScript.Tests
                 }
             }
 
-            return new ErrorList(ErrorKind.TypeMismatch, $"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}");
+            return new ErrorList(new Error(ErrorKind.TypeMismatch, $"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}"));
         }
 
         private async Task<Either<ErrorList, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
@@ -270,7 +270,7 @@ namespace SimpleScript.Tests
             }
             catch (Exception ex)
             {
-                return new ErrorList(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}");
+                return new ErrorList(new Error(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}"));
             }
         }
 
@@ -281,7 +281,7 @@ namespace SimpleScript.Tests
                 return val;
             }
 
-            return new ErrorList(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'");
+            return new ErrorList(new Error(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'"));
         }
     }
 }

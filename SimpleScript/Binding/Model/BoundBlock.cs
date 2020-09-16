@@ -4,11 +4,11 @@ namespace SimpleScript.Binding.Model
 {
     public class BoundBlock : IBoundNode
     {
-        public IEnumerable<BoundStatement> BoundStatements { get; }
+        public IEnumerable<BoundStatement> Statements { get; }
 
-        public BoundBlock(IEnumerable<BoundStatement> boundStatements)
+        public BoundBlock(IEnumerable<BoundStatement> statements)
         {
-            BoundStatements = boundStatements;
+            Statements = statements;
         }
 
         public void Accept(IBoundNodeVisitor visitor)

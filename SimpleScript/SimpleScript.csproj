@@ -11,7 +11,7 @@
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Superpower" Version="2.3.0" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="Zafiro.Core" Version="2.3.24" />
+    <PackageReference Include="Zafiro.Core" Version="2.3.25" />
   </ItemGroup>
 
 </Project>

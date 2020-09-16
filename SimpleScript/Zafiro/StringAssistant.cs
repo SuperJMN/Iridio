@@ -39,12 +39,12 @@ namespace SimpleScript.Zafiro
             return stringBuilder.ToString();
         }
 
-        public void Print(AppendableString str)
+        public void Print(FormatlessString str)
         {
             stringBuilder.Append(str);
         }
 
-        public void TabPrint(AppendableString str)
+        public void TabPrint(FormatlessString str)
         {
             stringBuilder.Append($"{Indent}{str}");
         }

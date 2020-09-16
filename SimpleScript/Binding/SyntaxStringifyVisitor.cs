@@ -21,7 +21,7 @@ namespace SimpleScript.Binding
         {
             sa.TabPrint(a.Variable + " = ");
             a.Expression.Accept(this);
-            sa.Print(";");
+            sa.Print("\r\n;");
         }
 
         public void Visit(Condition c)

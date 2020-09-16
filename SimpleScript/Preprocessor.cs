@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SimpleScript.Zafiro;
 using Zafiro.Core.FileSystem;
 
 namespace SimpleScript

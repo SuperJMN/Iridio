@@ -22,7 +22,7 @@ namespace SimpleScript
 
     public class ErrorList : Collection<Error>
     {
-        public ErrorList(ErrorKind unableToParse, string additionalData = null) : base(new List<Error>{ new Error(unableToParse, additionalData)})
+        public ErrorList(params Error[] errors) : base(errors)
         {
         }
 
@@ -33,34 +33,5 @@ namespace SimpleScript
         public ErrorList()
         {
         }
-    }
-
-    public class Error
-    {
-        public Error(ErrorKind kind, string additionalData = null)
-        {
-            ErrorKind = kind;
-            AdditionalData = additionalData;
-        }
-
-        public ErrorKind ErrorKind { get; }
-        public string AdditionalData { get; }
-
-        public override string ToString()
-        {
-            return $"{nameof(ErrorKind)}: {ErrorKind}, {nameof(AdditionalData)}: {AdditionalData}";
-        }
-    }
-
-    public enum ErrorKind
-    {
-        UnableToParse,
-        TypeMismatch,
-        UndefinedVariable,
-        IntegratedFunctionFailure,
-        VariableNotFound,
-        UndefinedMainFunction,
-        BindError,
-        UndeclaredFunction
     }
 }

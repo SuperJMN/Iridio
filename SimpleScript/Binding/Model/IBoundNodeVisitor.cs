@@ -12,7 +12,6 @@ namespace SimpleScript.Binding.Model
         void Visit(BoundFunctionDeclaration functionDeclaration);
         void Visit(BoundBlock block);
         void Visit(BoundNumericExpression numericExpression);
-        
         void Visit(BoundCallStatement st);
         void Visit(BoundIdentifier boundIdentifier);
         void Visit(BoundStringExpression identifier);
