@@ -28,13 +28,13 @@ namespace SimpleScript.Tests
             this.binder = binder;
         }
 
-        public async Task<Either<ErrorList, Success>> Run(string input, Dictionary<string, object> variables)
+        public async Task<Either<Errors, Success>> Run(string input, Dictionary<string, object> variables)
         {
             this.variables = variables;
 
             var mapSuccess = parser
                 .Parse(input)
-                .MapLeft(pr => new ErrorList(ErrorKind.UnableToParse))
+                .MapLeft(pr => new Errors(ErrorKind.UnableToParse))
                 .MapRight(parsed => binder.Bind(parsed)
                     .MapRight(async bound =>
                     {
@@ -46,28 +46,28 @@ namespace SimpleScript.Tests
             return awaitRight.MapRight(either => new Success());
         }
 
-        private Task<Either<ErrorList, Success>> Execute(BoundScript bound)
+        private Task<Either<Errors, Success>> Execute(BoundScript bound)
         {
             return Execute(bound.StartupFunction);
         }
 
-        private Task<Either<ErrorList, Success>> Execute(BoundFunctionDeclaration main)
+        private Task<Either<Errors, Success>> Execute(BoundFunctionDeclaration main)
         {
             return Execute(main.Block);
         }
 
-        private async Task<Either<ErrorList, Success>> Execute(BoundBlock block)
+        private async Task<Either<Errors, Success>> Execute(BoundBlock block)
         {
             var asyncSelect = await block.Statements.AsyncSelect(Execute);
 
             var combine = CombineExtensions
-                .Combine(asyncSelect, Errors.Concat)
+                .Combine(asyncSelect, ErrorUtils.Concat)
                 .MapRight(successes => new Success());
 
             return combine;
         }
 
-        private async Task<Either<ErrorList, Success>> Execute(BoundStatement statement)
+        private async Task<Either<Errors, Success>> Execute(BoundStatement statement)
         {
             switch (statement)
             {
@@ -86,13 +86,13 @@ namespace SimpleScript.Tests
             return new Success();
         }
 
-        private async Task<Either<ErrorList, Success>> Execute(BoundCallStatement boundCallStatement)
+        private async Task<Either<Errors, Success>> Execute(BoundCallStatement boundCallStatement)
         {
             var either = await Evaluate(boundCallStatement.Call);
             return either.MapRight(o => new Success());
         }
 
-        private async Task<Either<ErrorList, Success>> Execute(BoundIfStatement boundIfStatement)
+        private async Task<Either<Errors, Success>> Execute(BoundIfStatement boundIfStatement)
         {
             var eitherComparison = await IsMet(boundIfStatement.Condition);
 
@@ -107,7 +107,7 @@ namespace SimpleScript.Tests
                 else
                 {
                     var optionalTask = boundIfStatement.FalseBlock.Map(Execute);
-                    var task = (Task<Either<ErrorList, Success>>) optionalTask.Match(t => t, () => Task.CompletedTask);
+                    var task = (Task<Either<Errors, Success>>) optionalTask.Match(t => t, () => Task.CompletedTask);
                     return await task;
                 }
             });
@@ -115,14 +115,14 @@ namespace SimpleScript.Tests
             return await result.RightTask();
         }
 
-        private async Task<Either<ErrorList, bool>> IsMet(BoundCondition condition)
+        private async Task<Either<Errors, bool>> IsMet(BoundCondition condition)
         {
             var left = await Evaluate(condition.Left);
             var right = await Evaluate(condition.Right);
-            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), Errors.Concat);
+            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), ErrorUtils.Concat);
         }
 
-        private Either<ErrorList, bool> Compare(object a, object b, BooleanOperator op)
+        private Either<Errors, bool> Compare(object a, object b, BooleanOperator op)
         {
             if (a is string strA && b is string strB)
             {
@@ -170,17 +170,17 @@ namespace SimpleScript.Tests
                 }
             }
 
-            return new ErrorList(new Error(ErrorKind.TypeMismatch, $"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}"));
+            return new Errors(new Error(ErrorKind.TypeMismatch, $"Cannot compare '{a}' of type {a.GetType()} and '{b}' of type {b.GetType()}"));
         }
 
-        private async Task<Either<ErrorList, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
+        private async Task<Either<Errors, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
         {
             var evaluation = await Evaluate(boundAssignmentStatement.Expression);
             evaluation.WhenRight(o => variables[boundAssignmentStatement.Variable] = o);
             return evaluation.MapRight(o => new Success());
         }
 
-        private async Task<Either<ErrorList, object>> Evaluate(BoundExpression expression)
+        private async Task<Either<Errors, object>> Evaluate(BoundExpression expression)
         {
             switch (expression)
             {
@@ -199,12 +199,12 @@ namespace SimpleScript.Tests
             throw new ArgumentOutOfRangeException(nameof(expression));
         }
 
-        private async Task<Either<ErrorList, object>> Evaluate(BoundStringExpression boundStringExpression)
+        private async Task<Either<Errors, object>> Evaluate(BoundStringExpression boundStringExpression)
         {
             var undefinedVariables = GetUnsetReferences(boundStringExpression.String);
             if (undefinedVariables.Any())
             {
-                return new ErrorList(undefinedVariables.Select(u => new Error(ErrorKind.UndefinedVariable, $"Usage of undefined variable '{u}'") ));
+                return new Errors(undefinedVariables.Select(u => new Error(ErrorKind.UndefinedVariable, $"Usage of undefined variable '{u}'") ));
             }
 
             return Replace(boundStringExpression.String);
@@ -222,7 +222,7 @@ namespace SimpleScript.Tests
             return query.Where(arg => !arg.value.HasValue).Select(x => x.variable).ToList();
         }
 
-        private Either<ErrorList, object> Replace(string str)
+        private Either<Errors, object> Replace(string str)
         {
             var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
             var references = matches.Select(match => match.Groups[1].Value);
@@ -252,15 +252,15 @@ namespace SimpleScript.Tests
             return result;
         }
 
-        private async Task<Either<ErrorList, object>> Evaluate(BoundCustomCallExpression call)
+        private async Task<Either<Errors, object>> Evaluate(BoundCustomCallExpression call)
         {
             return await Execute(call.FunctionDeclaration.Block);
         }
 
-        private async Task<Either<ErrorList, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
+        private async Task<Either<Errors, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
         {
             var eitherParameters = await call.Parameters.AsyncSelect(Evaluate);
-            var eitherParameter = CombineExtensions.Combine(eitherParameters, Errors.Concat);
+            var eitherParameter = CombineExtensions.Combine(eitherParameters, ErrorUtils.Concat);
 
             try
             {
@@ -270,18 +270,18 @@ namespace SimpleScript.Tests
             }
             catch (Exception ex)
             {
-                return new ErrorList(new Error(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}"));
+                return new Errors(new Error(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}"));
             }
         }
 
-        private async Task<Either<ErrorList, object>> Evaluate(BoundIdentifier identifier)
+        private async Task<Either<Errors, object>> Evaluate(BoundIdentifier identifier)
         {
             if (variables.TryGetValue(identifier.Identifier, out var val))
             {
                 return val;
             }
 
-            return new ErrorList(new Error(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'"));
+            return new Errors(new Error(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'"));
         }
     }
 }

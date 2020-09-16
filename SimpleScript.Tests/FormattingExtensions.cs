@@ -21,7 +21,7 @@ namespace SimpleScript.Tests
             return visitor.ToString();
         }
 
-        public static string Flatten(this ErrorList list)
+        public static string Flatten(this Errors list)
         {
             return string.Join(",", list);
         }

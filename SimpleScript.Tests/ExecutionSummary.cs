@@ -8,9 +8,9 @@ namespace SimpleScript.Tests
     {
         public bool IsSuccess { get; }
         public Dictionary<string, object> Variables { get; }
-        public ErrorList Errors { get; }
+        public Errors Errors { get; }
 
-        public ExecutionSummary(bool isSuccess, Dictionary<string, object> variables, ErrorList errors)
+        public ExecutionSummary(bool isSuccess, Dictionary<string, object> variables, Errors errors)
         {
             IsSuccess = isSuccess;
             Variables = variables;

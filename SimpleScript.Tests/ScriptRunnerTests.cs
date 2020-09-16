@@ -121,7 +121,7 @@ namespace SimpleScript.Tests
             var result = await sut.Run(input, variables);
 
             var executionSummary = result
-                .MapRight(s => new ExecutionSummary(true, variables, new ErrorList()))
+                .MapRight(s => new ExecutionSummary(true, variables, new Errors()))
                 .Handle(errors => new ExecutionSummary(false, variables, errors));
 
             executionSummary.Errors.ForEach(s => testOutputHelper.WriteLine(s.ToString()));

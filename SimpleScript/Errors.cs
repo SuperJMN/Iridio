@@ -1,19 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript
 {
-    public static class Errors
+    public class Errors : Collection<Error>
     {
-        public static ErrorList Concat(this ErrorList list, ErrorList errorList)
+        public Errors(params Error[] errors) : base(errors)
         {
-            return new ErrorList(Enumerable.Concat(list, errorList));
         }
 
-        public static string Join(ErrorList list)
+        public Errors(IEnumerable<Error> items) : base(items.ToList())
         {
-            return string.Join(Environment.NewLine, list);
+        }
+
+        public Errors()
+        {
         }
     }
 }

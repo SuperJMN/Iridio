@@ -7,6 +7,6 @@ namespace SimpleScript.Tests
 {
     internal interface IScriptRunner
     {
-        Task<Either<ErrorList, Success>> Run(string input, Dictionary<string, object> variables);
+        Task<Either<Errors, Success>> Run(string input, Dictionary<string, object> variables);
     }
 }

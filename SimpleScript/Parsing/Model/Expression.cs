@@ -4,9 +4,4 @@ namespace SimpleScript.Parsing.Model
     {
         public abstract void Accept(IExpressionVisitor visitor);
     }
-
-    public interface ISyntax
-    {
-        void Accept(IExpressionVisitor visitor);
-    }
 }

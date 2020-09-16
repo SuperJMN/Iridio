@@ -6,6 +6,6 @@ namespace SimpleScript.Binding
 {
     public interface IBinder
     {
-        Either<ErrorList, BoundScript> Bind(EnhancedScript script);
+        Either<Errors, BoundScript> Bind(EnhancedScript script);
     }
 }
