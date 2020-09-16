@@ -1,0 +1,6 @@
+﻿[Declaration:Something]
+
+Main 
+{
+	a = Call(b);
+}

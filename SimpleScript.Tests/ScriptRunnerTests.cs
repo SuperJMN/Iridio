@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using FluentAssertions.Equivalency;
 using MoreLinq.Extensions;
+using Runtime;
 using SimpleScript.Binding;
 using Xunit;
 using Xunit.Abstractions;
-using Zafiro.Core.Patterns;
 using Zafiro.Core.Patterns.Either;
 
 namespace SimpleScript.Tests
@@ -32,12 +30,7 @@ namespace SimpleScript.Tests
         public async Task No_main_function_produces_error()
         {
             var execution = await Execute("Function { }");
-            execution.Errors.Should().ContainEquivalentOf(new Error(ErrorKind.UndefinedMainFunction), ErrorComparisonConfig());
-        }
-
-        private static Func<EquivalencyAssertionOptions<Error>, EquivalencyAssertionOptions<Error>> ErrorComparisonConfig()
-        {
-            return options => options.Excluding(error => error.AdditionalData);
+            execution.Errors.Should().ContainEquivalentOf(new Error(ErrorKind.UndefinedMainFunction), AssertConfiguration.ForErrors);
         }
 
         [Fact]
@@ -88,7 +81,8 @@ namespace SimpleScript.Tests
         public async Task Token_replacement_unset_variable()
         {
             var execution = await Execute(@"Main { greeting=""Hi {name}!""; }");
-            execution.Errors.Should().ContainEquivalentOf(new Error(ErrorKind.UndefinedVariable), ErrorComparisonConfig());
+            var expectedError = new Error(ErrorKind.ReferenceToUninitializedVariable);
+            execution.Errors.Should().ContainEquivalentOf(expectedError, AssertConfiguration.ForErrors);
         }
 
         [Theory]
@@ -112,6 +106,14 @@ namespace SimpleScript.Tests
         {
             var execution = await Execute($@"Main {{ a=""{left}""; if (a {op} ""{right}"") {{ b = 1; }} else {{ b=2; }}}}");
             execution.Variables["b"].Should().Be(expected ? 1 : 2);
+        }
+
+        [Fact]
+        public async Task TypeMismatch()
+        {
+            var execution = await Execute("Main { a=125; b = \"Hi\"; if (a == b) { } }");
+            var expectedError = new Error(ErrorKind.TypeMismatch);
+            execution.Errors.Should().ContainEquivalentOf(expectedError, AssertConfiguration.ForErrors);
         }
 
         private async Task<ExecutionSummary> Execute(string input)

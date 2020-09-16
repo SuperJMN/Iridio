@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using MoreLinq;
 using Optional.Collections;
+using SimpleScript;
 using SimpleScript.Binding;
 using SimpleScript.Binding.Model;
 using SimpleScript.Parsing.Model;
+using SimpleScript.Tests;
 using SimpleScript.Tokenization;
 using Zafiro.Core;
-using Zafiro.Core.Patterns;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Tests
+namespace Runtime
 {
     public class ScriptRunner : IScriptRunner
     {
@@ -186,11 +186,11 @@ namespace SimpleScript.Tests
             switch (expression)
             {
                 case BoundIdentifier boundIdentifier:
-                    return await Evaluate(boundIdentifier);
+                    return Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
                     return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
-                    return await Evaluate(boundStringExpression);
+                    return Evaluate(boundStringExpression);
                 case BoundCustomCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
                 case BoundNumericExpression boundNumericExpression:
@@ -200,33 +200,14 @@ namespace SimpleScript.Tests
             throw new ArgumentOutOfRangeException(nameof(expression));
         }
 
-        private async Task<Either<Errors, object>> Evaluate(BoundStringExpression boundStringExpression)
+        private Either<Errors, object> Evaluate(BoundStringExpression boundStringExpression)
         {
-            var undefinedVariables = GetUnsetReferences(boundStringExpression.String);
-            if (undefinedVariables.Any())
-            {
-                return new Errors(undefinedVariables.Select(u => new Error(ErrorKind.UndefinedVariable, $"Usage of undefined variable '{u}'") ));
-            }
-
             return Replace(boundStringExpression.String);
-        }
-
-        private List<string> GetUnsetReferences(string str)
-        {
-            var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
-            var references = matches.Cast<Match>().Select(match => match.Groups[1].Value);
-
-            var query = from variable in references
-                let value = DictionaryExtensions.GetValueOrNone(variables, variable)
-                select new {variable, value};
-
-            return query.Where(arg => !arg.value.HasValue).Select(x => x.variable).ToList();
         }
 
         private Either<Errors, object> Replace(string str)
         {
-            var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
-            var references = matches.Cast<Match>().Select(match => match.Groups[1].Value);
+            var references = References.FromString(str);
 
             var refsAndValues = from variable in references
                 from value in DictionaryExtensions.GetValueOrNone(variables, variable).ToEnumerable()
@@ -241,7 +222,7 @@ namespace SimpleScript.Tests
             }
 
             var regex = new Regex(pattern);
-            var valuesDict = System.Linq.Enumerable.ToDictionary(refsAndValuesList, x => x.variable, x => x.value);
+            var valuesDict = refsAndValuesList.ToDictionary(x => x.variable, x => x.value);
             var result = regex.Replace(str, match =>
             {
                 var skipLast = MoreLinq.MoreEnumerable.SkipLast(match.Value.Skip(1), 1);
@@ -270,11 +251,11 @@ namespace SimpleScript.Tests
             }
             catch (Exception ex)
             {
-                return new Errors(new Error(ErrorKind.IntegratedFunctionFailure, $"Function failed with exception {ex.Message}"));
+                return new Errors(new Error(ErrorKind.IntegratedFunctionFailure, $"Function {call.Function.Name} threw an exception: '{ex.Message}'"));
             }
         }
 
-        private async Task<Either<Errors, object>> Evaluate(BoundIdentifier identifier)
+        private Either<Errors, object> Evaluate(BoundIdentifier identifier)
         {
             if (variables.TryGetValue(identifier.Identifier, out var val))
             {

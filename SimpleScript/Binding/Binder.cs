@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using MoreLinq;
 using Optional;
 using Optional.Collections;
 using SimpleScript.Binding.Model;
@@ -14,6 +15,7 @@ namespace SimpleScript.Binding
     {
         private readonly BindingContext context;
         private readonly IDictionary<string, BoundFunctionDeclaration> declaredFunctions = new Dictionary<string, BoundFunctionDeclaration>();
+        private readonly ISet<string> initializedVariables = new HashSet<string>();
 
         public Binder(BindingContext context)
         {
@@ -80,7 +82,12 @@ namespace SimpleScript.Binding
         private Either<Errors, BoundStatement> Bind(AssignmentStatement assignmentStatement)
         {
             return CombineExtensions
-                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>) assignmentStatement.Variable, (expression, variable) => (Either<Errors, BoundStatement>)new BoundAssignmentStatement(variable, expression), (list, errorList) => Errors.Concat(errorList, errorList));
+                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>) assignmentStatement.Variable, (expression, variable) =>
+                {
+                    var assignment = new BoundAssignmentStatement(variable, expression);
+                    initializedVariables.Add(variable);
+                    return (Either<Errors, BoundStatement>) assignment;
+                }, (list, errorList) => Errors.Concat(errorList, errorList));
         }
 
         private Either<Errors, BoundStatement> Bind(CallStatement callStatement)
@@ -114,7 +121,8 @@ namespace SimpleScript.Binding
             var op = condition.Op;
             var right = Bind(condition.Right);
 
-            return CombineExtensions.Combine<Errors, BoundExpression, BoundExpression, BoundCondition>(left, right, (a, b) => new BoundCondition(a, op, b), (list, errorList) => Errors.Concat(errorList, errorList));
+            return CombineExtensions.Combine<Errors, BoundExpression, BoundExpression, BoundCondition>(left, right,
+                (a, b) => new BoundCondition(a, op, b), Errors.Concat);
         }
 
         private Either<Errors, BoundExpression> Bind(Expression expression)
@@ -124,14 +132,36 @@ namespace SimpleScript.Binding
                 case CallExpression callExpression:
                     return Bind(callExpression);
                 case IdentifierExpression identifierExpression:
-                    return new BoundIdentifier(identifierExpression.Identifier);
+                    return Bind(identifierExpression);
                 case NumericExpression constant:
                     return new BoundNumericExpression(constant.Value);
                 case StringExpression stringExpression:
-                    return new BoundStringExpression(stringExpression.String);
+                    return Bind(stringExpression);
             }
 
             return new Errors(new Error(ErrorKind.BindError, $"Expression '{expression}' could not be bound"));
+        }
+
+        private Either<Errors, BoundExpression> Bind(IdentifierExpression identifierExpression)
+        {
+            if (!initializedVariables.Contains(identifierExpression.Identifier))
+            {
+                return new Errors(new Error(ErrorKind.ReferenceToUninitializedVariable, identifierExpression.Identifier));
+            }
+
+            return new BoundIdentifier(identifierExpression.Identifier);
+        }
+
+        private Either<Errors, BoundExpression> Bind(StringExpression stringExpression)
+        {
+            var references = References.FromString(stringExpression.String);
+            var variableIsInitialized = references.Partition(s => initializedVariables.Contains(s));
+            if (variableIsInitialized.False.Any())
+            {
+                return new Errors(variableIsInitialized.False.Select(variable => new Error(ErrorKind.ReferenceToUninitializedVariable, variable)));
+            }
+            
+            return new BoundStringExpression(stringExpression.String);
         }
 
         private Either<Errors, BoundExpression> Bind(CallExpression call)

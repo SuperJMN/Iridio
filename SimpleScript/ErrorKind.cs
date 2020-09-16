@@ -9,6 +9,7 @@
         VariableNotFound,
         UndefinedMainFunction,
         BindError,
-        UndeclaredFunction
+        UndeclaredFunction,
+        ReferenceToUninitializedVariable
     }
 }
