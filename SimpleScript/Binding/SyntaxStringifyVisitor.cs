@@ -1,5 +1,5 @@
-﻿using MoreLinq;
-using Optional.Collections;
+﻿using System.Linq;
+using MoreLinq;
 using SimpleScript.Parsing.Model;
 using SimpleScript.Zafiro;
 
@@ -33,8 +33,22 @@ namespace SimpleScript.Binding
             sa.Print(")");
         }
 
+        public void Visit(Header header)
+        {
+            header.Declarations.ToList().ForEach(declaration =>
+            {
+                declaration.Accept(this);
+            });
+        }
+
+        public void Visit(Declaration declaration)
+        {
+            sa.Print($"[{declaration.Identifier}:{declaration.Value}]");
+        }
+
         public void Visit(EchoStatement echo)
         {
+            sa.TabPrint($"<{echo.Message}>");
         }
 
         public void Visit(IfStatement ifs)
@@ -64,7 +78,7 @@ namespace SimpleScript.Binding
             sa.NewLine();
 
             sa.IncreaseIndent();
-            block.Statements.WhenMiddleAndLast(st =>
+            block.Statements.ForEach(st =>
             {
                 st.Accept(this);
                 sa.NewLine();
@@ -85,7 +99,7 @@ namespace SimpleScript.Binding
         public void Visit(CallExpression callExpression)
         {
             sa.Print(callExpression.Name + "(");
-            callExpression.Parameters.WhenMiddleAndLast(ex =>
+            callExpression.Parameters.ForEach(ex =>
             {
                 ex.Accept(this);
                 sa.Print(", ");

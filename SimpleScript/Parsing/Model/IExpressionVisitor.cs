@@ -14,5 +14,7 @@ namespace SimpleScript.Parsing.Model
         void Visit(Block block);
         void Visit(FunctionDeclaration fd);
         void Visit(Condition c);
+        void Visit(Header header);
+        void Visit(Declaration declaration);
     }
 }

@@ -64,7 +64,7 @@ namespace SimpleScript.Binding
             sa.NewLine();
 
             sa.IncreaseIndent();
-            block.Statements.ToList().WhenMiddleAndLast(st =>
+            block.Statements.ToList().ForEach(st =>
             {
                 st.Accept(this);
                 sa.NewLine();
@@ -92,7 +92,7 @@ namespace SimpleScript.Binding
         public void Visit(BoundBuiltInFunctionCallExpression functionDeclaration)
         {
             sa.Print(functionDeclaration.Function.Name + "(");
-            functionDeclaration.Parameters.ToList().WhenMiddleAndLast(ex =>
+            functionDeclaration.Parameters.ToList().ForEach(ex =>
             {
                 ex.Accept(this);
                 sa.Print(", ");
@@ -103,7 +103,7 @@ namespace SimpleScript.Binding
         public void Visit(BoundCustomCallExpression callExpression)
         {
             sa.Print(callExpression.FunctionDeclaration.Name + "(");
-            callExpression.Parameters.ToList().WhenMiddleAndLast(ex =>
+            callExpression.Parameters.ToList().ForEach(ex =>
             {
                 ex.Accept(this);
                 sa.Print(", ");

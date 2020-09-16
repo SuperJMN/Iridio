@@ -2,7 +2,7 @@ using System;
 
 namespace SimpleScript.Parsing.Model
 {
-    public class Declaration
+    public class Declaration : ISyntax
     {
         public string Identifier { get; }
         public string Value { get; }
@@ -49,6 +49,11 @@ namespace SimpleScript.Parsing.Model
         public override string ToString()
         {
             return $"{nameof(Identifier)}: {Identifier}, {nameof(Value)}: {Value}";
+        }
+
+        public void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

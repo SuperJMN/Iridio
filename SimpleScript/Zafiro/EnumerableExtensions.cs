@@ -7,7 +7,7 @@ namespace SimpleScript.Zafiro
 {
     public static class EnumerableExtensions
     {
-        public static void WhenMiddleAndLast<T>(this ICollection<T> collection, Action<T> nonLast, Action<T> last)
+        public static void ForEach<T>(this ICollection<T> collection, Action<T> nonLast, Action<T> last)
         {
             collection.SkipLast(1)
                 .ForEach(nonLast);
