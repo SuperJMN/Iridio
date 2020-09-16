@@ -22,7 +22,6 @@ namespace SimpleScript.Binding
             sa.TabPrint(a.Variable + " = ");
             a.Expression.Accept(this);
             sa.Print(";");
-
         }
 
         public void Visit(BoundCondition c)
@@ -85,7 +84,9 @@ namespace SimpleScript.Binding
 
         public void Visit(BoundCallStatement st)
         {
+            sa.TabPrint("");
             st.Call.Accept(this);
+            sa.Print(";");
         }
 
         public void Visit(BoundBuiltInFunctionCallExpression functionDeclaration)

@@ -40,22 +40,22 @@ namespace SimpleScript.Tests
                 .MapRight(script => script.AsString());
 
 
-            result.Should().BeEquivalentTo(expected,
-                options => options.Using<Errors>(context =>
-                    context.Expectation.Should().BeEquivalentTo(context.Expectation,
-                        x => x.Using<Error>(assertionContext =>
-                                assertionContext.Expectation.ErrorKind.Should()
-                                    .Be(assertionContext.Expectation.ErrorKind))
-                            .WhenTypeIs<Error>())).WhenTypeIs<Errors>());
+            result.Should().BeEquivalentTo(expected, opts =>
+            {
+                return opts
+                    .Using<Error>(config => config.Subject.ErrorKind.Should().Be(config.Expectation.ErrorKind)).WhenTypeIs<Error>()
+                    .ComparingByMembers<Option<Errors>>()
+                    .ComparingByMembers<Either<Errors, string>>(); ;
+            });
         }
 
         public static IEnumerable<object[]> Data()
         {
-            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File1.txt"), File.ReadAllText("TestData\\Expectations\\File1.txt") };
-            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File3.txt"), File.ReadAllText("TestData\\Expectations\\File3.txt") };
-            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File4.txt"), File.ReadAllText("TestData\\Expectations\\File4.txt") };
-            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
-            //yield return new object[] { File.ReadAllText("TestData\\Inputs\\File6.txt"), File.ReadAllText("TestData\\Expectations\\File6.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File1.txt"), File.ReadAllText("TestData\\Expectations\\File1.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File3.txt"), File.ReadAllText("TestData\\Expectations\\File3.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File4.txt"), File.ReadAllText("TestData\\Expectations\\File4.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File5.txt"), File.ReadAllText("TestData\\Expectations\\File5.txt") };
+            yield return new object[] { File.ReadAllText("TestData\\Inputs\\File6.txt"), File.ReadAllText("TestData\\Expectations\\File6.txt") };
             yield return new object[] { File.ReadAllText("TestData\\Inputs\\File7.txt"), new Errors(ErrorKind.UndefinedMainFunction) };
         }
     }
