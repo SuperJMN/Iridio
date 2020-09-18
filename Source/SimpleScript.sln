@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleScript", "SimpleScrip
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleScript.Tests", "SimpleScript.Tests\SimpleScript.Tests.csproj", "{6C0F0F0C-2373-49D3-BD6A-79F3EFE3B2D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runtime", "Runtime\Runtime.csproj", "{6D18AB46-6953-43D3-8AA0-99AE74012AF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleScript.Runtime", "SimpleScript.Runtime\SimpleScript.Runtime.csproj", "{6D18AB46-6953-43D3-8AA0-99AE74012AF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
