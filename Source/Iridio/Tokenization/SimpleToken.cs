@@ -1,4 +1,4 @@
-namespace SimpleScript.Tokenization
+namespace Iridio.Tokenization
 {
     public enum SimpleToken
     {

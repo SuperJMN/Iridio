@@ -3,7 +3,7 @@ using Moq;
 using Xunit;
 using Zafiro.Core.FileSystem;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class PreprocessorTests
     {

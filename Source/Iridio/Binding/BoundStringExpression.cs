@@ -1,6 +1,6 @@
-﻿using SimpleScript.Binding.Model;
+﻿using Iridio.Binding.Model;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public class BoundStringExpression : BoundExpression
     {

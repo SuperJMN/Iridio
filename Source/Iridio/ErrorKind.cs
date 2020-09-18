@@ -1,4 +1,4 @@
-﻿namespace SimpleScript
+﻿namespace Iridio
 {
     public enum ErrorKind
     {

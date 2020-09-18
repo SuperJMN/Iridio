@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SimpleScript.Parsing.Model
+namespace Iridio.Parsing.Model
 {
     public class ScriptSyntax
     {

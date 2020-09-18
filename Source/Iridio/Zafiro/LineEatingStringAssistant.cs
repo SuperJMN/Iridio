@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleScript.Zafiro
+namespace Iridio.Zafiro
 {
     public class LineEatingStringAssistant : IStringAssistant
     {

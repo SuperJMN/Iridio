@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MoreLinq.Extensions;
 using Optional.Collections;
 
-namespace SimpleScript.Zafiro
+namespace Iridio.Zafiro
 {
     public static class EnumerableExtensions
     {

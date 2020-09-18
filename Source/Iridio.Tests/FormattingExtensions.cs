@@ -1,9 +1,8 @@
-using SimpleScript.Binding;
-using SimpleScript.Binding.Model;
-using SimpleScript.Parsing.Model;
-using Zafiro.Core.Patterns.Either;
+using Iridio.Binding;
+using Iridio.Binding.Model;
+using Iridio.Parsing.Model;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public static class FormattingExtensions
     {

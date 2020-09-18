@@ -1,7 +1,7 @@
 ﻿using System;
 using FluentAssertions.Equivalency;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public static class AssertConfiguration 
     {

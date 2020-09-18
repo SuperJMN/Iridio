@@ -1,9 +1,9 @@
-using SimpleScript.Parsing;
+using Iridio.Parsing;
 using Superpower;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
 
-namespace SimpleScript.Tokenization
+namespace Iridio.Tokenization
 {
     public static class Tokenizer
     {

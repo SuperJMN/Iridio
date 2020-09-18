@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using MoreLinq.Extensions;
 
-namespace SimpleScript
+namespace Iridio
 {
     public static class ReflectionMixin
     {

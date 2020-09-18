@@ -1,7 +1,7 @@
 using System;
 using Optional;
 
-namespace SimpleScript.Parsing.Model
+namespace Iridio.Parsing.Model
 {
     public class IfStatement : Statement
     {

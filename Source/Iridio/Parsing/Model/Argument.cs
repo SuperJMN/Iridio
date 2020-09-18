@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleScript.Parsing.Model
+namespace Iridio.Parsing.Model
 {
     public class Argument
     {

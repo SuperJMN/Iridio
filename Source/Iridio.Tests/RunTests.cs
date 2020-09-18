@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class RunTests
     {

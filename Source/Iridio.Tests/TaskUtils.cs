@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public static class TaskUtils
     {

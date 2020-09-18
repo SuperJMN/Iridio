@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
+using Iridio.Binding;
 using Optional;
-using SimpleScript.Binding;
 using Xunit;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class BinderTests
     {

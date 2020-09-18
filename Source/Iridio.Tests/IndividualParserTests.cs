@@ -1,9 +1,9 @@
-using SimpleScript.Parsing;
-using SimpleScript.Tokenization;
+using Iridio.Parsing;
+using Iridio.Tokenization;
 using Superpower;
 using Xunit;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class IndividualParserTests
     {

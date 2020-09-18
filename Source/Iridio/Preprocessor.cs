@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SimpleScript.Zafiro;
+using Iridio.Zafiro;
 using Zafiro.Core.FileSystem;
 
-namespace SimpleScript
+namespace Iridio
 {
     public class Preprocessor : IPreprocessor
     {

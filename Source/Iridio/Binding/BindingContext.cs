@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public class BindingContext
     {

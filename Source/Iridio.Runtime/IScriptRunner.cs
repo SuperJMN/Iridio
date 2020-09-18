@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SimpleScript;
-using SimpleScript.Tests;
 using Zafiro.Core.Patterns.Either;
 
-namespace Runtime
+namespace Iridio.Runtime
 {
     public interface IScriptRunner
     {

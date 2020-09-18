@@ -1,10 +1,10 @@
 using System.Linq;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Tokenization;
+using Iridio.Parsing.Model;
+using Iridio.Tokenization;
 using Superpower;
 using Superpower.Parsers;
 
-namespace SimpleScript.Parsing
+namespace Iridio.Parsing
 {
     public class SimpleParser
     {

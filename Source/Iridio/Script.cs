@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SimpleScript.Parsing.Model;
+using Iridio.Parsing.Model;
 
-namespace SimpleScript
+namespace Iridio
 {
     public class Script
     {

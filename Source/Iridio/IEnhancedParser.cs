@@ -1,7 +1,7 @@
-﻿using SimpleScript.Parsing.Model;
+﻿using Iridio.Parsing.Model;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript
+namespace Iridio
 {
     public interface IEnhancedParser
     {

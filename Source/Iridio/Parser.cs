@@ -1,9 +1,9 @@
-﻿using SimpleScript.Parsing;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Tokenization;
+﻿using Iridio.Parsing;
+using Iridio.Parsing.Model;
+using Iridio.Tokenization;
 using Superpower;
 
-namespace SimpleScript
+namespace Iridio
 {
     public class Parser : IParser
     {

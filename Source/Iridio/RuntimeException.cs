@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleScript
+namespace Iridio
 {
     internal class RuntimeException : ApplicationException
     {

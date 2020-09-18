@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleScript.Binding.Model
+namespace Iridio.Binding.Model
 {
     public class BoundFunctionDeclaration : IBoundNode
     {

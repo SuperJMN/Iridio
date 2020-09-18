@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using Iridio.Parsing.Model;
+using Iridio.Zafiro;
 using MoreLinq;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Zafiro;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public class SyntaxStringifyVisitor : IExpressionVisitor
     {

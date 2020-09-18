@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using Iridio.Binding.Model;
+using Iridio.Zafiro;
 using MoreLinq;
-using SimpleScript.Binding.Model;
-using SimpleScript.Zafiro;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public class BoundNodeStringifyVisitor : IBoundNodeVisitor
     {

@@ -1,6 +1,6 @@
-﻿using SimpleScript.Parsing.Model;
+﻿using Iridio.Parsing.Model;
 
-namespace SimpleScript
+namespace Iridio
 {
     public interface IParser
     {

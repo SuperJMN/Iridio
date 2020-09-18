@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
+using Iridio.Binding;
+using Iridio.Parsing.Model;
 using Optional;
-using SimpleScript.Binding;
-using SimpleScript.Parsing.Model;
 using Xunit;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class SyntaxToStringTests
     {

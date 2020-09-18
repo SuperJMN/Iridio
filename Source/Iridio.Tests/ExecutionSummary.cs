@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Zafiro.Core.Patterns;
-using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     internal class ExecutionSummary
     {

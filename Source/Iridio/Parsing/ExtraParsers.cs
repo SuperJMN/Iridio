@@ -2,7 +2,7 @@ using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
 
-namespace SimpleScript.Parsing
+namespace Iridio.Parsing
 {
     public static class ExtraParsers
     {

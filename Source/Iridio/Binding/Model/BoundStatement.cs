@@ -1,4 +1,4 @@
-﻿namespace SimpleScript.Binding.Model
+﻿namespace Iridio.Binding.Model
 {
     public abstract class BoundStatement : IBoundNode
     {

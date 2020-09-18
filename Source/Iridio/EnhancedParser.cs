@@ -1,11 +1,10 @@
-﻿using SimpleScript.Parsing;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Tokenization;
+﻿using Iridio.Parsing;
+using Iridio.Parsing.Model;
+using Iridio.Tokenization;
 using Superpower;
-using Zafiro.Core.Patterns;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript
+namespace Iridio
 {
     public class EnhancedParser : IEnhancedParser
     {

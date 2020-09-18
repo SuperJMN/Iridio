@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using SimpleScript.Zafiro;
+using Iridio.Zafiro;
 using Xunit;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class LineEatingTests
     {

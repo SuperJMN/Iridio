@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Iridio.Binding;
+using Iridio.Runtime;
 using MoreLinq.Extensions;
-using Runtime;
-using SimpleScript.Binding;
 using Xunit;
 using Xunit.Abstractions;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class ScriptRunnerTests
     {

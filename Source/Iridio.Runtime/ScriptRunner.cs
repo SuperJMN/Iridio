@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Iridio.Binding;
+using Iridio.Binding.Model;
+using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional.Collections;
-using SimpleScript;
-using SimpleScript.Binding;
-using SimpleScript.Binding.Model;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Tests;
-using SimpleScript.Tokenization;
 using Zafiro.Core;
 using Zafiro.Core.Patterns.Either;
 
-namespace Runtime
+namespace Iridio.Runtime
 {
     public class ScriptRunner : IScriptRunner
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace SimpleScript.Zafiro
+namespace Iridio.Zafiro
 {
     public class StringAssistant : IStringAssistant
     {

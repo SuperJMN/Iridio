@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FluentAssertions;
 using Xunit;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Tests
+namespace Iridio.Tests
 {
     public class EnhancedParserTests
     {

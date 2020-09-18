@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SimpleScript.Parsing.Model;
+using Iridio.Parsing.Model;
 
-namespace SimpleScript
+namespace Iridio
 {
     public interface IFunction
     {

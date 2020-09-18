@@ -1,4 +1,4 @@
-﻿namespace SimpleScript.Zafiro
+﻿namespace Iridio.Zafiro
 {
     public class FormatlessString : ValidString
     {

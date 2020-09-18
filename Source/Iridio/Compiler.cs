@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SimpleScript.Parsing.Model;
-using Zafiro.Core.FileSystem;
+﻿using Zafiro.Core.FileSystem;
 
-namespace SimpleScript
+namespace Iridio
 {
     public class Compiler : ICompiler
     {

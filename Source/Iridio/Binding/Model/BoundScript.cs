@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 
-namespace SimpleScript.Binding.Model
+namespace Iridio.Binding.Model
 {
     public class BoundScript : IBoundNode
     {

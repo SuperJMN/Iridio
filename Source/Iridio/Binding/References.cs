@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SimpleScript.Tokenization;
+using Iridio.Tokenization;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public static class References
     {

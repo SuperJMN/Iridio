@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SimpleScript
+namespace Iridio
 {
     public interface IRunner
     {

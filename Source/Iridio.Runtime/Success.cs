@@ -1,4 +1,4 @@
-﻿namespace SimpleScript.Tests
+﻿namespace Iridio.Runtime
 {
     public class Success
     {

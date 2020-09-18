@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace SimpleScript.Parsing.Model
+namespace Iridio.Parsing.Model
 {
     public class CallExpression : Expression
     {

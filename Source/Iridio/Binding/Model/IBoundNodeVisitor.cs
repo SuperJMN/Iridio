@@ -1,6 +1,4 @@
-﻿using SimpleScript.Parsing.Model;
-
-namespace SimpleScript.Binding.Model
+﻿namespace Iridio.Binding.Model
 {
     public interface IBoundNodeVisitor
     {

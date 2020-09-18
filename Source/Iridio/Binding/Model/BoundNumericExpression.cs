@@ -1,4 +1,4 @@
-﻿namespace SimpleScript.Binding.Model
+﻿namespace Iridio.Binding.Model
 {
     public class BoundNumericExpression : BoundExpression
     {

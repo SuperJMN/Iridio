@@ -1,11 +1,11 @@
 using System.Linq;
+using Iridio.Parsing.Model;
+using Iridio.Tokenization;
 using Optional;
-using SimpleScript.Parsing.Model;
-using SimpleScript.Tokenization;
 using Superpower;
 using Superpower.Parsers;
 
-namespace SimpleScript.Parsing
+namespace Iridio.Parsing
 {
     public class EnhancedParsers
     {

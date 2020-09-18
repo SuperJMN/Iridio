@@ -1,8 +1,8 @@
-﻿using SimpleScript.Binding.Model;
-using SimpleScript.Parsing.Model;
+﻿using Iridio.Binding.Model;
+using Iridio.Parsing.Model;
 using Zafiro.Core.Patterns.Either;
 
-namespace SimpleScript.Binding
+namespace Iridio.Binding
 {
     public interface IBinder
     {
