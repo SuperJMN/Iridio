@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MoreLinq;
 using Optional.Collections;
 using SimpleScript;
 using SimpleScript.Binding;
@@ -59,13 +60,22 @@ namespace Runtime
 
         private async Task<Either<Errors, Success>> Execute(BoundBlock block)
         {
-            var asyncSelect = await block.Statements.AsyncSelect(Execute);
-
-            var combine = CombineExtensions
-                .Combine(asyncSelect, Errors.Concat)
+            var statementExecutions = await block.Statements.AsyncSelect(Execute);
+            
+            var execResult = CombineExtensions
+                .Combine(statementExecutions.TakeUntil(ExecutionFails), Errors.Concat)
                 .MapRight(successes => new Success());
 
-            return combine;
+            return execResult;
+        }
+
+        private static bool ExecutionFails(Either<Errors, Success> either)
+        {
+            var executionFails = either
+                .MapRight(success => false)
+                .Handle(errors => errors.Any());
+
+            return executionFails;
         }
 
         private async Task<Either<Errors, Success>> Execute(BoundStatement statement)

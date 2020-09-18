@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MoreLinq.Extensions;
@@ -109,11 +110,23 @@ namespace SimpleScript.Tests
         }
 
         [Fact]
-        public async Task TypeMismatch()
+        public async Task Type_mismatch()
         {
             var execution = await Execute("Main { a=125; b = \"Hi\"; if (a == b) { } }");
             var expectedError = new Error(ErrorKind.TypeMismatch);
             execution.Errors.Should().ContainEquivalentOf(expectedError, AssertConfiguration.ForErrors);
+        }
+
+        [Fact]
+        public async Task Failing_function()
+        {
+            var execution = await Execute("Main { Fail(); Fail(); }");
+            var expectedError = new Error(ErrorKind.IntegratedFunctionFailure);
+            execution.Errors
+                .Should()
+                .ContainEquivalentOf(expectedError, AssertConfiguration.ForErrors)
+                .And
+                .ContainSingle(error => error.ErrorKind == ErrorKind.IntegratedFunctionFailure);
         }
 
         private async Task<ExecutionSummary> Execute(string input)
@@ -133,7 +146,12 @@ namespace SimpleScript.Tests
 
         private IScriptRunner CreateSut()
         {
-            var functions = new IFunction[] {new Function("Func1"), new LambdaFunction<int, int, int>("Add", (a, b) => a + b),  };
+            var functions = new IFunction[]
+            {
+                new Function("Func1"), 
+                new LambdaFunction<int, int, int>("Add", (a, b) => a + b),
+                new LambdaFunction<int, int, int>("Fail", (a, b) => throw new InvalidOperationException()),
+            };
             return new ScriptRunner(functions, new EnhancedParser(), new Binder(new BindingContext(functions)));
         }
     }

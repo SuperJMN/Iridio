@@ -174,7 +174,10 @@ namespace SimpleScript.Binding
             }
 
             return context.Functions.FirstOrNone(function => function.Name == call.Name)
-                .Match(function => eitherParameters.MapRight(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
+                .Match(function => eitherParameters.MapRight(parameters =>
+                    {
+                        return (BoundExpression) new BoundBuiltInFunctionCallExpression(function, parameters);
+                    }),
                     () => new Errors(new Error(ErrorKind.UndeclaredFunction, $"FunctionDeclaration '{call.Name}' isn't declared")));
         }
 
