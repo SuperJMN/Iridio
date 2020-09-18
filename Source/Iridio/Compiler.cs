@@ -1,4 +1,5 @@
-﻿using Iridio.Binding;
+﻿using System.Collections.Generic;
+using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Parsing;
@@ -11,10 +12,10 @@ namespace Iridio
         private readonly IParser parser;
         private readonly IBinder binder;
 
-        public Compiler(IParser parser, IBinder binder)
+        public Compiler(IEnumerable<IFunction> functions)
         {
-            this.parser = parser;
-            this.binder = binder;
+            this.parser = new Parser();
+            this.binder = new Binder(new BindingContext(functions));
         }
 
         public Either<Errors, CompiledScript> Compile(string input)
