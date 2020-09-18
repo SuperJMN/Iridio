@@ -7,7 +7,7 @@ using Zafiro.Core.Patterns.Either;
 
 namespace Iridio
 {
-    public class Compiler
+    public class Compiler : ICompiler
     {
         private readonly IParser parser;
         private readonly IBinder binder;
