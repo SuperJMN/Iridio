@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Iridio.Zafiro;
+using Iridio.Common.Utils;
 using Xunit;
 
 namespace Iridio.Tests

@@ -1,5 +1,6 @@
 using Iridio.Binding;
 using Iridio.Binding.Model;
+using Iridio.Common;
 using Iridio.Parsing.Model;
 
 namespace Iridio.Tests

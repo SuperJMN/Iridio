@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Iridio
+namespace Iridio.Common
 {
     public class Errors : Collection<Error>
     {

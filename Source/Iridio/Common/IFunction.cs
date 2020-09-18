@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iridio.Parsing.Model;
 
-namespace Iridio
+namespace Iridio.Common
 {
     public interface IFunction
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Iridio.Binding.Model;
+using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional;
@@ -22,7 +23,7 @@ namespace Iridio.Binding
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Either<Errors, BoundScript> Bind(EnhancedScript script)
+        public Either<Errors, CompiledScript> Bind(EnhancedScript script)
         {
             var eitherFuncs = script.Functions
                 .ToObservable()
@@ -39,7 +40,7 @@ namespace Iridio.Binding
             return CombineExtensions.Combine(combine, eitherMain, (a, _) =>
             {
                 var main = a.First(d => d.Name == "Main");
-                return (Either<Errors, BoundScript>) new BoundScript(main, a);
+                return (Either<Errors, CompiledScript>) new CompiledScript(main, a);
             }, Errors.Concat);
         }
 

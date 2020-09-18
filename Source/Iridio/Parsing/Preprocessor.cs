@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Iridio.Zafiro;
+using Iridio.Common.Utils;
 using Zafiro.Core.FileSystem;
 
-namespace Iridio
+namespace Iridio.Parsing
 {
     public class Preprocessor : IPreprocessor
     {

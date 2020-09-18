@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Iridio.Zafiro
+namespace Iridio.Common.Utils
 {
     public interface IStringAssistant
     {

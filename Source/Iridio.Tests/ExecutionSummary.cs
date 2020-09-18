@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Iridio.Common;
 
 namespace Iridio.Tests
 {

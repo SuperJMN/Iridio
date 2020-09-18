@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Iridio.Common.Utils;
 using Xunit;
 
 namespace Iridio.Tests

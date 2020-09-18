@@ -2,6 +2,8 @@
 using System.IO;
 using FluentAssertions;
 using Iridio.Binding;
+using Iridio.Common;
+using Iridio.Parsing;
 using Optional;
 using Xunit;
 using Zafiro.Core.Patterns.Either;
@@ -19,7 +21,7 @@ namespace Iridio.Tests
                 new Function("Call"),
             }));
 
-            var parser = new EnhancedParser();
+            var parser = new Parser();
 
             var result = parser
                 .Parse(input)

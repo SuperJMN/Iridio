@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using Iridio.Parsing;
 using Xunit;
 using Zafiro.Core.Patterns.Either;
 
@@ -13,7 +14,7 @@ namespace Iridio.Tests
         [MemberData(nameof(TestData))]
         public void Verify(string testName, string input, string expected)
         {
-            var sut = new EnhancedParser();
+            var sut = new Parser();
             var parse = sut.Parse(input);
             var result = parse
                 .MapRight(script => script.AsString())

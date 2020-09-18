@@ -1,4 +1,4 @@
-﻿namespace Iridio
+﻿namespace Iridio.Common
 {
     public class Error
     {

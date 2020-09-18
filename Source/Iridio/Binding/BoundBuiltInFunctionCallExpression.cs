@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Iridio.Binding.Model;
+using Iridio.Common;
 
 namespace Iridio.Binding
 {

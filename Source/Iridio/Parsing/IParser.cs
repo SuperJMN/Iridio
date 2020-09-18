@@ -1,9 +1,9 @@
 ﻿using Iridio.Parsing.Model;
 using Zafiro.Core.Patterns.Either;
 
-namespace Iridio
+namespace Iridio.Parsing
 {
-    public interface IEnhancedParser
+    public interface IParser
     {
         Either<ParsingError, EnhancedScript> Parse(string source);
     }

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Iridio.Binding.Model;
-using Iridio.Zafiro;
+using Iridio.Common.Utils;
 using MoreLinq;
 
 namespace Iridio.Binding
@@ -9,9 +9,9 @@ namespace Iridio.Binding
     {
         private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
-        public void Visit(BoundScript boundScript)
+        public void Visit(CompiledScript compiledScript)
         {
-            boundScript.Functions.ForEach(function =>
+            compiledScript.Functions.ForEach(function =>
             {
                 function.Accept(this);
             });

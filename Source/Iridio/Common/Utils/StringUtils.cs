@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Iridio.Zafiro
+namespace Iridio.Common.Utils
 {
     public static class StringUtils
     {

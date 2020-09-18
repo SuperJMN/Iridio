@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions.Equivalency;
+using Iridio.Common;
 
 namespace Iridio.Tests
 {

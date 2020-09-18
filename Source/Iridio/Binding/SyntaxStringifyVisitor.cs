@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using Iridio.Common.Utils;
 using Iridio.Parsing.Model;
-using Iridio.Zafiro;
 using MoreLinq;
 
 namespace Iridio.Binding

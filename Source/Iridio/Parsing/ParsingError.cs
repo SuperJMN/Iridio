@@ -1,4 +1,4 @@
-﻿namespace Iridio
+﻿namespace Iridio.Parsing
 {
     public class ParsingError
     {

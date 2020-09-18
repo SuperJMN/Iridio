@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Iridio.Zafiro
+namespace Iridio.Common.Utils
 {
     public abstract class ValidString
     {

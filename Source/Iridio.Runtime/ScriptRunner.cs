@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Iridio.Binding;
 using Iridio.Binding.Model;
+using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional.Collections;
@@ -15,39 +16,18 @@ namespace Iridio.Runtime
 {
     public class ScriptRunner : IScriptRunner
     {
-        private readonly IFunction[] functions;
-        private readonly IEnhancedParser parser;
-        private readonly IBinder binder;
         private Dictionary<string, object> variables;
 
-        public ScriptRunner(IFunction[] functions, IEnhancedParser parser, IBinder binder)
-        {
-            this.functions = functions;
-            this.parser = parser;
-            this.binder = binder;
-        }
-
-        public async Task<Either<Errors, Success>> Run(string input, Dictionary<string, object> variables)
+        public Task<Either<Errors, Success>> Run(CompiledScript script, Dictionary<string, object> variables)
         {
             this.variables = variables;
 
-            var mapSuccess = parser
-                .Parse(input)
-                .MapLeft(pr => new Errors(ErrorKind.UnableToParse))
-                .MapRight(parsed => binder.Bind(parsed)
-                    .MapRight(async bound =>
-                    {
-                        var execute = await Execute(bound);
-                        return execute;
-                    }));
-
-            var awaitRight = await mapSuccess.RightTask();
-            return awaitRight.MapRight(either => new Success());
+            return Execute(script);
         }
 
-        private Task<Either<Errors, Success>> Execute(BoundScript bound)
+        private Task<Either<Errors, Success>> Execute(CompiledScript compiled)
         {
-            return Execute(bound.StartupFunction);
+            return Execute(compiled.StartupFunction);
         }
 
         private Task<Either<Errors, Success>> Execute(BoundFunctionDeclaration main)

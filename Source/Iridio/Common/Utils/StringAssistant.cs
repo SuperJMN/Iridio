@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Iridio.Zafiro
+namespace Iridio.Common.Utils
 {
     public class StringAssistant : IStringAssistant
     {

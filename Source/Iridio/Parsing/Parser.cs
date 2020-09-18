@@ -1,12 +1,11 @@
-﻿using Iridio.Parsing;
-using Iridio.Parsing.Model;
+﻿using Iridio.Parsing.Model;
 using Iridio.Tokenization;
 using Superpower;
 using Zafiro.Core.Patterns.Either;
 
-namespace Iridio
+namespace Iridio.Parsing
 {
-    public class EnhancedParser : IEnhancedParser
+    public class Parser : IParser
     {
         public Either<ParsingError, EnhancedScript> Parse(string source)
         {
