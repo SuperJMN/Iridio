@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Iridio.Runtime</PackageId>
+    <Authors>SuperJMN</Authors>
+    <Product>Iridio</Product>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleScript\SimpleScript.csproj" />
+    <ProjectReference Include="..\Iridio\Iridio.csproj" />
   </ItemGroup>
 
 </Project>
