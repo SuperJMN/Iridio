@@ -20,7 +20,7 @@ variables:
 
 stages:
   - stage: Stage
-    displayName: Build and publish
+    displayName: Build and pack
     jobs:
     - job: job
       steps:
