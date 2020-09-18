@@ -24,6 +24,7 @@ namespace SimpleScript.Tokenization
         LessOrEqual,
         If,
         Else,
-        NotEqual
+        NotEqual,
+        AnythingButBrackets
     }
 }

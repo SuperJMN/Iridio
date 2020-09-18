@@ -27,10 +27,13 @@ namespace SimpleScript.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierParameter =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
 
+        public static readonly TokenListParser<SimpleToken, string> DeclarationValue =
+            Token.EqualTo(SimpleToken.AnythingButBrackets).Select(token => token.ToStringValue());
+
         private static readonly TokenListParser<SimpleToken, Declaration> Declaration =
             (from id in Identifier
                 from colon in Token.EqualTo(SimpleToken.Colon)
-                from text in Identifier
+                from text in Text
                 select new {id, text})
             .Between(Token.EqualTo(SimpleToken.OpenBracket), Token.EqualTo(SimpleToken.CloseBracket))
             .Select(arg => new Declaration(arg.id, arg.text));

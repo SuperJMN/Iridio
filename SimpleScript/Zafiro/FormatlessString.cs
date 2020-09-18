@@ -2,7 +2,7 @@
 {
     public class FormatlessString : ValidString
     {
-        public FormatlessString(string value) : base(value)
+        private FormatlessString(string value) : base(value)
         {
         }
         

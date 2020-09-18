@@ -1,4 +1,4 @@
-﻿[Declaration:Something]
+﻿[Declaration:"Something"]
 
 Main 
 {

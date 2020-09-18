@@ -1,6 +1,0 @@
-﻿[Declaration:Something]
-
-Main 
-{
-	a = "{b}";
-}

@@ -39,13 +39,14 @@ namespace SimpleScript.Binding
             header.Declarations.ToList().ForEach(declaration =>
             {
                 declaration.Accept(this);
+                sa.NewLine();
             });
             sa.NewLine();
         }
 
         public void Visit(Declaration declaration)
         {
-            sa.Print($"[{declaration.Key}:{declaration.Value}]");
+            sa.Print($@"[{declaration.Key}:""{declaration.Value}""]");
         }
 
         public void Visit(EchoStatement echo)
