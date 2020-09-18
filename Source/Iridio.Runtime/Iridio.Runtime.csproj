@@ -7,6 +7,7 @@
     <Product>Iridio</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Icon.png</PackageIcon>
+    <Description>Simple runtime for the Iridio language.</Description>
   </PropertyGroup>
 
   <ItemGroup>
