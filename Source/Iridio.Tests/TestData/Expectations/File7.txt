@@ -1,0 +1,5 @@
+﻿Function
+{
+	a = 123;
+	b = "hello";
+}

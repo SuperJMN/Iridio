@@ -1,0 +1,8 @@
+﻿Function 
+{
+}
+
+Main 
+{ 
+	Function();
+}

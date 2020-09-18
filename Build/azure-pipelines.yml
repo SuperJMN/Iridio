@@ -1,0 +1,76 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  BuildPlatform: 'Any CPU'
+  BuildConfiguration: 'Release'
+  Major: 2
+  Minor: 0
+  Patch: $[counter(variables['Minor'], 0)] # this will reset when we bump Minor
+  NugetVersion: $(Major).$(Minor).$(Patch)
+  ArtifactName: 'Nuget Packages'
+
+stages:
+  - stage: Stage
+    displayName: Build and pack
+    jobs:
+    - job: job
+      steps:
+      - checkout: self
+        submodules: recursive            
+      - task: NuGetToolInstaller@1
+        displayName: 'Install NuGet'
+      - task: NuGetCommand@2
+        displayName: 'Restore packages'
+        inputs:
+          restoreSolution: 'Source\Iris.sln'
+      - task: DotNetCoreCLI@2
+        inputs:
+            command: 'pack'
+            packagesToPack: '**/*.csproj'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: NugetVersion
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: 'Source'
+          Contents: '**\Iris*.nupkg'
+          TargetFolder: '$(build.artifactstagingdirectory)'
+          flattenFolders: true
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish artifact $(ApplicationConfiguration)'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: $(ArtifactName)
+          publishLocation: 'Container'
+
+  - stage: Release
+    condition: succeeded()
+    jobs:
+    - job: Publish_NuGet_External      
+      steps:        
+      - checkout: none
+
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: current
+          downloadType: single
+          artifactName: $(ArtifactName)
+
+      - task: NuGetToolInstaller@1
+        displayName: 'Install NuGet'
+
+      - task: NuGetCommand@2
+        displayName: Publish packages
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'Nuget'

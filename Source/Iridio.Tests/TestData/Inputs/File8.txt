@@ -1,0 +1,5 @@
+﻿[Declaration:"Something"]
+
+Main 
+{
+}

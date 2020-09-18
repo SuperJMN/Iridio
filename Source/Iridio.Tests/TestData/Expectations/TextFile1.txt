@@ -1,0 +1,4 @@
+﻿Main
+{
+	Call("this", "and", "this");
+}

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Iridio.Runtime</PackageId>
+    <Authors>SuperJMN</Authors>
+    <Product>Iridio</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Icon.png</PackageIcon>
+    <Description>Simple runtime for the Iridio language.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="Optional.Collections" Version="1.1.0" />
+    <PackageReference Include="Zafiro.Core" Version="2.3.25" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Iridio\Iridio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Artwork\Icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
