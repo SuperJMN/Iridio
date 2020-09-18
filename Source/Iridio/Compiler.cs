@@ -18,7 +18,7 @@ namespace Iridio
             this.binder = new Binder(new BindingContext(functions));
         }
 
-        public Either<Errors, CompiledScript> Compile(string input)
+        public Either<Errors, CompilationUnit> Compile(string input)
         {
             var compileResult = parser
                 .Parse(input)

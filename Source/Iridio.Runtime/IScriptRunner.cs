@@ -8,6 +8,6 @@ namespace Iridio.Runtime
 {
     public interface IScriptRunner
     {
-        Task<Either<Errors, Success>> Run(CompiledScript input, Dictionary<string, object> variables);
+        Task<Either<Errors, Success>> Run(CompilationUnit compilationUnit, IDictionary<string, object> variables);
     }
 }

@@ -23,7 +23,7 @@ namespace Iridio.Binding
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public Either<Errors, CompiledScript> Bind(EnhancedScript script)
+        public Either<Errors, CompilationUnit> Bind(EnhancedScript script)
         {
             var eitherFuncs = script.Functions
                 .ToObservable()
@@ -40,7 +40,7 @@ namespace Iridio.Binding
             return CombineExtensions.Combine(combine, eitherMain, (a, _) =>
             {
                 var main = a.First(d => d.Name == "Main");
-                return (Either<Errors, CompiledScript>) new CompiledScript(main, a);
+                return (Either<Errors, CompilationUnit>) new CompilationUnit(main, a);
             }, Errors.Concat);
         }
 

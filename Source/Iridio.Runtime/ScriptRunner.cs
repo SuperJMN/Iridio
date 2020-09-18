@@ -16,16 +16,16 @@ namespace Iridio.Runtime
 {
     public class ScriptRunner : IScriptRunner
     {
-        private Dictionary<string, object> variables;
+        private IDictionary<string, object> variables;
 
-        public Task<Either<Errors, Success>> Run(CompiledScript script, Dictionary<string, object> variables)
+        public Task<Either<Errors, Success>> Run(CompilationUnit compilationUnit, IDictionary<string, object> variables)
         {
             this.variables = variables;
 
-            return Execute(script);
+            return Execute(compilationUnit);
         }
 
-        private Task<Either<Errors, Success>> Execute(CompiledScript compiled)
+        private Task<Either<Errors, Success>> Execute(CompilationUnit compiled)
         {
             return Execute(compiled.StartupFunction);
         }

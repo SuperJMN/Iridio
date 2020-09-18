@@ -9,9 +9,9 @@ namespace Iridio.Binding
     {
         private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
-        public void Visit(CompiledScript compiledScript)
+        public void Visit(CompilationUnit compilationUnit)
         {
-            compiledScript.Functions.ForEach(function =>
+            compilationUnit.Functions.ForEach(function =>
             {
                 function.Accept(this);
             });

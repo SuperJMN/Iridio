@@ -2,13 +2,13 @@
 
 namespace Iridio.Binding.Model
 {
-    public class CompiledScript : IBoundNode
+    public class CompilationUnit : IBoundNode
     {
         public BoundFunctionDeclaration StartupFunction { get; }
         public IEnumerable<BoundFunctionDeclaration> Functions { get; }
         public BoundHeader Header { get; set; }
 
-        public CompiledScript(BoundFunctionDeclaration startupFunction, IEnumerable<BoundFunctionDeclaration> functions)
+        public CompilationUnit(BoundFunctionDeclaration startupFunction, IEnumerable<BoundFunctionDeclaration> functions)
         {
             StartupFunction = startupFunction;
             Functions = functions;

@@ -7,6 +7,6 @@ namespace Iridio.Binding
 {
     public interface IBinder
     {
-        Either<Errors, CompiledScript> Bind(EnhancedScript script);
+        Either<Errors, CompilationUnit> Bind(EnhancedScript script);
     }
 }

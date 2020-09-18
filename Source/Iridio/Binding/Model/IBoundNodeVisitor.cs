@@ -2,7 +2,7 @@
 {
     public interface IBoundNodeVisitor
     {
-        void Visit(CompiledScript compiledScript);
+        void Visit(CompilationUnit compilationUnit);
         void Visit(BoundAssignmentStatement assignment);
         void Visit(BoundCondition boundScript);
         void Visit(BoundEchoStatement echo);
