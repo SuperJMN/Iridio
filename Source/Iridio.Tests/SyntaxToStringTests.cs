@@ -69,9 +69,9 @@ namespace Iridio.Tests
             return new Block(statements);
         }
 
-        private static FunctionDeclaration GetFunctionDeclaration(params Statement[] statements)
+        private static ProcedureDeclaration GetFunctionDeclaration(params Statement[] statements)
         {
-            return new FunctionDeclaration("Main", new Block(statements));
+            return new ProcedureDeclaration("Main", new Block(statements));
         }
     }
 }

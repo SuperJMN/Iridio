@@ -2,12 +2,12 @@
 
 namespace Iridio.Binding.Model
 {
-    public class BoundCustomCallExpression : BoundCallExpression
+    public class BoundProcedureCallExpression : BoundCallExpression
     {
         public BoundFunctionDeclaration FunctionDeclaration { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundCustomCallExpression(BoundFunctionDeclaration functionDeclaration, IEnumerable<BoundExpression> parameters)
+        public BoundProcedureCallExpression(BoundFunctionDeclaration functionDeclaration, IEnumerable<BoundExpression> parameters)
         {
             FunctionDeclaration = functionDeclaration;
             Parameters = parameters;

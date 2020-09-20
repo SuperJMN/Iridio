@@ -106,10 +106,10 @@ namespace Iridio.Parsing
                 .Between(Token.EqualTo(SimpleToken.OpenBrace), Token.EqualTo(SimpleToken.CloseBrace))
             select new Block(statements);
 
-        public static TokenListParser<SimpleToken, FunctionDeclaration> Function => 
+        public static TokenListParser<SimpleToken, ProcedureDeclaration> Function => 
             from i in Identifier
             from block in Block
-            select new FunctionDeclaration(i, block);
+            select new ProcedureDeclaration(i, block);
 
         public static TokenListParser<SimpleToken, EnhancedScript> Parser =>
             (from header in Header.Try().OptionalOrDefault()

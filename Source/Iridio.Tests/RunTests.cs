@@ -20,7 +20,7 @@ namespace Iridio.Tests
         //[Fact]
         //public async Task Run()
         //{
-        //    IEnumerable<FunctionDeclaration> funcs = new[] { new FunctionDeclaration(typeof(IntTask)), new FunctionDeclaration(typeof(StringTask)), };
+        //    IEnumerable<ProcedureDeclaration> funcs = new[] { new ProcedureDeclaration(typeof(IntTask)), new ProcedureDeclaration(typeof(StringTask)), };
         //    var runner = new Runner(funcs);
         //    var compiler = new Compiler(new Parser(), new FileSystemOperations());
         //    var script = compiler.Compile("Root.txt");

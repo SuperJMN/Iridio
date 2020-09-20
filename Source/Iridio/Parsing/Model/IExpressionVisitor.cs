@@ -12,7 +12,7 @@ namespace Iridio.Parsing.Model
         void Visit(EnhancedScript identifierExpression);
         void Visit(EchoStatement echoStatement);
         void Visit(Block block);
-        void Visit(FunctionDeclaration fd);
+        void Visit(ProcedureDeclaration fd);
         void Visit(Condition c);
         void Visit(Header header);
         void Visit(Declaration declaration);

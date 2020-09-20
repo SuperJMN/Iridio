@@ -1,11 +1,11 @@
 namespace Iridio.Parsing.Model
 {
-    public class FunctionDeclaration : ISyntax
+    public class ProcedureDeclaration : ISyntax
     {
         public string Name { get; }
         public Block Block { get; }
 
-        public FunctionDeclaration(string name, Block block)
+        public ProcedureDeclaration(string name, Block block)
         {
             Name = name;
             Block = block;

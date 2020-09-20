@@ -14,6 +14,6 @@
         void Visit(BoundIdentifier boundIdentifier);
         void Visit(BoundStringExpression identifier);
         void Visit(BoundBuiltInFunctionCallExpression functionDeclaration);
-        void Visit(BoundCustomCallExpression callExpression);
+        void Visit(BoundProcedureCallExpression callExpression);
     }
 }
