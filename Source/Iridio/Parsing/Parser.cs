@@ -9,9 +9,9 @@ namespace Iridio.Parsing
     {
         public Either<ParsingError, EnhancedScript> Parse(string source)
         {
-            var tokenization = Tokenizer.Create().Tokenize(source);
             try
             {
+                var tokenization = Tokenizer.Create().Tokenize(source);
                 return EnhancedParsers.Parser.Parse(tokenization);
             }
             catch (ParseException e)

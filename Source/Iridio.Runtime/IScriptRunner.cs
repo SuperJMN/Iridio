@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Iridio.Binding.Model;
 using Iridio.Common;
@@ -9,5 +10,6 @@ namespace Iridio.Runtime
     public interface IScriptRunner
     {
         Task<Either<Errors, Success>> Run(CompilationUnit compilationUnit, IDictionary<string, object> variables);
+        IObservable<string> Messages { get; }
     }
 }

@@ -10,6 +10,7 @@
         UndefinedMainFunction,
         BindError,
         UndeclaredFunction,
-        ReferenceToUninitializedVariable
+        ReferenceToUninitializedVariable,
+        ProcedureAlreadyDeclared
     }
 }

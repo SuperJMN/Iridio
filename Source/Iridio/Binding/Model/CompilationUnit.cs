@@ -5,12 +5,14 @@ namespace Iridio.Binding.Model
     public class CompilationUnit : IBoundNode
     {
         public BoundFunctionDeclaration StartupFunction { get; }
+        public BoundHeader Header { get; }
         public IEnumerable<BoundFunctionDeclaration> Functions { get; }
-        public BoundHeader Header { get; set; }
 
-        public CompilationUnit(BoundFunctionDeclaration startupFunction, IEnumerable<BoundFunctionDeclaration> functions)
+        public CompilationUnit(BoundFunctionDeclaration startupFunction, BoundHeader header,
+            IEnumerable<BoundFunctionDeclaration> functions)
         {
             StartupFunction = startupFunction;
+            Header = header;
             Functions = functions;
         }
 

@@ -1,0 +1,4 @@
+﻿Main
+{
+	<Doing something>
+}

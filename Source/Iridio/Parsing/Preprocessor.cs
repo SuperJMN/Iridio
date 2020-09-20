@@ -18,16 +18,21 @@ namespace Iridio.Parsing
         public string Process(string input)
         {
             var result = from line in input.Lines()
-                where !line.StartsWith("//")
+                where !IsComment(line)
                 let processed = ExpandIfNeeded(line)
                 select processed;
 
             return string.Join(Environment.NewLine, result);
         }
 
+        private bool IsComment(string line)
+        {
+            return Regex.IsMatch(line, @"\s*//");
+        }
+
         private string ExpandIfNeeded(string line)
         {
-            var match = Regex.Match(line, @"#include\s*(.*)");
+            var match = Regex.Match(line, @"#include\s+(.*)");
             if (match.Success)
             {
                 var file = match.Groups[1].Value;

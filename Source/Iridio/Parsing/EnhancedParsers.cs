@@ -27,9 +27,6 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierParameter =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
 
-        public static readonly TokenListParser<SimpleToken, string> DeclarationValue =
-            Token.EqualTo(SimpleToken.AnythingButBrackets).Select(token => token.ToStringValue());
-
         private static readonly TokenListParser<SimpleToken, Declaration> Declaration =
             (from id in Identifier
                 from colon in Token.EqualTo(SimpleToken.Colon)

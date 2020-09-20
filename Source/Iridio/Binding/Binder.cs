@@ -25,22 +25,24 @@ namespace Iridio.Binding
 
         public Either<Errors, CompilationUnit> Bind(EnhancedScript script)
         {
+            declaredFunctions.Clear();
+
             var eitherFuncs = script.Functions
                 .ToObservable()
                 .Select(Bind)
                 .Do(func => func.WhenRight(bf => declaredFunctions.Add(bf.Name, bf)))
                 .ToEnumerable();
 
-            var declarations = Bind(script.Header);
+            var header = Bind(script.Header);
 
             var eitherMain = script.Functions.FirstOrNone(f => f.Name == "Main").Match(
                 _ => Either.Success<Errors, bool>(true), () => new Errors(new Error(ErrorKind.UndefinedMainFunction, "Main function not defined")));
 
             var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
-            return CombineExtensions.Combine(combine, eitherMain, (a, _) =>
+            return CombineExtensions.Combine(combine, eitherMain, (functions, _) =>
             {
-                var main = a.First(d => d.Name == "Main");
-                return (Either<Errors, CompilationUnit>) new CompilationUnit(main, a);
+                var main = functions.First(d => d.Name == "Main");
+                return (Either<Errors, CompilationUnit>) new CompilationUnit(main, header, functions);
             }, Errors.Concat);
         }
 
@@ -49,13 +51,18 @@ namespace Iridio.Binding
             return new BoundHeader(header.Declarations.Select(Bind));
         }
 
-        private BoundDeclaration Bind(Declaration decl)
+        private static BoundDeclaration Bind(Declaration decl)
         {
             return new BoundDeclaration(decl.Key, decl.Value);
         }
 
         private Either<Errors, BoundFunctionDeclaration> Bind(FunctionDeclaration func)
         {
+            if (declaredFunctions.ContainsKey(func.Name))
+            {
+                return new Errors(new Error(ErrorKind.ProcedureAlreadyDeclared, func.Name));
+            }
+
             var statementsEither = CombineExtensions.Combine(func.Block.Statements.Select(Bind), (list, errorList) => Errors.Concat(errorList, errorList));
             var either = CombineExtensions.Combine<Errors, string, IEnumerable<BoundStatement>, BoundFunctionDeclaration>(
                 Either.Success<Errors, string>(func.Name), statementsEither,

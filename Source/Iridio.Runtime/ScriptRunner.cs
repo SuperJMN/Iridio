@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Iridio.Binding;
@@ -17,6 +19,7 @@ namespace Iridio.Runtime
     public class ScriptRunner : IScriptRunner
     {
         private IDictionary<string, object> variables;
+        private readonly ISubject<string> messages = new Subject<string>();
 
         public Task<Either<Errors, Success>> Run(CompilationUnit compilationUnit, IDictionary<string, object> variables)
         {
@@ -24,6 +27,8 @@ namespace Iridio.Runtime
 
             return Execute(compilationUnit);
         }
+
+        public IObservable<string> Messages => messages.AsObservable();
 
         private Task<Either<Errors, Success>> Execute(CompilationUnit compiled)
         {
@@ -59,14 +64,15 @@ namespace Iridio.Runtime
         {
             switch (statement)
             {
-                case BoundAssignmentStatement boundAssignmentStatement:
-                    return await Execute(boundAssignmentStatement);
-                case BoundCallStatement boundCallStatement:
-                    return await Execute(boundCallStatement);
-                case BoundEchoStatement boundEchoStatement:
+                case BoundAssignmentStatement assignment:
+                    return await Execute(assignment);
+                case BoundCallStatement call:
+                    return await Execute(call);
+                case BoundEchoStatement echo:
+                    messages.OnNext(echo.Message);
                     break;
-                case BoundIfStatement boundIfStatement:
-                    return await Execute(boundIfStatement);
+                case BoundIfStatement ifStatement:
+                    return await Execute(ifStatement);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(statement));
             }
