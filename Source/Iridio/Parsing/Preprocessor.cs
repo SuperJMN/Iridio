@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Iridio.Common.Utils;
@@ -15,9 +16,9 @@ namespace Iridio.Parsing
             this.fileSystemOperations = fileSystemOperations;
         }
 
-        public string Process(string input)
+        public string Process(string path)
         {
-            var result = from line in input.Lines()
+            var result = from line in fileSystemOperations.ReadAllText(path).Lines()
                 where !IsComment(line)
                 let processed = ExpandIfNeeded(line)
                 select processed;
@@ -36,8 +37,11 @@ namespace Iridio.Parsing
             if (match.Success)
             {
                 var file = match.Groups[1].Value;
-                var input = fileSystemOperations.ReadAllText(file);
-                return Process(input);
+                var newDir = Path.Combine(fileSystemOperations.WorkingDirectory, Path.GetDirectoryName(file));
+                using (new DirectorySwitch(fileSystemOperations, newDir))
+                {
+                    return Process(Path.GetFileName(file));
+                }
             }
 
             return line;

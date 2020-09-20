@@ -2,6 +2,6 @@
 {
     public interface IPreprocessor
     {
-        string Process(string input);
+        string Process(string path);
     }
 }

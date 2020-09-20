@@ -21,9 +21,9 @@ namespace Iridio
             preprocessor = new Preprocessor(new FileSystemOperations());
         }
 
-        public Either<Errors, CompilationUnit> Compile(string input)
+        public Either<Errors, CompilationUnit> Compile(string path)
         {
-            var processed = preprocessor.Process(input);
+            var processed = preprocessor.Process(path);
 
             var compileResult = parser
                 .Parse(processed)
