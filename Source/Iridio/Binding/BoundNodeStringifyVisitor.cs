@@ -100,7 +100,7 @@ namespace Iridio.Binding
             sa.Print(")");
         }
 
-        public void Visit(BoundCustomCallExpression callExpression)
+        public void Visit(BoundProcedureCallExpression callExpression)
         {
             sa.Print(callExpression.FunctionDeclaration.Name + "(");
             callExpression.Parameters.ToList().ForEach(ex =>

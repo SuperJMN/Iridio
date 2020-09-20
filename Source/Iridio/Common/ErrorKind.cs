@@ -9,7 +9,7 @@
         VariableNotFound,
         UndefinedMainFunction,
         BindError,
-        UndeclaredFunction,
+        UndeclaredFunctionOrProcedure,
         ReferenceToUninitializedVariable,
         ProcedureAlreadyDeclared
     }

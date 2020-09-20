@@ -184,7 +184,7 @@ namespace Iridio.Runtime
                     return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
                     return Evaluate(boundStringExpression);
-                case BoundCustomCallExpression boundCustomCallExpression:
+                case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
                 case BoundNumericExpression boundNumericExpression:
                     return boundNumericExpression.Value;
@@ -226,7 +226,7 @@ namespace Iridio.Runtime
             return result;
         }
 
-        private async Task<Either<Errors, object>> Evaluate(BoundCustomCallExpression call)
+        private async Task<Either<Errors, object>> Evaluate(BoundProcedureCallExpression call)
         {
             return await Execute(call.FunctionDeclaration.Block);
         }

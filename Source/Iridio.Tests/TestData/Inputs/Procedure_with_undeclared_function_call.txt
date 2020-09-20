@@ -1,0 +1,13 @@
+﻿[Requirement:"WimFile"]
+[Requirement:"WimImageIndex"]
+[Requirement:"Disk"]
+
+Function
+{
+	Unknown();	
+}
+
+Main 
+{
+	Function();
+}

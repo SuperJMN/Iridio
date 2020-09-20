@@ -12,7 +12,7 @@ namespace Iridio.Binding
         public void Visit(EnhancedScript boundScript)
         {
             boundScript.Header.Accept(this);
-            boundScript.Functions.ForEach(function =>
+            boundScript.Procedures.ForEach(function =>
             {
                 function.Accept(this);
             });
@@ -68,7 +68,7 @@ namespace Iridio.Binding
             });
         }
 
-        public void Visit(FunctionDeclaration fd)
+        public void Visit(ProcedureDeclaration fd)
         {
             sa.Print(fd.Name);
             fd.Block.Accept(this);
