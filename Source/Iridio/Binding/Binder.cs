@@ -8,6 +8,7 @@ using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional;
 using Optional.Collections;
+using Zafiro.Core.Mixins;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding
@@ -27,32 +28,31 @@ namespace Iridio.Binding
         {
             declaredProcedures.Clear();
 
-            var procedures = BindProcedures(script, script.Procedures);
+            var procedures = BindProcedures(script.Procedures);
             var header = Bind(script.Header);
 
             var eitherMain = script.Procedures.FirstOrNone(f => f.Name == "Main").Match(
                 _ => Either.Success<Errors, bool>(true), () => new Errors(new Error(ErrorKind.UndefinedMainFunction, "Main procedure not defined")));
-                        
+
             return CombineExtensions.Combine(procedures, eitherMain, (functions, _) =>
             {
                 var main = functions.First(d => d.Name == "Main");
-                return (Either<Errors, CompilationUnit>) new CompilationUnit(main, header, functions);
+                return (Either<Errors, CompilationUnit>)new CompilationUnit(main, header, functions);
             }, Errors.Concat);
         }
 
-        private Either<Errors, IEnumerable<BoundFunctionDeclaration>> BindProcedures(EnhancedScript script, ProcedureDeclaration[] functionDeclarations)
+        private Either<Errors, IEnumerable<BoundFunctionDeclaration>> BindProcedures(IEnumerable<ProcedureDeclaration> procs)
         {
-            var eitherFuncs = functionDeclarations
-                .ToObservable()
-                .Select(decl => new {Bound = Bind(decl), Decl = decl})
-                .Do(func =>
-                {
-                    func.Bound.WhenRight(bf => declaredProcedures.Add(bf.Name, bf));
-                    func.Bound.WhenLeft(bf =>
-                        declaredProcedures.Add(func.Decl.Name, new BoundFunctionDeclaration(func.Decl.Name, new BoundBlock())));
-                })
-                .Select(arg => arg.Bound)
-                .ToEnumerable();
+            var eitherFuncs = procs
+                .Select(decl => new { Bound = Bind(decl), Decl = decl })
+                //.Do(func =>
+                //{
+                //    func.Bound.WhenRight(bf => declaredProcedures.Add(bf.Name, bf));
+                //    func.Bound.WhenLeft(bf =>
+                //        declaredProcedures.Add(func.Decl.Name,
+                //            new BoundFunctionDeclaration(func.Decl.Name, new BoundBlock())));
+                //})
+                .Select(arg => arg.Bound);
 
             var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
             return combine;
@@ -102,18 +102,18 @@ namespace Iridio.Binding
         private Either<Errors, BoundStatement> Bind(AssignmentStatement assignmentStatement)
         {
             return CombineExtensions
-                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>) assignmentStatement.Variable, (expression, variable) =>
-                {
-                    var assignment = new BoundAssignmentStatement(variable, expression);
-                    initializedVariables.Add(variable);
-                    return (Either<Errors, BoundStatement>) assignment;
-                }, Errors.Concat);
+                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>)assignmentStatement.Variable, (expression, variable) =>
+               {
+                   var assignment = new BoundAssignmentStatement(variable, expression);
+                   initializedVariables.Add(variable);
+                   return (Either<Errors, BoundStatement>)assignment;
+               }, Errors.Concat);
         }
 
         private Either<Errors, BoundStatement> Bind(CallStatement callStatement)
         {
             var either = Bind(callStatement.Call);
-            return either.MapRight(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression) expression));
+            return either.MapRight(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression)expression));
         }
 
         private Either<Errors, BoundStatement> Bind(IfStatement ifStatement)
@@ -123,7 +123,7 @@ namespace Iridio.Binding
             var falseStatements = ifStatement.FalseBlock.Map(block => Bind(block));
 
             return falseStatements.Match(f => CombineExtensions.Combine(cond, trueStatements, f,
-                (condition, ts, fs) => (Either<Errors, BoundStatement>) new BoundIfStatement(condition, ts, fs.Some()),
+                (condition, ts, fs) => (Either<Errors, BoundStatement>)new BoundIfStatement(condition, ts, fs.Some()),
                 Errors.Concat), () => CombineExtensions.Combine(cond, trueStatements,
                 (condition, ts) => (Either<Errors, BoundStatement>)new BoundIfStatement(condition, ts, Option.None<BoundBlock>()),
                 Errors.Concat));
@@ -180,7 +180,7 @@ namespace Iridio.Binding
             {
                 return new Errors(variableIsInitialized.False.Select(variable => new Error(ErrorKind.ReferenceToUninitializedVariable, variable)));
             }
-            
+
             return new BoundStringExpression(stringExpression.String);
         }
 
@@ -191,11 +191,11 @@ namespace Iridio.Binding
             return declaredProcedures.GetValueOrNone(call.Name)
                 .Match(
                     func => eitherParameters.MapRight(parameters =>
-                        (BoundExpression) new BoundProcedureCallExpression(func, parameters)),
+                        (BoundExpression)new BoundProcedureCallExpression(func, parameters)),
                     () =>
                     {
                         return context.Functions.FirstOrNone(function => function.Name == call.Name)
-                            .Match(function => eitherParameters.MapRight(parameters => (BoundExpression) new BoundBuiltInFunctionCallExpression(function, parameters)),
+                            .Match(function => eitherParameters.MapRight(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
                                 () => new Errors(new Error(ErrorKind.UndeclaredFunctionOrProcedure, $"Undeclared function or procedure '{call.Name}'")));
                     });
         }
