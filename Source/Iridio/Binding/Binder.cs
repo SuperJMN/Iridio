@@ -45,13 +45,6 @@ namespace Iridio.Binding
         {
             var eitherFuncs = procs
                 .Select(decl => new { Bound = Bind(decl), Decl = decl })
-                //.Do(func =>
-                //{
-                //    func.Bound.WhenRight(bf => declaredProcedures.Add(bf.Name, bf));
-                //    func.Bound.WhenLeft(bf =>
-                //        declaredProcedures.Add(func.Decl.Name,
-                //            new BoundFunctionDeclaration(func.Decl.Name, new BoundBlock())));
-                //})
                 .Select(arg => arg.Bound);
 
             var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
