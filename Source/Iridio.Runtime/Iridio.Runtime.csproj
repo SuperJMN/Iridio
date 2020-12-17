@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\SuperJMN-Zafiro\Zafiro\Source\Zafiro.Core\Zafiro.Core.csproj" />
     <ProjectReference Include="..\Iridio\Iridio.csproj" />
   </ItemGroup>
 
