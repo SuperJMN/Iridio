@@ -1,144 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
-using Optional;
 using Optional.Collections;
-using Zafiro.Core.Mixins;
+using Optional.Unsafe;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding
 {
     public class Binder : IBinder
     {
-        private readonly BindingContext context;
-        private readonly IDictionary<string, BoundFunctionDeclaration> declaredProcedures = new Dictionary<string, BoundFunctionDeclaration>();
+        private readonly IDictionary<string, IFunctionDeclaration> functions;
+        private readonly Collection<Error> errors = new Collection<Error>();
+
+        private readonly IDictionary<string, BoundProcedure> procedures =
+            new Dictionary<string, BoundProcedure>();
+
         private readonly ISet<string> initializedVariables = new HashSet<string>();
 
-        public Binder(BindingContext context)
+        public Binder(IEnumerable<IFunctionDeclaration> functionDeclarations)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            if (functionDeclarations == null) throw new ArgumentNullException(nameof(functionDeclarations));
+            functions = functionDeclarations.ToDictionary(d => d.Name, d => d);
         }
 
-        public Either<Errors, CompilationUnit> Bind(EnhancedScript script)
+        public Either<Errors, Script> Bind(IridioSyntax syntax)
         {
-            declaredProcedures.Clear();
+            procedures.Clear();
+            initializedVariables.Clear();
+            errors.Clear();
 
-            var procedures = BindProcedures(script.Procedures);
-            var header = Bind(script.Header);
+            var procs = syntax.Procedures.Select(Bind);
+            var boundProcedures = procs.ToList();
+            var main = boundProcedures.FirstOrNone(b => b.Name == "Main");
+            main.MatchNone(() => errors.Add(new Error(ErrorKind.UndefinedMainFunction, "Main procedure is undefined")));
 
-            var eitherMain = script.Procedures.FirstOrNone(f => f.Name == "Main").Match(
-                _ => Either.Success<Errors, bool>(true), () => new Errors(new Error(ErrorKind.UndefinedMainFunction, "Main procedure not defined")));
-
-            return CombineExtensions.Combine(procedures, eitherMain, (functions, _) =>
+            if (errors.Any())
             {
-                var main = functions.First(d => d.Name == "Main");
-                return (Either<Errors, CompilationUnit>)new CompilationUnit(main, header, functions);
-            }, Errors.Concat);
-        }
-
-        private Either<Errors, IEnumerable<BoundFunctionDeclaration>> BindProcedures(IEnumerable<ProcedureDeclaration> procs)
-        {
-            var eitherFuncs = procs
-                .Select(decl => new { Bound = Bind(decl), Decl = decl })
-                .Select(arg => arg.Bound);
-
-            var combine = CombineExtensions.Combine(eitherFuncs, Errors.Concat);
-            return combine;
-        }
-
-        private BoundHeader Bind(Header header)
-        {
-            return new BoundHeader(header.Declarations.Select(Bind));
-        }
-
-        private static BoundDeclaration Bind(Declaration decl)
-        {
-            return new BoundDeclaration(decl.Key, decl.Value);
-        }
-
-        private Either<Errors, BoundFunctionDeclaration> Bind(ProcedureDeclaration func)
-        {
-            if (declaredProcedures.ContainsKey(func.Name))
-            {
-                return new Errors(new Error(ErrorKind.ProcedureAlreadyDeclared, func.Name));
+                return Either.Error<Errors, Script>(new Errors(errors));
             }
 
-            var statementsEither = CombineExtensions.Combine(func.Block.Statements.Select(Bind), Errors.Concat);
-            var either = CombineExtensions.Combine<Errors, string, IEnumerable<BoundStatement>, BoundFunctionDeclaration>(
-                Either.Success<Errors, string>(func.Name), statementsEither,
-                (name, statements) => new BoundFunctionDeclaration(name, new BoundBlock(statements)), Errors.Concat);
-            return either;
+            var script = new Script(boundProcedures, main.ValueOrFailure());
+            return Either.Success<Errors, Script>(script);
         }
 
-        private Either<Errors, BoundStatement> Bind(Statement statement)
+        private BoundProcedure Bind(Procedure proc)
         {
-            switch (statement)
+            if (functions.ContainsKey(proc.Name))
             {
-                case IfStatement ifs:
-                    return Bind(ifs);
-                case CallStatement call:
-                    return Bind(call);
-                case EchoStatement echo:
-                    return Bind(echo);
-                case AssignmentStatement assignment:
-                    return Bind(assignment);
+                AddError(new Error(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Name));
             }
 
-            return new Errors(new Error(ErrorKind.BindError, $"Cannot bind {statement}"));
+            var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList()));
+            procedures.Add(proc.Name, boundProcedure);
+            return boundProcedure;
         }
 
-        private Either<Errors, BoundStatement> Bind(AssignmentStatement assignmentStatement)
+        private BoundStatement Bind(Statement st)
         {
-            return CombineExtensions
-                .Combine(Bind(assignmentStatement.Expression), (Either<Errors, string>)assignmentStatement.Variable, (expression, variable) =>
-               {
-                   var assignment = new BoundAssignmentStatement(variable, expression);
-                   initializedVariables.Add(variable);
-                   return (Either<Errors, BoundStatement>)assignment;
-               }, Errors.Concat);
+            switch (st)
+            {
+                case AssignmentStatement assignmentStatement:
+                    return Bind(assignmentStatement);
+                case CallStatement callStatement:
+                    return Bind(callStatement);
+                case EchoStatement echoStatement:
+                    return Bind(echoStatement);
+                case IfStatement ifStatement:
+                    return Bind(ifStatement);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(st));
+            }
         }
 
-        private Either<Errors, BoundStatement> Bind(CallStatement callStatement)
+        private BoundStatement Bind(AssignmentStatement assignmentStatement)
         {
-            var either = Bind(callStatement.Call);
-            return either.MapRight(expression => (BoundStatement)new BoundCallStatement((BoundCallExpression)expression));
+            initializedVariables.Add(assignmentStatement.Variable);
+
+            return new BoundAssignmentStatement(assignmentStatement.Variable, Bind(assignmentStatement.Expression));
         }
 
-        private Either<Errors, BoundStatement> Bind(IfStatement ifStatement)
-        {
-            var cond = Bind(ifStatement.Condition);
-            var trueStatements = Bind(ifStatement.TrueBlock);
-            var falseStatements = ifStatement.FalseBlock.Map(block => Bind(block));
-
-            return falseStatements.Match(f => CombineExtensions.Combine(cond, trueStatements, f,
-                (condition, ts, fs) => (Either<Errors, BoundStatement>)new BoundIfStatement(condition, ts, fs.Some()),
-                Errors.Concat), () => CombineExtensions.Combine(cond, trueStatements,
-                (condition, ts) => (Either<Errors, BoundStatement>)new BoundIfStatement(condition, ts, Option.None<BoundBlock>()),
-                Errors.Concat));
-        }
-
-        private Either<Errors, BoundBlock> Bind(Block block)
-        {
-            var stataments = block.Statements.Select(Bind).Combine(Errors.Concat);
-            return stataments.MapRight(statements => new BoundBlock(statements));
-        }
-
-        private Either<Errors, BoundCondition> Bind(Condition condition)
-        {
-            var left = Bind(condition.Left);
-            var op = condition.Op;
-            var right = Bind(condition.Right);
-
-            return CombineExtensions.Combine<Errors, BoundExpression, BoundExpression, BoundCondition>(left, right,
-                (a, b) => new BoundCondition(a, op, b), Errors.Concat);
-        }
-
-        private Either<Errors, BoundExpression> Bind(Expression expression)
+        private BoundExpression Bind(Expression expression)
         {
             switch (expression)
             {
@@ -146,56 +92,94 @@ namespace Iridio.Binding
                     return Bind(callExpression);
                 case IdentifierExpression identifierExpression:
                     return Bind(identifierExpression);
-                case NumericExpression constant:
-                    return new BoundNumericExpression(constant.Value);
+
+                case NumericExpression numericExpression:
+                    return Bind(numericExpression);
                 case StringExpression stringExpression:
                     return Bind(stringExpression);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(expression));
             }
-
-            return new Errors(new Error(ErrorKind.BindError, $"Expression '{expression}' could not be bound"));
         }
 
-        private Either<Errors, BoundExpression> Bind(IdentifierExpression identifierExpression)
+        private BoundExpression Bind(StringExpression stringExpression)
         {
-            if (!initializedVariables.Contains(identifierExpression.Identifier))
-            {
-                return new Errors(new Error(ErrorKind.ReferenceToUninitializedVariable, identifierExpression.Identifier));
-            }
+            var str = stringExpression.String;
+            //LookupUninitializedReferences(str);
+
+            return new BoundStringExpression(str);
+        }
+
+        private void LookupUninitializedReferences(string str)
+        {
+            var references = References.FromString(str);
+            var notInitialized = references.Where(s => !initializedVariables.Contains(s));
+            notInitialized.ForEach(s => AddError(new Error(ErrorKind.ReferenceToUninitializedVariable, s)));
+        }
+
+        private BoundExpression Bind(NumericExpression numericExpression)
+        {
+            return new BoundNumericExpression(numericExpression.Value);
+        }
+
+        private BoundExpression Bind(IdentifierExpression identifierExpression)
+        {
+            //if (!initializedVariables.Contains(identifierExpression.Identifier))
+            //{
+            //    AddError(new Error(ErrorKind.ReferenceToUninitializedVariable, identifierExpression.Identifier));
+            //}
 
             return new BoundIdentifier(identifierExpression.Identifier);
         }
 
-        private Either<Errors, BoundExpression> Bind(StringExpression stringExpression)
+        private void AddError(Error error)
         {
-            var references = References.FromString(stringExpression.String);
-            var variableIsInitialized = references.Partition(s => initializedVariables.Contains(s));
-            if (variableIsInitialized.False.Any())
-            {
-                return new Errors(variableIsInitialized.False.Select(variable => new Error(ErrorKind.ReferenceToUninitializedVariable, variable)));
-            }
-
-            return new BoundStringExpression(stringExpression.String);
+            errors.Add(error);
         }
 
-        private Either<Errors, BoundExpression> Bind(CallExpression call)
+        private BoundCallExpression Bind(CallExpression callExpression)
         {
-            var eitherParameters = call.Parameters.Select(Bind).Combine(Errors.Concat);
+            var parameters = callExpression.Parameters.Select(Bind).ToList();
+            var func = functions.GetValueOrNone(callExpression.Name).Map(f => (BoundCallExpression)new BoundBuiltInFunctionCallExpression(f, parameters));
+            var proc = procedures.GetValueOrNone(callExpression.Name).Map(procedure => (BoundCallExpression)new BoundProcedureCallExpression(procedure, parameters));
 
-            return declaredProcedures.GetValueOrNone(call.Name)
-                .Match(
-                    func => eitherParameters.MapRight(parameters =>
-                        (BoundExpression)new BoundProcedureCallExpression(func, parameters)),
-                    () =>
-                    {
-                        return context.Functions.FirstOrNone(function => function.Name == call.Name)
-                            .Match(function => eitherParameters.MapRight(parameters => (BoundExpression)new BoundBuiltInFunctionCallExpression(function, parameters)),
-                                () => new Errors(new Error(ErrorKind.UndeclaredFunctionOrProcedure, $"Undeclared function or procedure '{call.Name}'")));
-                    });
+            var funcOrPro = func.Else(() => proc);
+
+            funcOrPro.MatchNone(() => errors.Add(new Error(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Name)));
+
+            return funcOrPro.ValueOr(new BoundEmptyCallExpression());
         }
 
-        private Either<Errors, BoundStatement> Bind(EchoStatement echoStatement)
+        private BoundStatement Bind(IfStatement ifStatement)
+        {
+            return new BoundIfStatement(Bind(ifStatement.Condition), Bind(ifStatement.TrueBlock), ifStatement.FalseBlock.Map(Bind));
+        }
+
+        private BoundBlock Bind(Block block)
+        {
+            return new BoundBlock(block.Statements.Select(Bind));
+        }
+
+        private BoundCondition Bind(Condition ifStatementCondition)
+        {
+            return new BoundCondition(Bind(ifStatementCondition.Left), ifStatementCondition.Op, Bind(ifStatementCondition.Right));
+        }
+
+        private BoundStatement Bind(EchoStatement echoStatement)
         {
             return new BoundEchoStatement(echoStatement.Message);
+        }
+
+        private BoundStatement Bind(CallStatement callStatement)
+        {
+            return new BoundCallStatement(Bind(callStatement.Call));
+        }
+    }
+
+    internal class BoundEmptyCallExpression : BoundCallExpression
+    {
+        public override void Accept(IBoundNodeVisitor visitor)
+        {
         }
     }
 }

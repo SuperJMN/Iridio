@@ -12,11 +12,12 @@
 
   <ItemGroup>
     <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="Optional.Async" Version="1.3.0" />
     <PackageReference Include="Optional.Collections" Version="1.1.0" />
-    <PackageReference Include="Zafiro.Core" Version="2.3.25" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\SuperJMN-Zafiro\Zafiro\Source\Zafiro.Core\Zafiro.Core.csproj" />
     <ProjectReference Include="..\Iridio\Iridio.csproj" />
   </ItemGroup>
 

@@ -38,7 +38,7 @@ namespace Iridio.Tests
             return new Binder(new BindingContext(new List<IFunction>()
             {
                 new Function("Call"),
-            }));
+            }), new List<IFunctionDeclaration>() { new FunctionDeclaration("Call")});
         }
 
         private static

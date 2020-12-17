@@ -4,15 +4,14 @@ namespace Iridio.Binding.Model
 {
     public class BoundProcedureCallExpression : BoundCallExpression
     {
-        public BoundFunctionDeclaration FunctionDeclaration { get; }
+        public BoundProcedure Procedure { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundProcedureCallExpression(BoundFunctionDeclaration functionDeclaration, IEnumerable<BoundExpression> parameters)
+        public BoundProcedureCallExpression(BoundProcedure procedure, IEnumerable<BoundExpression> parameters)
         {
-            FunctionDeclaration = functionDeclaration;
+            Procedure = procedure;
             Parameters = parameters;
         }
-
 
         public override void Accept(IBoundNodeVisitor visitor)
         {

@@ -9,9 +9,9 @@ namespace Iridio.Binding
     {
         private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
-        public void Visit(CompilationUnit compilationUnit)
+        public void Visit(Script compilationUnit)
         {
-            compilationUnit.Functions.ForEach(function =>
+            compilationUnit.Procedures.ForEach(function =>
             {
                 function.Accept(this);
             });
@@ -51,7 +51,7 @@ namespace Iridio.Binding
             });
         }
 
-        public void Visit(BoundFunctionDeclaration fd)
+        public void Visit(BoundProcedure fd)
         {
             sa.Print(fd.Name);
             fd.Block.Accept(this);
@@ -102,7 +102,7 @@ namespace Iridio.Binding
 
         public void Visit(BoundProcedureCallExpression callExpression)
         {
-            sa.Print(callExpression.FunctionDeclaration.Name + "(");
+            sa.Print(callExpression.Procedure.Name + "(");
             callExpression.Parameters.ToList().ForEach(ex =>
             {
                 ex.Accept(this);

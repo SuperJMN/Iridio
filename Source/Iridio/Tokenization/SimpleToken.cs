@@ -9,7 +9,7 @@ namespace Iridio.Tokenization
         Identifier,
         Echo,
         Text,
-        CloseParent,
+        CloseParen,
         OpenParen,
         Exclamation,
         Colon,

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using Iridio.Binding.Model;
 using Iridio.Common;
+using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding
 {
     public class BoundBuiltInFunctionCallExpression : BoundCallExpression
     {
-        public IFunction Function { get; }
+        public IFunctionDeclaration Function { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundBuiltInFunctionCallExpression(IFunction function, IEnumerable<BoundExpression> parameters)
+        public BoundBuiltInFunctionCallExpression(IFunctionDeclaration function, IEnumerable<BoundExpression> parameters)
         {
             Function = function;
             Parameters = parameters;

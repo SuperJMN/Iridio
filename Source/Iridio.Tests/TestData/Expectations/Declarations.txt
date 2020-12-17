@@ -1,5 +1,0 @@
-﻿[Declaration1:"Saludos cordiales"]
-[Declaration2:"Saludos cordiales2"]
-Main
-{
-}

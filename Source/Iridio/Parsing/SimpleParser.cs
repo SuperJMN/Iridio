@@ -19,19 +19,9 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> NumberParameter = Number.Select(x => (Expression)new NumericExpression(x));
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierParameter = Identifier.Select(x => (Expression)new IdentifierExpression(x));
 
-        private static readonly TokenListParser<SimpleToken, Declaration> Declaration =
-            (from id in Identifier
-                from colon in Token.EqualTo(SimpleToken.Colon)
-                from text in Identifier
-                select new {id, text})
-            .Between(Token.EqualTo(SimpleToken.OpenBracket), Token.EqualTo(SimpleToken.CloseBracket))
-            .Select(arg => new Declaration(arg.id, arg.text));
-
-        private static readonly TokenListParser<SimpleToken, Header> Header = Declaration.Many().Select(declarations => new Header(declarations));
-
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
             .ManyDelimitedBy(Token.EqualTo(SimpleToken.Comma))
-            .Between(SimpleToken.OpenParen, SimpleToken.CloseParent)
+            .Between(SimpleToken.OpenParen, SimpleToken.CloseParen)
             .Select(objects => objects);
 
         public static readonly TokenListParser<SimpleToken, Expression> CallExpression = from funcName in Identifier
@@ -59,9 +49,8 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Statement> Statement = Sentence.Try().Or(EchoSentence);
 
         public static TokenListParser<SimpleToken, ScriptSyntax> SimpleScript =>
-            (from header in Header.Try().OptionalOrDefault()
-                from statements in Statement.Many()
-                select new ScriptSyntax(header ?? new Header(Enumerable.Empty<Declaration>()), statements))
+            (from statements in Statement.Many()
+                select new ScriptSyntax(statements))
             .AtEnd();
     }
 }

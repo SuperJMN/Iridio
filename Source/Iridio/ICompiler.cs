@@ -6,6 +6,6 @@ namespace Iridio
 {
     public interface ICompiler
     {
-        Either<Errors, CompilationUnit> Compile(string path);
+        Either<Errors, Script> Compile(string path);
     }
 }

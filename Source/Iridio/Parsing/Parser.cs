@@ -7,16 +7,16 @@ namespace Iridio.Parsing
 {
     public class Parser : IParser
     {
-        public Either<ParsingError, EnhancedScript> Parse(string source)
+        public Either<ParsingError, IridioSyntax> Parse(string source)
         {
             try
             {
                 var tokenization = Tokenizer.Create().Tokenize(source);
-                return EnhancedParsers.Parser.Parse(tokenization);
+                return Either.Success<ParsingError, IridioSyntax>(EnhancedParsers.Parser.Parse(tokenization));
             }
             catch (ParseException e)
             {
-                return new ParsingError(e.ToString());
+                return Either.Error<ParsingError, IridioSyntax>(new ParsingError(e.ToString()));
             }
         }
     }

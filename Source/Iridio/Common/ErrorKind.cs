@@ -11,6 +11,7 @@
         BindError,
         UndeclaredFunctionOrProcedure,
         ReferenceToUninitializedVariable,
-        ProcedureAlreadyDeclared
+        ProcedureAlreadyDeclared,
+        ProcedureNameConflictsWithBuiltInFunction
     }
 }

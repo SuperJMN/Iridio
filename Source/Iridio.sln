@@ -5,9 +5,14 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio", "Iridio\Iridio.csproj", "{7D1BC888-13A2-4E66-8EEF-B4C4DD9054B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio.Runtime", "Iridio.Runtime\Iridio.Runtime.csproj", "{62976AA1-5A69-4511-967B-6DB1CD3BEE91}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio.Tests", "Iridio.Tests\Iridio.Tests.csproj", "{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E3E5FC8-B443-44A8-9E4E-223C4F834473}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio.Runtime", "Iridio.Runtime\Iridio.Runtime.csproj", "{AC79D02A-3648-490C-9912-AC3D82C87C83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +24,14 @@ Global
 		{7D1BC888-13A2-4E66-8EEF-B4C4DD9054B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D1BC888-13A2-4E66-8EEF-B4C4DD9054B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D1BC888-13A2-4E66-8EEF-B4C4DD9054B1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{62976AA1-5A69-4511-967B-6DB1CD3BEE91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{62976AA1-5A69-4511-967B-6DB1CD3BEE91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{62976AA1-5A69-4511-967B-6DB1CD3BEE91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{62976AA1-5A69-4511-967B-6DB1CD3BEE91}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC79D02A-3648-490C-9912-AC3D82C87C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC79D02A-3648-490C-9912-AC3D82C87C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC79D02A-3648-490C-9912-AC3D82C87C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC79D02A-3648-490C-9912-AC3D82C87C83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Iridio.Binding.Model;
 using Iridio.Common.Utils;
 using Iridio.Parsing.Model;
 using MoreLinq;
@@ -9,9 +10,8 @@ namespace Iridio.Binding
     {
         private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
-        public void Visit(EnhancedScript boundScript)
+        public void Visit(IridioSyntax boundScript)
         {
-            boundScript.Header.Accept(this);
             boundScript.Procedures.ForEach(function =>
             {
                 function.Accept(this);
@@ -34,21 +34,6 @@ namespace Iridio.Binding
             sa.Print(")");
         }
 
-        public void Visit(Header header)
-        {
-            header.Declarations.ToList().ForEach(declaration =>
-            {
-                declaration.Accept(this);
-                sa.NewLine();
-            });
-            sa.NewLine();
-        }
-
-        public void Visit(Declaration declaration)
-        {
-            sa.Print($@"[{declaration.Key}:""{declaration.Value}""]");
-        }
-
         public void Visit(EchoStatement echo)
         {
             sa.TabPrint($"<{echo.Message}>");
@@ -68,7 +53,7 @@ namespace Iridio.Binding
             });
         }
 
-        public void Visit(ProcedureDeclaration fd)
+        public void Visit(Procedure fd)
         {
             sa.Print(fd.Name);
             fd.Block.Accept(this);

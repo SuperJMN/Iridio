@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
@@ -17,11 +18,11 @@ namespace Iridio
         public Compiler(IEnumerable<IFunction> functions)
         {
             parser = new Parser();
-            binder = new Binder(new BindingContext(functions));
+            binder = new Binder(Enumerable.Empty<IFunctionDeclaration>());
             preprocessor = new Preprocessor(new FileSystemOperations());
         }
 
-        public Either<Errors, CompilationUnit> Compile(string path)
+        public Either<Errors, Script> Compile(string path)
         {
             var processed = preprocessor.Process(path);
 

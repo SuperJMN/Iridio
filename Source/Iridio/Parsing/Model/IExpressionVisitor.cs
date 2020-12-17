@@ -9,12 +9,10 @@ namespace Iridio.Parsing.Model
         void Visit(AssignmentStatement a);
         void Visit(IfStatement ifs);
         void Visit(CallStatement identifierExpression);
-        void Visit(EnhancedScript identifierExpression);
+        void Visit(IridioSyntax identifierExpression);
         void Visit(EchoStatement echoStatement);
         void Visit(Block block);
-        void Visit(ProcedureDeclaration fd);
+        void Visit(Procedure fd);
         void Visit(Condition c);
-        void Visit(Header header);
-        void Visit(Declaration declaration);
     }
 }

@@ -27,20 +27,9 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierParameter =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
 
-        private static readonly TokenListParser<SimpleToken, Declaration> Declaration =
-            (from id in Identifier
-                from colon in Token.EqualTo(SimpleToken.Colon)
-                from text in Text
-                select new {id, text})
-            .Between(Token.EqualTo(SimpleToken.OpenBracket), Token.EqualTo(SimpleToken.CloseBracket))
-            .Select(arg => new Declaration(arg.id, arg.text));
-
-        private static readonly TokenListParser<SimpleToken, Header> Header =
-            Declaration.Many().Select(declarations => new Header(declarations));
-
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
             .ManyDelimitedBy(Token.EqualTo(SimpleToken.Comma))
-            .Between(SimpleToken.OpenParen, SimpleToken.CloseParent)
+            .Between(SimpleToken.OpenParen, SimpleToken.CloseParen)
             .Select(objects => objects);
 
         public static readonly TokenListParser<SimpleToken, Expression> CallExpression = from funcName in Identifier
@@ -66,7 +55,7 @@ namespace Iridio.Parsing
                 from op in BooleanOperators
                 from right in Expression
                 select new Condition(left, op, right))
-            .Between(Token.EqualTo(SimpleToken.OpenParen), Token.EqualTo(SimpleToken.CloseParent));
+            .Between(Token.EqualTo(SimpleToken.OpenParen), Token.EqualTo(SimpleToken.CloseParen));
 
         public static readonly TokenListParser<SimpleToken, Statement> IfStatement =
             from keyword in Token.EqualTo(SimpleToken.If)
@@ -97,7 +86,7 @@ namespace Iridio.Parsing
             from semicolon in Token.EqualTo(SimpleToken.Semicolon)
             select s;
 
-        public static readonly TokenListParser<SimpleToken, Statement> Sentence = SingleSentence.Try().Or(IfStatement);
+        public static readonly TokenListParser<SimpleToken, Statement> Sentence = IfStatement.Try().Or(SingleSentence);
 
         public static readonly TokenListParser<SimpleToken, Statement> Statement = Sentence.Try().Or(EchoSentence);
 
@@ -106,15 +95,14 @@ namespace Iridio.Parsing
                 .Between(Token.EqualTo(SimpleToken.OpenBrace), Token.EqualTo(SimpleToken.CloseBrace))
             select new Block(statements);
 
-        public static TokenListParser<SimpleToken, ProcedureDeclaration> Function => 
+        public static TokenListParser<SimpleToken, Procedure> Function => 
             from i in Identifier
             from block in Block
-            select new ProcedureDeclaration(i, block);
+            select new Procedure(i, block);
 
-        public static TokenListParser<SimpleToken, EnhancedScript> Parser =>
-            (from header in Header.Try().OptionalOrDefault()
-                from functions in Function.Many()
-                select new EnhancedScript(header ?? new Header(Enumerable.Empty<Declaration>()), functions))
+        public static TokenListParser<SimpleToken, IridioSyntax> Parser =>
+            (from functions in Function.Many()
+                select new IridioSyntax(functions))
             .AtEnd();
     }
 }

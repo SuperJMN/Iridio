@@ -2,12 +2,12 @@
 
 namespace Iridio.Binding.Model
 {
-    public class BoundFunctionDeclaration : IBoundNode
+    public class BoundProcedure : IBoundNode
     {
         public string Name { get; }
         public BoundBlock Block { get; }
 
-        public BoundFunctionDeclaration(string name, BoundBlock block)
+        public BoundProcedure(string name, BoundBlock block)
         {
             Name = name;
             Block = block;

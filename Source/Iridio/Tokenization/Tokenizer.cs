@@ -19,7 +19,7 @@ namespace Iridio.Tokenization
                 .Match(Character.EqualTo(','), SimpleToken.Comma)
                 .Match(Character.EqualTo('='), SimpleToken.Equal)
                 .Match(Character.EqualTo('('), SimpleToken.OpenParen)
-                .Match(Character.EqualTo(')'), SimpleToken.CloseParent)
+                .Match(Character.EqualTo(')'), SimpleToken.CloseParen)
                 .Match(Character.EqualTo('['), SimpleToken.OpenBracket)
                 .Match(Character.EqualTo(']'), SimpleToken.CloseBracket)
                 .Match(Character.EqualTo('{'), SimpleToken.OpenBrace)

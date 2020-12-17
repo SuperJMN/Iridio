@@ -19,9 +19,9 @@ namespace Iridio.Common
         {
         }
 
-        public static Errors Concat(Errors another, Errors errors)
+        public static Errors Concat(Errors error, Errors anotherError)
         {
-            return new Errors(Enumerable.Concat(another, errors));
+            return new Errors(error.Concat(anotherError));
         }
 
         public static string Join(Errors list)

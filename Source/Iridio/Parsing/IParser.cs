@@ -5,6 +5,6 @@ namespace Iridio.Parsing
 {
     public interface IParser
     {
-        Either<ParsingError, EnhancedScript> Parse(string source);
+        Either<ParsingError, IridioSyntax> Parse(string source);
     }
 }
