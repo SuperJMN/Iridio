@@ -34,7 +34,7 @@ namespace Iridio.Parsing
 
         private bool IsComment(string line)
         {
-            return Regex.IsMatch(line, @"\s*//");
+            return Regex.IsMatch(line, @"(?<!\S)\s*(//.*)");
         }
 
         private string ExpandIfNeeded(string line)
