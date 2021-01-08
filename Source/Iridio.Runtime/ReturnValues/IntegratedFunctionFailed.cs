@@ -17,7 +17,7 @@ namespace Iridio.Runtime.ReturnValues
 
         public override string ToString()
         {
-            return $"Function {Function.Name} threw an exception: '{Exception.InnerException?.Message}'";
+            return $"Function {Function.Name} threw an exception: '{Exception.Message}'";
         }
 
         public override IEnumerable<string> Items => new[] {ToString()};
