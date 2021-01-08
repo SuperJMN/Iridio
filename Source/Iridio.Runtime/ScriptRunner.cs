@@ -14,6 +14,7 @@ using Iridio.Runtime.ReturnValues;
 using MoreLinq.Extensions;
 using Optional.Async.Extensions;
 using Optional.Collections;
+using Optional.Unsafe;
 using Zafiro.Core;
 using Zafiro.Core.Patterns.Either;
 
@@ -51,13 +52,16 @@ namespace Iridio.Runtime
 
         private async Task<Either<RuntimeErrors, Success>> Execute(BoundBlock block)
         {
-            var statementExecutions = await block.Statements.AsyncSelect(Execute);
+            foreach (var st in block.Statements)
+            {
+                var result = await Execute(st);
+                if (!result.IsRight())
+                {
+                    return result.Left.ValueOrFailure();
+                }
+            }
 
-            var execResult = CombineExtensions
-                .Combine(statementExecutions.TakeUntil(ExecutionFails), RuntimeErrors.Concat)
-                .MapRight(successes => new Success());
-
-            return execResult;
+            return new Success();
         }
 
         private static bool ExecutionFails(Either<RuntimeErrors, Success> either)
@@ -272,6 +276,8 @@ namespace Iridio.Runtime
                 {
                     case TaskCanceledException tc:
                         return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new ExecutionCanceled(tc.Message)));
+                    case Exception inner:
+                        return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new IntegratedFunctionFailed(function, inner)));
                     default:
                         return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new IntegratedFunctionFailed(function, ex)));
                 }
