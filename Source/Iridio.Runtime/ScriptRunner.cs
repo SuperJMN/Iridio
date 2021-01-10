@@ -64,15 +64,6 @@ namespace Iridio.Runtime
             return new Success();
         }
 
-        private static bool ExecutionFails(Either<RuntimeErrors, Success> either)
-        {
-            var executionFails = either
-                .MapRight(success => false)
-                .Handle(errors => errors.Any());
-
-            return executionFails;
-        }
-
         private async Task<Either<RuntimeErrors, Success>> Execute(BoundStatement statement)
         {
             switch (statement)
