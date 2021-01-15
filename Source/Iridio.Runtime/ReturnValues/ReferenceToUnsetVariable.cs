@@ -2,7 +2,7 @@
 
 namespace Iridio.Runtime.ReturnValues
 {
-    internal class ReferenceToUnsetVariable : RuntimeError
+    public class ReferenceToUnsetVariable : RuntimeError
     {
         public string VariableName { get; }
 

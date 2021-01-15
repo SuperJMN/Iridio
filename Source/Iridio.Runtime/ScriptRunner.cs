@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
+using Iridio.Parsing;
 using Iridio.Parsing.Model;
 using Iridio.Runtime.ReturnValues;
 using MoreLinq.Extensions;
@@ -197,15 +198,18 @@ namespace Iridio.Runtime
 
         private Either<RuntimeErrors, object> Evaluate(BoundStringExpression boundStringExpression)
         {
-            var referencedReplaced = Replace(boundStringExpression.String);
-            return referencedReplaced.MapRight(s =>
-            {
-                var a = Regex.Replace(s, "{{", "{");
-                var b = Regex.Replace(a, "}}", "}");
-                var c = Regex.Replace(b, @"\"".*\""", "{$1}");
+            var pattern = "(?<=(?<!{)(?:{{)*){([^{}]*)}(?=(?:}})*(?!}))";
+            var str = boundStringExpression.String;
+            var r = str.ReplaceWithRegex(pattern, FindReplacement);
+            return r.RegexReplace("{{", "{")
+                .RegexReplace("}}", "}");
+        }
 
-                return Either.Success<RuntimeErrors, object>(s);
-            });
+        private Replacement FindReplacement(Match arg)
+        {
+            var refName = arg.Groups[1].Value;
+            var value = variables[refName];
+            return new Replacement(value.ToString(), arg.Groups[0]);
         }
 
         private Either<RuntimeErrors, string> Replace(string str)

@@ -1,50 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reactive.Joins;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 using FluentAssertions;
+using Iridio.Runtime;
+using Iridio.Runtime.ReturnValues;
 using Xunit;
-
-//  This is it: "(?<!{)({{)?{([^{}]+)}(?(1)}})(?!})"
+using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Tests
 {
-    public class StringReplacerTests
+    public class StringEvaluatorTests
     {
         [Fact]
-        public void Given_simple_input_the_correct_output_should_be_the_expected()
+        public void All_variables_should_be_found()
         {
-            var pattern = "(?<=(?<!{)(?:{{)*){([^{}]*)}(?=(?:}})*(?!}))";
-            var input = "Hello {replaced}, {{non_replaced}}, {{{replaced_between_braces}}}";
-            
-            var actual = input.ReplaceWithRegex(pattern, match =>
+            var sut = new StringEvaluator();
+            var dict = new Dictionary<string, object>
             {
-                var dict = new Dictionary<string, string>
-                {
-                    {"replaced", "mate"},
-                    {"replaced_between_braces", "boy!"},
-                    {"non_replaced", "will not appear on resulting string"}, {"", ""},
-                };
+                {"replaced", "mate"},
+                {"replaced_between_braces", "boy!"},
+                {"non_replaced", "will not appear on resulting string"},
+            };
 
-                var toReplace = match.Groups[1].Value;
-                return new Replacement(dict[toReplace], match.Groups[0]);
-            });
-
-            var expected = "Hello mate, {{non_replaced}}, {{boy!}}";
-
+            var actual = sut.Evaluate("Hello {replaced}, {{non_replaced}}, {{{replaced_between_braces}}}", dict);
+            var expected = Either.Success<RuntimeErrors, string>("Hello mate, {{non_replaced}}, {{boy!}}");
             actual.Should().Be(expected);
         }
-    }
 
-    public class Replacement
-    {
-        public string String { get; }
-        public Group Range { get; }
-
-        public Replacement(string @string, Group range)
+        [Fact]
+        public void Variable_not_found()
         {
-            String = @string;
-            Range = range;
+            var sut = new StringEvaluator();
+            var dict = new Dictionary<string, object>();
+
+            var actual = sut.Evaluate("This will {fail}", dict);
+            var expected = Either.Error<RuntimeErrors, string>(new RuntimeErrors(new ReferenceToUnsetVariable("fail")));
+            actual.Should().Be(expected);
         }
     }
 }
