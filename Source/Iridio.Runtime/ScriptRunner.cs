@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
-using Iridio.Parsing;
 using Iridio.Parsing.Model;
 using Iridio.Runtime.ReturnValues;
-using MoreLinq.Extensions;
 using Optional.Async.Extensions;
 using Optional.Collections;
 using Optional.Unsafe;
@@ -198,51 +194,9 @@ namespace Iridio.Runtime
 
         private Either<RuntimeErrors, object> Evaluate(BoundStringExpression boundStringExpression)
         {
-            var pattern = "(?<=(?<!{)(?:{{)*){([^{}]*)}(?=(?:}})*(?!}))";
             var str = boundStringExpression.String;
-            var r = str.ReplaceWithRegex(pattern, FindReplacement);
-            return r.RegexReplace("{{", "{")
-                .RegexReplace("}}", "}");
-        }
-
-        private Replacement FindReplacement(Match arg)
-        {
-            var refName = arg.Groups[1].Value;
-            var value = variables[refName];
-            return new Replacement(value.ToString(), arg.Groups[0]);
-        }
-
-        private Either<RuntimeErrors, string> Replace(string str)
-        {
-            var references = References.FromString(str).ToList();
-            var undefinedReferences = references.Except(variables.Keys).ToList();
-            if (undefinedReferences.Any())
-            {
-                return new RuntimeErrors(undefinedReferences.Select(s => new ReferenceToUnsetVariable(s)));
-            }
-
-            var refsAndValues = from variable in references
-                                from value in DictionaryExtensions.GetValueOrNone(variables, variable).ToEnumerable()
-                                select new { variable, value };
-
-            var refsAndValuesList = refsAndValues.ToList();
-
-            var pattern = string.Join("|", refsAndValuesList.Select(arg => $"{{{arg.variable}}}"));
-            if (pattern == "")
-            {
-                return str;
-            }
-
-            var regex = new Regex(pattern);
-            var valuesDict = refsAndValuesList.ToDictionary(x => x.variable, x => x.value);
-            var result = regex.Replace(str, match =>
-            {
-                var skipLast = MoreLinq.MoreEnumerable.SkipLast(match.Value.Skip(1), 1);
-                var key = new string(skipLast.ToArray());
-                return valuesDict[key].ToString();
-            });
-
-            return result;
+            var evaluator = new StringEvaluator();
+            return evaluator.Evaluate(str, variables);
         }
 
         private async Task<Either<RuntimeErrors, object>> Evaluate(BoundProcedureCallExpression call)
