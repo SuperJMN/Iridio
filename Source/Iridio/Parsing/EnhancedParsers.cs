@@ -1,4 +1,3 @@
-using System.Linq;
 using Iridio.Parsing.Model;
 using Iridio.Tokenization;
 using Optional;
@@ -13,7 +12,17 @@ namespace Iridio.Parsing
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
 
         private static readonly TokenListParser<SimpleToken, string> Text = Token.EqualTo(SimpleToken.Text)
-            .Apply(ExtraParsers.SpanBetween('\"').Select(x => x.ToStringValue()));
+            .Select(x => Unescape(Unwrap(x.ToStringValue())));
+
+        private static string Unwrap(string str)
+        {
+            return str.Substring(1, str.Length-2);
+        }
+
+        private static string Unescape(string token)
+        {
+            return token.RegexReplace("\"\"", "\"");
+        }
 
         private static readonly TokenListParser<SimpleToken, int> Number =
             Token.EqualTo(SimpleToken.Number).Apply(Numerics.IntegerInt32);

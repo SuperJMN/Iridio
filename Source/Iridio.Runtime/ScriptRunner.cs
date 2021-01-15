@@ -200,9 +200,11 @@ namespace Iridio.Runtime
             var referencedReplaced = Replace(boundStringExpression.String);
             return referencedReplaced.MapRight(s =>
             {
-                var unescaped = Regex.Replace(s, @"\\\{(.+)\\\}", "{$1}");
+                var a = Regex.Replace(s, "{{", "{");
+                var b = Regex.Replace(a, "}}", "}");
+                var c = Regex.Replace(b, @"\"".*\""", "{$1}");
 
-                return Either.Success<RuntimeErrors, object>(unescaped);
+                return Either.Success<RuntimeErrors, object>(s);
             });
         }
 

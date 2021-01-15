@@ -10,7 +10,7 @@ namespace Iridio.Tokenization
         public static Tokenizer<SimpleToken> Create()
         {
             var builder = new TokenizerBuilder<SimpleToken>()
-                .Match(ExtraParsers.SpanBetween('\"'), SimpleToken.Text)
+                .Match(Span.Regex(@"""((?:""""|[^""])*)"""), SimpleToken.Text)
                 .Match(ExtraParsers.SpanBetween('<', '>'), SimpleToken.Echo)
                 .Ignore(Span.WhiteSpace)
                 .BooleanOperators()
