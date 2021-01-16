@@ -22,7 +22,12 @@ namespace Iridio.Runtime
                 return new RuntimeErrors(errors);
             }
 
-            return Replace(str, dictionary);
+            var replace = Replace(str, dictionary);
+            
+            return replace
+                .Replace("\"\"", "\"")
+                .Replace("{{", "{")
+                .Replace("}}", "}");
         }
 
         private string Replace(string str, IDictionary<string, object> dictionary)

@@ -196,7 +196,8 @@ namespace Iridio.Runtime
         {
             var str = boundStringExpression.String;
             var evaluator = new StringEvaluator();
-            return evaluator.Evaluate(str, variables);
+            var either = evaluator.Evaluate(str, variables);
+            return either.MapRight(s => (object)s);
         }
 
         private async Task<Either<RuntimeErrors, object>> Evaluate(BoundProcedureCallExpression call)

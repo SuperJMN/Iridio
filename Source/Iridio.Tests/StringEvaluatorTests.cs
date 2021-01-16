@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Iridio.Runtime;
 using Iridio.Runtime.ReturnValues;
+using Optional;
 using Xunit;
 using Zafiro.Core.Patterns.Either;
 
@@ -21,8 +22,8 @@ namespace Iridio.Tests
             };
 
             var actual = sut.Evaluate("Hello {replaced}, {{non_replaced}}, {{{replaced_between_braces}}}", dict);
-            var expected = Either.Success<RuntimeErrors, string>("Hello mate, {{non_replaced}}, {{boy!}}");
-            actual.Should().Be(expected);
+            var expected = Either.Success<RuntimeErrors, string>("Hello mate, {non_replaced}, {boy!}");
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -33,7 +34,9 @@ namespace Iridio.Tests
 
             var actual = sut.Evaluate("This will {fail}", dict);
             var expected = Either.Error<RuntimeErrors, string>(new RuntimeErrors(new ReferenceToUnsetVariable("fail")));
-            actual.Should().Be(expected);
+            actual.Should().BeEquivalentTo(expected, options => options
+                .ComparingByMembers(typeof(Either<,>))
+                .ComparingByMembers(typeof(Option<RuntimeErrors>)));
         }
     }
 }
