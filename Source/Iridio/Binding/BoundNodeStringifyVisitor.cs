@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using Iridio.Binding.Model;
 using Iridio.Common.Utils;
 using MoreLinq;
@@ -77,7 +78,7 @@ namespace Iridio.Binding
             sa.NewLine();
         }
 
-        public void Visit(BoundNumericExpression ne)
+        public void Visit(BoundIntegerExpression ne)
         {
             sa.Print(ne.Value.ToString());
         }
@@ -109,6 +110,11 @@ namespace Iridio.Binding
                 sa.Print(", ");
             }, ex => ex.Accept(this));
             sa.Print(")");
+        }
+
+        public void Visit(BoundDoubleExpression doubleExpression)
+        {
+            sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void Visit(BoundIdentifier boundIdentifier)

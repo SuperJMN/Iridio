@@ -36,9 +36,9 @@ namespace Iridio.Common.Utils
             action();
         }
 
-        public void Indentate(Action action)
+        public void Indent(Action action)
         {
-            Do(() => inner.Indentate(action));
+            Do(() => inner.Indent(action));
         }
 
         public void NewLine()

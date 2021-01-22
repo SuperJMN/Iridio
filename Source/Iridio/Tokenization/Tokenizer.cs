@@ -27,7 +27,8 @@ namespace Iridio.Tokenization
                 .Match(Character.EqualTo(';'), SimpleToken.Semicolon)
                 .Match(Span.EqualTo("if"), SimpleToken.If, true)
                 .Match(Span.EqualTo("else"), SimpleToken.Else, true)
-                .Match(Numerics.Integer, SimpleToken.Number)
+                .Match(Numerics.Integer, SimpleToken.Integer)
+                .Match(Numerics.DecimalDouble, SimpleToken.Double)
                 .Match(Span.Regex(IdentifierRegex), SimpleToken.Identifier)
                 .Build();
             return builder;

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Iridio.Common;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding.Model
 {

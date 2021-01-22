@@ -12,7 +12,8 @@ namespace Iridio.Parsing
             try
             {
                 var tokenization = Tokenizer.Create().Tokenize(source);
-                return Either.Success<ParsingError, IridioSyntax>(EnhancedParsers.Parser.Parse(tokenization));
+                var parsed = ParserDefinitions.Parser.Parse(tokenization);
+                return Either.Success<ParsingError, IridioSyntax>(parsed);
             }
             catch (ParseException e)
             {

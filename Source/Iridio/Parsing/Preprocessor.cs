@@ -18,7 +18,9 @@ namespace Iridio.Parsing
 
         public string Process(string path)
         {
-            var newDir = Path.Combine(fileSystemOperations.WorkingDirectory, Path.GetDirectoryName(path));
+            var directoryName = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
+            
+            var newDir = Path.Combine(fileSystemOperations.WorkingDirectory, directoryName);
             var file = Path.GetFileName(path);
 
             using (new DirectorySwitch(fileSystemOperations, newDir))

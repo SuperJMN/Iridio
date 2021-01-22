@@ -12,5 +12,10 @@ namespace Iridio.Parsing.Model
 
         public Type Type { get; }
         public string Name { get; }
+
+        public override string ToString()
+        {
+            return $"{Name}";
+        }
     }
 }

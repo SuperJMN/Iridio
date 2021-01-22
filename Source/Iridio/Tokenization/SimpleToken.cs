@@ -4,7 +4,7 @@ namespace Iridio.Tokenization
     {
         Comma,
         Equal,
-        Number,
+        Integer,
         Semicolon,
         Identifier,
         Echo,
@@ -25,6 +25,7 @@ namespace Iridio.Tokenization
         If,
         Else,
         NotEqual,
-        AnythingButBrackets
+        AnythingButBrackets,
+        Double
     }
 }

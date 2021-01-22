@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
@@ -9,13 +8,14 @@ using Zafiro.Core.Patterns.Either;
 
 namespace Iridio
 {
+    // ReSharper disable once UnusedType.Global
     public class Compiler : ICompiler
     {
         private readonly IParser parser;
         private readonly IBinder binder;
         private readonly Preprocessor preprocessor;
 
-        public Compiler(IEnumerable<IFunction> functions)
+        public Compiler()
         {
             parser = new Parser();
             binder = new Binder(Enumerable.Empty<IFunctionDeclaration>());
@@ -28,7 +28,7 @@ namespace Iridio
 
             var compileResult = parser
                 .Parse(processed)
-                .MapLeft(pr => new Errors(ErrorKind.UnableToParse))
+                .MapLeft(_ => new Errors(ErrorKind.UnableToParse))
                 .MapRight(parsed => binder.Bind(parsed));
 
             return compileResult;

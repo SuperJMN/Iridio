@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Iridio.Runtime.ReturnValues;
+using Zafiro.Core.Mixins;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Runtime
@@ -15,7 +16,7 @@ namespace Iridio.Runtime
             var matches = Regex.Matches(str, Pattern);
             var refs = matches.Cast<Match>().Select(x => x.Groups[1].Value);
 
-            var notFound = refs.Except(dictionary.Keys);
+            var notFound = refs.Except(dictionary.Keys).ToList();
             if (notFound.Any())
             {
                 var errors = notFound.Select(nf => new ReferenceToUnsetVariable(nf));
@@ -38,7 +39,7 @@ namespace Iridio.Runtime
                 var refName = m.Groups[1].Value;
                 var toReplace = m.Groups[0];
                 var replacement = dictionary[refName].ToString();
-                str = TextMixin.Replace(str, toReplace.Index, toReplace.Length, replacement);
+                str = str.Replace(toReplace.Index, toReplace.Length, replacement);
             }
 
             return str;

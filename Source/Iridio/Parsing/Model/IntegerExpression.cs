@@ -1,8 +1,8 @@
 namespace Iridio.Parsing.Model
 {
-    public class NumericExpression : Expression
+    public class IntegerExpression : Expression
     {
-        public NumericExpression(in int n)
+        public IntegerExpression(in int n)
         {
             Value = n;
         }

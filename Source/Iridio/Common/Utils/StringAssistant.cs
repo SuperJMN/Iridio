@@ -8,7 +8,7 @@ namespace Iridio.Common.Utils
         private readonly StringBuilder stringBuilder = new StringBuilder();
         private int indentLevel;
 
-        private string Indent => GetIndent(indentLevel);
+        private string IndentLevel => GetIndent(indentLevel);
 
         public void IncreaseIndent()
         {
@@ -46,10 +46,10 @@ namespace Iridio.Common.Utils
 
         public void TabPrint(FormatlessString str)
         {
-            stringBuilder.Append($"{Indent}{str}");
+            stringBuilder.Append($"{IndentLevel}{str}");
         }
 
-        public void Indentate(Action action)
+        public void Indent(Action action)
         {
             IncreaseIndent();
             action();

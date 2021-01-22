@@ -7,7 +7,7 @@ namespace Iridio.Common.Utils
         string ToString();
         void Print(FormatlessString str);
         void TabPrint(FormatlessString str);
-        void Indentate(Action action);
+        void Indent(Action action);
         void NewLine();
         void IncreaseIndent();
         void DecreaseIndent();

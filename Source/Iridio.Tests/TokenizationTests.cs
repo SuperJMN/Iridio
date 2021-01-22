@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using FluentAssertions;
 using Iridio.Tokenization;
 using Xunit;
 

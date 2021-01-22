@@ -1,6 +1,6 @@
 namespace Iridio.Parsing.Model
 {
-    public class Block : Statement, ISyntax
+    public class Block : Statement
     {
         public Statement[] Statements { get; }
 

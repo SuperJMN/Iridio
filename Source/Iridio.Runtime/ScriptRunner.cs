@@ -17,10 +17,11 @@ using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Runtime
 {
+    // ReSharper disable once UnusedType.Global
     public class ScriptRunner : IScriptRunner
     {
         private readonly IEnumerable<IFunction> functions;
-        private IDictionary<string, object> variables;
+        private IDictionary<string, object> variables = new Dictionary<string, object>();
         private readonly ISubject<string> messages = new Subject<string>();
 
         public ScriptRunner(IEnumerable<IFunction> functions)
@@ -28,10 +29,8 @@ namespace Iridio.Runtime
             this.functions = functions;
         }
 
-        public Task<Either<RuntimeErrors, Success>> Run(Script script, IDictionary<string, object> variables)
+        public Task<Either<RuntimeErrors, Success>> Run(Script script)
         {
-            this.variables = variables;
-
             return Execute(script);
         }
 
@@ -185,8 +184,10 @@ namespace Iridio.Runtime
                     return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
-                case BoundNumericExpression boundNumericExpression:
+                case BoundIntegerExpression boundNumericExpression:
                     return Either.Success<RuntimeErrors, object>(boundNumericExpression.Value);
+                case BoundDoubleExpression boundDoubleExpression:
+                    return Either.Success<RuntimeErrors, object>(boundDoubleExpression.Value);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));

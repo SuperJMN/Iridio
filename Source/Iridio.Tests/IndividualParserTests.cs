@@ -11,7 +11,7 @@ namespace Iridio.Tests
         public void BlockTest()
         {
             var input = @"{ Call(""this"", ""and"", ""this""); }";
-            var parsed = EnhancedParsers.Block.Parse(Tokenizer.Create().Tokenize(input));
+            var parsed = ParserDefinitions.Block.Parse(Tokenizer.Create().Tokenize(input));
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace Iridio.Tests
     {
         d = ""444"";
     }";
-            var parsed = EnhancedParsers.IfStatement.Parse(Tokenizer.Create().Tokenize(input));
+            var parsed = ParserDefinitions.IfStatement.Parse(Tokenizer.Create().Tokenize(input));
         }
     }
 }

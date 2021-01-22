@@ -6,7 +6,7 @@ using Superpower.Parsers;
 
 namespace Iridio.Parsing
 {
-    public class EnhancedParsers
+    public class ParserDefinitions
     {
         private static readonly TokenListParser<SimpleToken, string> Identifier =
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
@@ -19,16 +19,22 @@ namespace Iridio.Parsing
             return str.Substring(1, str.Length-2);
         }
 
-        private static readonly TokenListParser<SimpleToken, int> Number =
-            Token.EqualTo(SimpleToken.Number).Apply(Numerics.IntegerInt32);
+        private static readonly TokenListParser<SimpleToken, int> Integer =
+            Token.EqualTo(SimpleToken.Integer).Apply(Numerics.IntegerInt32);
 
-        public static readonly TokenListParser<SimpleToken, Expression> TextParameter =
+        private static readonly TokenListParser<SimpleToken, double> Double =
+            Token.EqualTo(SimpleToken.Integer).Apply(Numerics.DecimalDouble);
+
+        public static readonly TokenListParser<SimpleToken, Expression> TextExpression =
             Text.Select(x => (Expression) new StringExpression(x));
 
-        public static readonly TokenListParser<SimpleToken, Expression> NumberParameter =
-            Number.Select(x => (Expression) new NumericExpression(x));
+        public static readonly TokenListParser<SimpleToken, Expression> IntegerExpression =
+            Integer.Select(x => (Expression) new IntegerExpression(x));
 
-        public static readonly TokenListParser<SimpleToken, Expression> IdentifierParameter =
+        public static readonly TokenListParser<SimpleToken, Expression> DoubleExpression =
+            Double.Select(x => (Expression)new DoubleExpression(x));
+
+        public static readonly TokenListParser<SimpleToken, Expression> IdentifierExpression =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
 
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
@@ -79,7 +85,7 @@ namespace Iridio.Parsing
             select (Statement) new AssignmentStatement(identifier, expr);
 
         public static readonly TokenListParser<SimpleToken, Expression> Expression =
-            CallExpression.Try().Or(NumberParameter).Or(TextParameter).Or(IdentifierParameter);
+            CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
 
         private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo)
             .Apply(ExtraParsers.SpanBetween('<', '>'))

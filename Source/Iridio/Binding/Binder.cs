@@ -93,20 +93,25 @@ namespace Iridio.Binding
                 case IdentifierExpression identifierExpression:
                     return Bind(identifierExpression);
 
-                case NumericExpression numericExpression:
+                case IntegerExpression numericExpression:
                     return Bind(numericExpression);
                 case StringExpression stringExpression:
                     return Bind(stringExpression);
+                case DoubleExpression doubleExpression:
+                    return Bind(doubleExpression);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(expression));
             }
         }
 
+        private BoundExpression Bind(DoubleExpression doubleExpression)
+        {
+            return new BoundDoubleExpression(doubleExpression.Value);
+        }
+
         private BoundExpression Bind(StringExpression stringExpression)
         {
             var str = stringExpression.String;
-            //LookupUninitializedReferences(str);
-
             return new BoundStringExpression(str);
         }
 
@@ -117,9 +122,9 @@ namespace Iridio.Binding
             notInitialized.ForEach(s => AddError(new Error(ErrorKind.ReferenceToUninitializedVariable, s)));
         }
 
-        private BoundExpression Bind(NumericExpression numericExpression)
+        private BoundExpression Bind(IntegerExpression integerExpression)
         {
-            return new BoundNumericExpression(numericExpression.Value);
+            return new BoundIntegerExpression(integerExpression.Value);
         }
 
         private BoundExpression Bind(IdentifierExpression identifierExpression)

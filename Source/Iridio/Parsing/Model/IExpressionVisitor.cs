@@ -2,7 +2,7 @@ namespace Iridio.Parsing.Model
 {
     public interface IExpressionVisitor
     {
-        void Visit(NumericExpression ne);
+        void Visit(IntegerExpression ne);
         void Visit(IdentifierExpression identifier);
         void Visit(StringExpression strExpr);
         void Visit(CallExpression identifierExpression);
@@ -14,5 +14,6 @@ namespace Iridio.Parsing.Model
         void Visit(Block block);
         void Visit(Procedure fd);
         void Visit(Condition c);
+        void Visit(DoubleExpression doubleExpression);
     }
 }

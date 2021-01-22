@@ -2,9 +2,5 @@
 {
     public class Success
     {
-        public Success()
-        {
-            
-        }
     }
 }
