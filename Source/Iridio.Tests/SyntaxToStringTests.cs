@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Iridio.Binding;
+using Iridio.Parsing;
 using Iridio.Parsing.Model;
 using Optional;
 using Xunit;
@@ -36,7 +37,7 @@ namespace Iridio.Tests
         public void IfWithoutElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new Condition(new IdentifierExpression("a"), new BooleanOperator("=="),
+            var condition = new BooleanExpression(new BooleanOperator("=="),new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             sut.Visit(new IfStatement(condition, CreateBlock(), CreateBlock().None()));
             sut.ToString().Should().Be("if (a == b)\r\n{\r\n}");
@@ -46,7 +47,7 @@ namespace Iridio.Tests
         public void IfWithElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new Condition(new IdentifierExpression("a"), new BooleanOperator("=="),
+            var condition = new BooleanExpression(new BooleanOperator("=="), new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             sut.Visit(new IfStatement(condition, CreateBlock(), CreateBlock().Some()));
             sut.ToString().Should().Be("if (a == b)\r\n{\r\n}\r\nelse\r\n{\r\n}");
@@ -56,7 +57,7 @@ namespace Iridio.Tests
         public void FunctionWithIfElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new Condition(new IdentifierExpression("a"), new BooleanOperator("=="),
+            var condition = new BooleanExpression(new BooleanOperator("=="), new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             var ifStatement = new IfStatement(condition, CreateBlock(), CreateBlock().Some());
             var function = GetFunctionDeclaration(ifStatement);

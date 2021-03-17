@@ -17,7 +17,7 @@ namespace Iridio.Tests
             var sut = new Parser();
             var parse = sut.Parse(input);
             var result = parse
-                .MapRight(script => script.AsString())
+                .MapRight(script => script.Stringyfy())
                 .Handle(error => error.Message);
 
             result.Should().Be(expected);

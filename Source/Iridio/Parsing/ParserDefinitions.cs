@@ -53,6 +53,9 @@ namespace Iridio.Parsing
 
         private static readonly TokenListParser<SimpleToken, BooleanOperator> BooleanOperators =
             Token.EqualTo(SimpleToken.EqualEqual)
+                .Or(Token.EqualTo(SimpleToken.And))
+                .Or(Token.EqualTo(SimpleToken.Or))
+                .Or(Token.EqualTo(SimpleToken.Not))
                 .Or(Token.EqualTo(SimpleToken.NotEqual))
                 .Or(Token.EqualTo(SimpleToken.Greater))
                 .Or(Token.EqualTo(SimpleToken.Less))
@@ -60,12 +63,9 @@ namespace Iridio.Parsing
                 .Or(Token.EqualTo(SimpleToken.GreaterOrEqual))
                 .Select(token => new BooleanOperator(token.ToStringValue()));
 
-        private static readonly TokenListParser<SimpleToken, Condition> Condition =
-            (from left in Parse.Ref(() => Expression)
-                from op in BooleanOperators
-                from right in Expression
-                select new Condition(left, op, right))
-            .Between(Token.EqualTo(SimpleToken.OpenParen), Token.EqualTo(SimpleToken.CloseParen));
+        private static readonly TokenListParser<SimpleToken, Expression> Condition =
+            Parse.Ref(() => Expression)
+                .Between(Token.EqualTo(SimpleToken.OpenParen), Token.EqualTo(SimpleToken.CloseParen));
 
         public static readonly TokenListParser<SimpleToken, Statement> IfStatement =
             from keyword in Token.EqualTo(SimpleToken.If)
@@ -84,8 +84,11 @@ namespace Iridio.Parsing
             from expr in Expression
             select (Statement) new AssignmentStatement(identifier, expr);
 
-        public static readonly TokenListParser<SimpleToken, Expression> Expression =
+        public static readonly TokenListParser<SimpleToken, Expression> Operand =
             CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
+
+        public static readonly TokenListParser<SimpleToken, Expression> Expression =
+            Parse.Chain(BooleanOperators, Operand, (o, l, r) => new BooleanExpression(o, l, r));
 
         private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo)
             .Apply(ExtraParsers.SpanBetween('<', '>'))
@@ -114,5 +117,24 @@ namespace Iridio.Parsing
             (from functions in Function.Many()
                 select new IridioSyntax(functions))
             .AtEnd();
+    }
+
+    public class BooleanExpression : Expression
+    {
+        public BooleanOperator Op { get; }
+        public Expression Left { get; }
+        public Expression Right { get; }
+
+        public BooleanExpression(BooleanOperator op, Expression left, Expression right)
+        {
+            Op = op;
+            Left = left;
+            Right = right;
+        }
+
+        public override void Accept(IExpressionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

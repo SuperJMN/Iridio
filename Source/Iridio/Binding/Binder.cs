@@ -165,11 +165,6 @@ namespace Iridio.Binding
             return new BoundBlock(block.Statements.Select(Bind));
         }
 
-        private BoundCondition Bind(Condition ifStatementCondition)
-        {
-            return new BoundCondition(Bind(ifStatementCondition.Left), ifStatementCondition.Op, Bind(ifStatementCondition.Right));
-        }
-
         private BoundStatement Bind(EchoStatement echoStatement)
         {
             return new BoundEchoStatement(echoStatement.Message);

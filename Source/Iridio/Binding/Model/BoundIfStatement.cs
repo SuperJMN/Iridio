@@ -4,11 +4,11 @@ namespace Iridio.Binding.Model
 {
     public class BoundIfStatement : BoundStatement
     {
-        public BoundCondition Condition { get; }
+        public BoundExpression Condition { get; }
         public BoundBlock TrueBlock { get; }
         public Option<BoundBlock> FalseBlock { get; }
 
-        public BoundIfStatement(BoundCondition condition, BoundBlock trueBlock, Option<BoundBlock> falseBlock)
+        public BoundIfStatement(BoundExpression condition, BoundBlock trueBlock, Option<BoundBlock> falseBlock)
         {
             Condition = condition;
             TrueBlock = trueBlock;

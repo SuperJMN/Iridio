@@ -49,6 +49,9 @@ namespace Iridio.Tokenization
         private static TokenizerBuilder<SimpleToken> BooleanOperators(this TokenizerBuilder<SimpleToken> builder)
         {
             builder
+                .Match(Span.EqualTo("&&"), SimpleToken.And)
+                .Match(Span.EqualTo("||"), SimpleToken.Or)
+                .Match(Span.EqualTo("!"), SimpleToken.Not)
                 .Match(Span.EqualTo("=="), SimpleToken.EqualEqual)
                 .Match(Span.EqualTo("!="), SimpleToken.NotEqual)
                 .Match(Span.EqualTo(">="), SimpleToken.GreaterOrEqual)

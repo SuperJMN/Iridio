@@ -107,11 +107,12 @@ namespace Iridio.Runtime
             return await result.RightTask();
         }
 
-        private async Task<Either<RuntimeErrors, bool>> IsMet(BoundCondition condition)
+        private async Task<Either<RuntimeErrors, bool>> IsMet(BoundExpression condition)
         {
-            var left = await Evaluate(condition.Left);
-            var right = await Evaluate(condition.Right);
-            return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeErrors.Concat);
+            return true;
+            //var left = await Evaluate(condition.Left);
+            //var right = await Evaluate(condition.Right);
+            //return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeErrors.Concat);
         }
 
         private Either<RuntimeErrors, bool> Compare(object a, object b, BooleanOperator op)

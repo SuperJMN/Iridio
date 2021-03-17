@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Iridio.Common.Utils;
+using Iridio.Parsing;
 using Iridio.Parsing.Model;
 using MoreLinq;
 
@@ -24,18 +25,16 @@ namespace Iridio.Binding
             sa.Print(";");
         }
 
-        public void Visit(Condition c)
-        {
-            sa.Print("(");
-            c.Left.Accept(this);
-            sa.Print(" " + c.Op.Op + " ");
-            c.Right.Accept(this);
-            sa.Print(")");
-        }
-
         public void Visit(DoubleExpression doubleExpression)
         {
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public void Visit(BooleanExpression booleanExpression)
+        {
+            booleanExpression.Left.Accept(this);
+            sa.Print(" " + booleanExpression.Op.Op + " ");
+            booleanExpression.Right.Accept(this);
         }
 
         public void Visit(EchoStatement echo)
@@ -45,8 +44,9 @@ namespace Iridio.Binding
 
         public void Visit(IfStatement ifs)
         {
-            sa.TabPrint("if ");
+            sa.TabPrint("if (");
             ifs.Condition.Accept(this);
+            sa.Print(")");
             ifs.TrueBlock.Accept(this);
             ifs.FalseBlock.MatchSome(b =>
             {
