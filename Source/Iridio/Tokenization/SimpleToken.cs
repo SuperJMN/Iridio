@@ -25,7 +25,6 @@ namespace Iridio.Tokenization
         If,
         Else,
         NotEqual,
-        AnythingButBrackets,
         Double
     }
 }

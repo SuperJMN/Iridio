@@ -46,8 +46,6 @@ namespace Iridio.Tests
                     { "Subdir\\file2.rdo", "#include file3.rdo\r\nThree" },
                     { "Subdir\\file3.rdo", "Two" },
                 };
-
-            
             }
 
             public Task Copy(string source, string destination, CancellationToken cancellationToken = new CancellationToken())
@@ -123,6 +121,11 @@ namespace Iridio.Tests
             }
 
             public Stream OpenForRead(string path)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task Truncate(string path)
             {
                 throw new NotImplementedException();
             }
