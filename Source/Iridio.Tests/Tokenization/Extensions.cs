@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using DynamicData.Annotations;
-using DynamicData.Binding;
 using Optional;
 using Optional.Unsafe;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Tokenization
 {
     public static class Extensions
     {
