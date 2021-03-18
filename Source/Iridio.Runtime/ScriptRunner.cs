@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -21,7 +22,7 @@ namespace Iridio.Runtime
     public class ScriptRunner : IScriptRunner
     {
         private readonly IEnumerable<IFunction> functions;
-        private IDictionary<string, object> variables = new Dictionary<string, object>();
+        private readonly IDictionary<string, object> variables = new Dictionary<string, object>();
         private readonly ISubject<string> messages = new Subject<string>();
 
         public ScriptRunner(IEnumerable<IFunction> functions)
@@ -35,6 +36,8 @@ namespace Iridio.Runtime
         }
 
         public IObservable<string> Messages => messages.AsObservable();
+
+        public IReadOnlyDictionary<string, object> Variables => new ReadOnlyDictionary<string, object>(variables);
 
         private Task<Either<RuntimeErrors, Success>> Execute(Script compiled)
         {
@@ -240,7 +243,7 @@ namespace Iridio.Runtime
 
         private Either<RuntimeErrors, object> Evaluate(BoundIdentifier identifier)
         {
-            if (variables.TryGetValue(identifier.Identifier, out var val))
+            if (Variables.TryGetValue(identifier.Identifier, out var val))
             {
                 return Either.Success<Errors, object>(val);
             }

@@ -15,11 +15,11 @@ namespace Iridio
         private readonly IBinder binder;
         private readonly Preprocessor preprocessor;
 
-        public Compiler()
+        public Compiler(IFileSystemOperations fileSystemOperations)
         {
             parser = new Parser();
             binder = new Binder(Enumerable.Empty<IFunctionDeclaration>());
-            preprocessor = new Preprocessor(new FileSystemOperations());
+            preprocessor = new Preprocessor(fileSystemOperations);
         }
 
         public Either<Errors, Script> Compile(string path)
