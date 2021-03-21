@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace Iridio.Common
 {
-    public class Errors : Collection<Error>
+    public class Errors : Collection<BinderError>
     {
-        public Errors(params Error[] errors) : base(errors)
+        public Errors(params BinderError[] errors) : base(errors)
         {
         }
 
-        public Errors(IEnumerable<Error> items) : base(items.ToList())
+        public Errors(IEnumerable<BinderError> items) : base(items.ToList())
         {
         }
 
@@ -19,14 +19,9 @@ namespace Iridio.Common
         {
         }
 
-        public static Errors Concat(Errors error, Errors anotherError)
+        public override string ToString()
         {
-            return new Errors(error.Concat(anotherError));
-        }
-
-        public static string Join(Errors list)
-        {
-            return string.Join(Environment.NewLine, list);
+            return string.Join(";", this);
         }
     }
 }

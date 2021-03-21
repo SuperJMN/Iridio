@@ -22,16 +22,46 @@ namespace Iridio
             preprocessor = new Preprocessor(fileSystemOperations);
         }
 
-        public Either<Errors, Script> Compile(string path)
+        public Either<CompilerError, Script> Compile(string path)
         {
             var processed = preprocessor.Process(path);
 
             var compileResult = parser
                 .Parse(processed)
-                .MapLeft(_ => new Errors(ErrorKind.UnableToParse))
-                .MapRight(parsed => binder.Bind(parsed));
+                .MapLeft(pe => (CompilerError)new ParseError(pe))
+                .MapRight(parsed => binder.Bind(parsed)
+                    .MapLeft(errors => (CompilerError)new BindError(errors)));
 
             return compileResult;
         }
+    }
+
+    public class BindError : CompilerError
+    {
+        public BinderErrors Errors { get; }
+
+        public BindError(BinderErrors errors)
+        {
+            Errors = errors;
+        }
+    }
+
+    public class ParseError : CompilerError
+    {
+        public ParsingError Error { get; }
+
+        public ParseError(ParsingError error)
+        {
+            Error = error;
+        }
+
+        public override string ToString()
+        {
+            return Error.ToString();
+        }
+    }
+
+    public abstract class CompilerError
+    {
     }
 }

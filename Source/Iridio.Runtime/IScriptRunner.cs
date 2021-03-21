@@ -8,7 +8,7 @@ namespace Iridio.Runtime
 {
     public interface IScriptRunner
     {
-        Task<Either<RuntimeErrors, Success>> Run(Script script);
+        Task<Either<RuntimeError, ExecutionSummary>> Run(Script script);
         IObservable<string> Messages { get; }
     }
 }

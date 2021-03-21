@@ -117,6 +117,11 @@ namespace Iridio.Binding
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public void Visit(BoundBinaryExpression functionDeclaration)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Visit(BoundIdentifier boundIdentifier)
         {
             sa.Print(boundIdentifier.Identifier);

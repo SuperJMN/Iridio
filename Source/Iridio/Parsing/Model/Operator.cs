@@ -1,10 +1,10 @@
 namespace Iridio.Parsing.Model
 {
-    public class BooleanOperator
+    public class Operator
     {
         public string Op { get; }
 
-        public BooleanOperator(string op)
+        public Operator(string op)
         {
             Op = op;
         }

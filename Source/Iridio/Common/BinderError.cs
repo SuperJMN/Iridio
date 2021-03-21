@@ -1,12 +1,12 @@
 ﻿namespace Iridio.Common
 {
-    public class Error
+    public class BinderError
     {
-        public Error()
+        public BinderError()
         {
         }
 
-        public Error(ErrorKind kind, string additionalData = null)
+        public BinderError(ErrorKind kind, string additionalData = null)
         {
             ErrorKind = kind;
             AdditionalData = additionalData;
@@ -20,9 +20,9 @@
             return $"{nameof(ErrorKind)}: {ErrorKind}, {nameof(AdditionalData)}: {AdditionalData}";
         }
 
-        public static implicit operator Error(ErrorKind errorKind)
+        public static implicit operator BinderError(ErrorKind errorKind)
         {
-            return new Error(errorKind);
+            return new BinderError(errorKind);
         }
     }
 }

@@ -14,6 +14,6 @@ namespace Iridio.Parsing.Model
         void Visit(Block block);
         void Visit(Procedure fd);
         void Visit(DoubleExpression doubleExpression);
-        void Visit(BooleanExpression booleanExpression);
+        void Visit(BinaryExpression expression);
     }
 }

@@ -3,11 +3,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Iridio.Common;
 using Iridio.Runtime;
-using Iridio.Runtime.ReturnValues;
 using Moq;
-using Optional;
 using Xunit;
-using Zafiro.Core;
 using Zafiro.Core.FileSystem;
 using Zafiro.Core.Patterns.Either;
 
@@ -16,42 +13,40 @@ namespace Iridio.Tests.Execution
     public class ExecutionTests
     {
         [Fact]
-        public async Task Add()
+        public async Task Constant_assignment()
         {
-            var source = "Main{ a = 13; }";
+            var vars = await Run("Main{ a = 13; }");
+            vars
+                .MapRight(x => x.Variables["a"])
+                .Should().Be(Either.Success<string, object>(13));
+        }
+
+        [Fact]
+        public async Task Addition_assignment()
+        {
+            var vars = await Run("Main{ a = 1+3; }");
+            vars
+                .MapRight(x => x.Variables["a"])
+                .Should().Be(Either.Success<string, object>(4));
+        }
+
+        private static async Task<Either<string, Runtime.ReturnValues.ExecutionSummary>> Run(string source)
+        {
             var fsoMock = new Mock<IFileSystemOperations>();
             fsoMock.Setup(fso => fso.ReadAllText(It.IsAny<string>())).Returns(source);
             fsoMock.SetupGet(x => x.WorkingDirectory).Returns("");
             var compiler = new Compiler(fsoMock.Object);
-            var compiled = await compiler.Compile("source")
+
+            return await compiler.Compile("source")
+                .MapLeft(x => x.ToString())
                 .MapRight(async script =>
                 {
                     var runner = new ScriptRunner(Enumerable.Empty<IFunction>());
-                    var either = await runner.Run(script);
-                    return either.MapLeft(x => new Errors());
+                    var runResult = await runner.Run(script);
+
+                    return runResult
+                        .MapLeft(x => x.ToString());
                 }).RightTask();
-
-            compiled.Should().BeEquivalentTo(Either.Success<RuntimeErrors, Success>(new Success()));
-        }
-
-        [Fact]
-        public void EitherTest()
-        {
-            var a = Either.Success<string, string>("");
-            var b = Either.Success<string, string>("");
-            a.Should().BeEquivalentTo(b);
-        }
-
-        [Fact]
-        public void EitherTest2()
-        {
-            var a = Either.Success<string, Success>(new Success());
-            var b = Either.Success<string, Success>(new Success());
-            a.Should().BeEquivalentTo(b, options => options
-                .ComparingByMembers(typeof(Either<,>))
-                .ComparingByMembers(typeof(Option<>))
-            //    .Using(new LambdaComparer<Success>((x, y) => true))
-            );
         }
     }
 }

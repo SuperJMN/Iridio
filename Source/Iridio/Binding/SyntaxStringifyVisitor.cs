@@ -30,11 +30,11 @@ namespace Iridio.Binding
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
-        public void Visit(BooleanExpression booleanExpression)
+        public void Visit(BinaryExpression expression)
         {
-            booleanExpression.Left.Accept(this);
-            sa.Print(" " + booleanExpression.Op.Op + " ");
-            booleanExpression.Right.Accept(this);
+            expression.Left.Accept(this);
+            sa.Print(" " + expression.Op.Op + " ");
+            expression.Right.Accept(this);
         }
 
         public void Visit(EchoStatement echo)

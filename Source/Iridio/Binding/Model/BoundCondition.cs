@@ -5,10 +5,10 @@ namespace Iridio.Binding.Model
     public class BoundCondition : BoundExpression
     {
         public BoundExpression Left { get; }
-        public BooleanOperator Op { get; }
+        public Operator Op { get; }
         public BoundExpression Right { get; }
 
-        public BoundCondition(BoundExpression left, BooleanOperator op, BoundExpression right)
+        public BoundCondition(BoundExpression left, Operator op, BoundExpression right)
         {
             Left = left;
             Op = op;

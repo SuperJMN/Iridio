@@ -16,5 +16,6 @@
         void Visit(BoundBuiltInFunctionCallExpression functionDeclaration);
         void Visit(BoundProcedureCallExpression callExpression);
         void Visit(BoundDoubleExpression doubleExpression);
+        void Visit(BoundBinaryExpression functionDeclaration);
     }
 }

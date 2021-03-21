@@ -30,7 +30,7 @@ namespace Iridio.Runtime
             this.functions = functions;
         }
 
-        public Task<Either<RuntimeErrors, Success>> Run(Script script)
+        public Task<Either<RuntimeError, ExecutionSummary>> Run(Script script)
         {
             return Execute(script);
         }
@@ -39,17 +39,18 @@ namespace Iridio.Runtime
 
         public IReadOnlyDictionary<string, object> Variables => new ReadOnlyDictionary<string, object>(variables);
 
-        private Task<Either<RuntimeErrors, Success>> Execute(Script compiled)
+        private async Task<Either<RuntimeError, ExecutionSummary>> Execute(Script compiled)
         {
-            return Execute(compiled.MainProcedure);
+            var execute = await Execute(compiled.MainProcedure);
+            return execute.MapRight(x => new ExecutionSummary(variables));
         }
 
-        private Task<Either<RuntimeErrors, Success>> Execute(BoundProcedure main)
+        private Task<Either<RuntimeError, Success>> Execute(BoundProcedure main)
         {
             return Execute(main.Block);
         }
 
-        private async Task<Either<RuntimeErrors, Success>> Execute(BoundBlock block)
+        private async Task<Either<RuntimeError, Success>> Execute(BoundBlock block)
         {
             foreach (var st in block.Statements)
             {
@@ -60,10 +61,10 @@ namespace Iridio.Runtime
                 }
             }
 
-            return new Success();
+            return Success.Value;
         }
 
-        private async Task<Either<RuntimeErrors, Success>> Execute(BoundStatement statement)
+        private async Task<Either<RuntimeError, Success>> Execute(BoundStatement statement)
         {
             switch (statement)
             {
@@ -80,16 +81,16 @@ namespace Iridio.Runtime
                     throw new ArgumentOutOfRangeException(nameof(statement));
             }
 
-            return Either.Success<RuntimeErrors, Success>(new Success());
+            return Either.Success<RuntimeError, Success>(Success.Value);
         }
 
-        private async Task<Either<RuntimeErrors, Success>> Execute(BoundCallStatement boundCallStatement)
+        private async Task<Either<RuntimeError, Success>> Execute(BoundCallStatement boundCallStatement)
         {
             var either = await Evaluate(boundCallStatement.Call);
-            return either.MapRight(o => new Success());
+            return either.MapRight(o => Success.Value);
         }
 
-        private async Task<Either<RuntimeErrors, Success>> Execute(BoundIfStatement boundIfStatement)
+        private async Task<Either<RuntimeError, Success>> Execute(BoundIfStatement boundIfStatement)
         {
             var eitherComparison = await IsMet(boundIfStatement.Condition);
 
@@ -103,33 +104,33 @@ namespace Iridio.Runtime
                 }
 
                 var optionalTask = boundIfStatement.FalseBlock.Map(Execute);
-                var task = optionalTask.Match(t => t, () => Task.FromResult(Either.Success<RuntimeErrors, Success>(new Success())));
+                var task = optionalTask.Match(t => t, () => Task.FromResult(Either.Success<RuntimeError, Success>(Success.Value)));
                 return await task;
             });
 
             return await result.RightTask();
         }
 
-        private async Task<Either<RuntimeErrors, bool>> IsMet(BoundExpression condition)
+        private async Task<Either<RuntimeError, bool>> IsMet(BoundExpression condition)
         {
             return true;
             //var left = await Evaluate(condition.Left);
             //var right = await Evaluate(condition.Right);
-            //return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeErrors.Concat);
+            //return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeError.Concat);
         }
 
-        private Either<RuntimeErrors, bool> Compare(object a, object b, BooleanOperator op)
+        private Either<RuntimeError, bool> Compare(object a, object b, Operator op)
         {
             if (a is string strA && b is string strB)
             {
                 if (op.Op == "==")
                 {
-                    return Either.Success<RuntimeErrors, bool>(strB.Equals(strA));
+                    return Either.Success<RuntimeError, bool>(strB.Equals(strA));
                 }
 
                 if (op.Op == "!=")
                 {
-                    return Either.Success<RuntimeErrors, bool>(!strB.Equals(strA));
+                    return Either.Success<RuntimeError, bool>(!strB.Equals(strA));
                 }
             }
 
@@ -137,49 +138,51 @@ namespace Iridio.Runtime
             {
                 if (op.Op == ">")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x > y);
+                    return Either.Success<RuntimeError, bool>(x > y);
                 }
 
                 if (op.Op == "<")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x < y);
+                    return Either.Success<RuntimeError, bool>(x < y);
                 }
 
                 if (op.Op == "==")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x == y);
+                    return Either.Success<RuntimeError, bool>(x == y);
                 }
 
                 if (op.Op == "!=")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x != y);
+                    return Either.Success<RuntimeError, bool>(x != y);
                 }
 
                 if (op.Op == ">=")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x >= y);
+                    return Either.Success<RuntimeError, bool>(x >= y);
                 }
 
                 if (op.Op == "<=")
                 {
-                    return Either.Success<RuntimeErrors, bool>(x <= y);
+                    return Either.Success<RuntimeError, bool>(x <= y);
                 }
             }
 
-            return Either.Error<RuntimeErrors, bool>(new RuntimeErrors(new TypeMismatch()));
+            return Either.Error<RuntimeError, bool>(new TypeMismatch());
         }
 
-        private async Task<Either<RuntimeErrors, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
+        private async Task<Either<RuntimeError, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
         {
             var evaluation = await Evaluate(boundAssignmentStatement.Expression);
             evaluation.WhenRight(o => variables[boundAssignmentStatement.Variable] = o);
-            return evaluation.MapRight(o => new Success());
+            return evaluation.MapRight(o => Success.Value);
         }
 
-        private async Task<Either<RuntimeErrors, object>> Evaluate(BoundExpression expression)
+        private async Task<Either<RuntimeError, object>> Evaluate(BoundExpression expression)
         {
             switch (expression)
             {
+                case BoundBinaryExpression boundBinaryExpression:
+                    return await Evaluate(boundBinaryExpression);
                 case BoundIdentifier boundIdentifier:
                     return Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
@@ -189,15 +192,29 @@ namespace Iridio.Runtime
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
                 case BoundIntegerExpression boundNumericExpression:
-                    return Either.Success<RuntimeErrors, object>(boundNumericExpression.Value);
+                    return Either.Success<RuntimeError, object>(boundNumericExpression.Value);
                 case BoundDoubleExpression boundDoubleExpression:
-                    return Either.Success<RuntimeErrors, object>(boundDoubleExpression.Value);
+                    return Either.Success<RuntimeError, object>(boundDoubleExpression.Value);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
         }
 
-        private Either<RuntimeErrors, object> Evaluate(BoundStringExpression boundStringExpression)
+        private async Task<Either<RuntimeError, object>> Evaluate(BoundBinaryExpression boundBinaryExpression)
+        {
+            var left = await Evaluate(boundBinaryExpression.Left);
+            var right = await Evaluate(boundBinaryExpression.Right);
+            switch (boundBinaryExpression.Op.Op)
+            {
+                case "+":
+                    return left.Combine<RuntimeError, object>(right, (a, b) => (int)a + (int)b, (e1, e2) => e1);
+
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        private Either<RuntimeError, object> Evaluate(BoundStringExpression boundStringExpression)
         {
             var str = boundStringExpression.String;
             var evaluator = new StringEvaluator();
@@ -205,18 +222,18 @@ namespace Iridio.Runtime
             return either.MapRight(s => (object)s);
         }
 
-        private async Task<Either<RuntimeErrors, object>> Evaluate(BoundProcedureCallExpression call)
+        private async Task<Either<RuntimeError, object>> Evaluate(BoundProcedureCallExpression call)
         {
             return (await Execute(call.Procedure.Block)).MapRight(s => (object)s);
         }
 
-        private Task<Either<RuntimeErrors, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
+        private Task<Either<RuntimeError, object>> Evaluate(BoundBuiltInFunctionCallExpression call)
         {
             var function = OptionCollectionExtensions.FirstOrNone(functions, f => f.Name == call.Function.Name);
-            return function.MatchAsync(f => Call(f, call.Parameters), () => Either.Error<RuntimeErrors, object>(new RuntimeErrors(new UndeclaredFunction(call.Function.Name))));
+            return function.MatchAsync(f => Call(f, call.Parameters), () => Either.Error<RuntimeError, object>(new UndeclaredFunction(call.Function.Name)));
         }
 
-        private async Task<Either<RuntimeErrors, object>> Call(IFunction function, IEnumerable<BoundExpression> parameters)
+        private async Task<Either<RuntimeError, object>> Call(IFunction function, IEnumerable<BoundExpression> parameters)
         {
             var eitherParameters = await parameters.AsyncSelect(async expression => await Evaluate(expression));
             var combined = eitherParameters.Combine((a, b) => a);
@@ -232,23 +249,28 @@ namespace Iridio.Runtime
                 switch (ex.InnerException)
                 {
                     case TaskCanceledException tc:
-                        return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new ExecutionCanceled(tc.Message)));
+                        return Either.Error<RuntimeError, object>(new ExecutionCanceled(tc.Message));
                     case Exception inner:
-                        return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new IntegratedFunctionFailed(function, inner)));
+                        return Either.Error<RuntimeError, object>(new IntegratedFunctionFailed(function, inner));
                     default:
-                        return Either.Error<RuntimeErrors, object>(new RuntimeErrors(new IntegratedFunctionFailed(function, ex)));
+                        return Either.Error<RuntimeError, object>(new IntegratedFunctionFailed(function, ex));
                 }
             }
         }
 
-        private Either<RuntimeErrors, object> Evaluate(BoundIdentifier identifier)
+        private Either<RuntimeError, object> Evaluate(BoundIdentifier identifier)
         {
             if (Variables.TryGetValue(identifier.Identifier, out var val))
             {
                 return Either.Success<Errors, object>(val);
             }
 
-            return Either.Error<Errors, object>(new Errors(new Error(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'")));
+            return Either.Error<Errors, object>(new Errors(new BinderError(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'")));
         }
+    }
+
+    internal class Success
+    {
+        public static Success Value = new Success();
     }
 }

@@ -28,6 +28,10 @@ namespace Iridio.Tokenization
         Double,
         And,
         Or,
-        Not
+        Not,
+        Plus,
+        Hyphen,
+        Asterisk,
+        Slash
     }
 }
