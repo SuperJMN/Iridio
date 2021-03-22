@@ -12,27 +12,23 @@ namespace Iridio.Tests.Execution
 {
     public class ExecutionTests
     {
-        [Fact]
-        public async Task Constant_assignment()
+        [Theory]
+        [InlineData("a=5", 5)]
+        [InlineData("a=1+2", 3)]
+        [InlineData("a=5-7", -2)]
+        [InlineData("a=3*2", 6)]
+        [InlineData("a=6/2", 3)]
+        public async Task SimpleAssignment(string source, object value)
         {
-            var vars = await Run(Main("a = 13"));
+            var vars = await Run(Main(source));
             vars
                 .MapRight(x => x.Variables["a"])
-                .Should().Be(Either.Success<RuntimeError, object>(13));
+                .Should().Be(Either.Success<RuntimeError, object>(value));
         }
 
         private static string Main(string content)
         {
             return $"Main {{ {content}; }}";
-        }
-
-        [Fact]
-        public async Task Addition_assignment()
-        {
-            var vars = await Run(Main("a = 1+3"));
-            vars
-                .MapRight(x => x.Variables["a"])
-                .Should().Be(Either.Success<RuntimeError, object>(4));
         }
 
         private static async Task<Either<RuntimeError, Runtime.ExecutionSummary>> Run(string source)
