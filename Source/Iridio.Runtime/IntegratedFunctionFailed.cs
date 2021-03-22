@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Iridio.Common;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public class IntegratedFunctionFailed : RuntimeError
+    public class IntegratedFunctionFailed : RunError
     {
         public IFunction Function { get; }
         public Exception Exception { get; }

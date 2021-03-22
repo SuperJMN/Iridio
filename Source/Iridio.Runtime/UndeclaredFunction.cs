@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public class UndeclaredFunction : RuntimeError
+    public class UndeclaredFunction : RunError
     {
         public string FunctionName { get; }
 

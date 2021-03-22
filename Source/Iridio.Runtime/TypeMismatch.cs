@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public class TypeMismatch : RuntimeError
+    public class TypeMismatch : RunError
     {
         public override IEnumerable<string> Items => new[] { this.ToString() };
 

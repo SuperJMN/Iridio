@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
     public class ExecutionSummary
     {

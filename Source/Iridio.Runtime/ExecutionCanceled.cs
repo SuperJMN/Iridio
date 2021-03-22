@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public class ExecutionCanceled : RuntimeError
+    public class ExecutionCanceled : RunError
     {
         public string Message { get; }
 

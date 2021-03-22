@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using Iridio.Runtime;
-using Iridio.Runtime.ReturnValues;
 using Optional;
 using Xunit;
 using Zafiro.Core.Patterns.Either;

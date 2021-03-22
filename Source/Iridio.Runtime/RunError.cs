@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public abstract class RuntimeError
+    public abstract class RunError
     {
         public abstract IEnumerable<string> Items { get; }
     }

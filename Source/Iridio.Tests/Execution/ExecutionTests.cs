@@ -15,38 +15,36 @@ namespace Iridio.Tests.Execution
         [Fact]
         public async Task Constant_assignment()
         {
-            var vars = await Run("Main{ a = 13; }");
+            var vars = await Run(Main("a = 13"));
             vars
                 .MapRight(x => x.Variables["a"])
-                .Should().Be(Either.Success<string, object>(13));
+                .Should().Be(Either.Success<RuntimeError, object>(13));
+        }
+
+        private static string Main(string content)
+        {
+            return $"Main {{ {content}; }}";
         }
 
         [Fact]
         public async Task Addition_assignment()
         {
-            var vars = await Run("Main{ a = 1+3; }");
+            var vars = await Run(Main("a = 1+3"));
             vars
                 .MapRight(x => x.Variables["a"])
-                .Should().Be(Either.Success<string, object>(4));
+                .Should().Be(Either.Success<RuntimeError, object>(4));
         }
 
-        private static async Task<Either<string, Runtime.ReturnValues.ExecutionSummary>> Run(string source)
+        private static async Task<Either<RuntimeError, Runtime.ExecutionSummary>> Run(string source)
         {
             var fsoMock = new Mock<IFileSystemOperations>();
             fsoMock.Setup(fso => fso.ReadAllText(It.IsAny<string>())).Returns(source);
             fsoMock.SetupGet(x => x.WorkingDirectory).Returns("");
             var compiler = new Compiler(fsoMock.Object);
 
-            return await compiler.Compile("source")
-                .MapLeft(x => x.ToString())
-                .MapRight(async script =>
-                {
-                    var runner = new ScriptRunner(Enumerable.Empty<IFunction>());
-                    var runResult = await runner.Run(script);
+            var runtime = new IridioRuntime(compiler, new ScriptRunner(Enumerable.Empty<IFunction>()));
 
-                    return runResult
-                        .MapLeft(x => x.ToString());
-                }).RightTask();
+            return await runtime.Run("file");
         }
     }
 }

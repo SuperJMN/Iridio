@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Runtime.ReturnValues
+namespace Iridio.Runtime
 {
-    public class ReferenceToUnsetVariable : RuntimeError
+    public class ReferenceToUnsetVariable : RunError
     {
         public string VariableName { get; }
 
