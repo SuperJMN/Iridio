@@ -45,13 +45,13 @@ namespace Iridio.Tokenization
             builder
                 .Match(Span.EqualTo("&&"), SimpleToken.And)
                 .Match(Span.EqualTo("||"), SimpleToken.Or)
-                .Match(Span.EqualTo("!"), SimpleToken.Not)
                 .Match(Span.EqualTo("=="), SimpleToken.EqualEqual)
                 .Match(Span.EqualTo("!="), SimpleToken.NotEqual)
                 .Match(Span.EqualTo(">="), SimpleToken.GreaterOrEqual)
                 .Match(Span.EqualTo("<="), SimpleToken.LessOrEqual)
                 .Match(Character.EqualTo('>'), SimpleToken.Greater)
                 .Match(Character.EqualTo('<'), SimpleToken.Less)
+                .Match(Span.EqualTo("!"), SimpleToken.Not)
                 ;
 
             return builder;

@@ -22,10 +22,10 @@ namespace Iridio.Parsing
         private static readonly TokenListParser<SimpleToken, Operator> Gt = Token.EqualTo(SimpleToken.Greater).Value(new Operator(">"));
         private static readonly TokenListParser<SimpleToken, Operator> Gte = Token.EqualTo(SimpleToken.GreaterOrEqual).Value(new Operator(">="));
         private static readonly TokenListParser<SimpleToken, Operator> Eq = Token.EqualTo(SimpleToken.EqualEqual).Value(new Operator("=="));
-        private static readonly TokenListParser<SimpleToken, Operator> Neq = Token.EqualTo(SimpleToken.NotEqual).Value(new Operator("!"));
+        private static readonly TokenListParser<SimpleToken, Operator> Neq = Token.EqualTo(SimpleToken.NotEqual).Value(new Operator("!="));
         private static readonly TokenListParser<SimpleToken, Operator> And = Token.EqualTo(SimpleToken.And).Value(new Operator("&&"));
         private static readonly TokenListParser<SimpleToken, Operator> Or = Token.EqualTo(SimpleToken.Or).Value(new Operator("||"));
-        private static readonly TokenListParser<SimpleToken, Operator> Negate = Token.EqualTo(SimpleToken.Exclamation).Value(new Operator("!"));
+        private static readonly TokenListParser<SimpleToken, Operator> Not = Token.EqualTo(SimpleToken.Exclamation).Value(new Operator("!"));
         
         private static readonly TokenListParser<SimpleToken, string> Identifier =
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
@@ -111,7 +111,7 @@ namespace Iridio.Parsing
                 .Or(Item);
 
         private static readonly TokenListParser<SimpleToken, Expression> Operand =
-            (from op in Negate
+            (from op in Not
                 from factor in Factor
                 select MakeUnary(op, factor)).Or(Factor).Named("expression");
 

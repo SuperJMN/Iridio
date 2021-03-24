@@ -22,6 +22,10 @@ namespace Iridio.Tests.Execution
         [InlineData("a=5d/2", 2.5D)]
         [InlineData("a=12/2*3", 18)]
         [InlineData("a=12/(2*3)", 2)]
+        [InlineData("a = 12==4", false)]
+        [InlineData("a = 12!=4", true)]
+        [InlineData("a = 4==4", true)]
+        [InlineData("a = true", true)]
         public async Task SimpleAssignment(string source, object value)
         {
             var vars = await Run(Main(source));
