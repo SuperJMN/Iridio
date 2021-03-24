@@ -25,8 +25,8 @@ namespace Iridio.Parsing
         private static readonly TokenListParser<SimpleToken, Operator> Neq = Token.EqualTo(SimpleToken.NotEqual).Value(new Operator("!"));
         private static readonly TokenListParser<SimpleToken, Operator> And = Token.EqualTo(SimpleToken.And).Value(new Operator("&&"));
         private static readonly TokenListParser<SimpleToken, Operator> Or = Token.EqualTo(SimpleToken.Or).Value(new Operator("||"));
-
-
+        private static readonly TokenListParser<SimpleToken, Operator> Negate = Token.EqualTo(SimpleToken.Exclamation).Value(new Operator("!"));
+        
         private static readonly TokenListParser<SimpleToken, string> Identifier =
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
 
@@ -103,7 +103,19 @@ namespace Iridio.Parsing
             from expr in Expression
             select (Statement) new AssignmentStatement(identifier, expr);
 
-        public static readonly TokenListParser<SimpleToken, Expression> InnerTerm = CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
+
+        private static readonly TokenListParser<SimpleToken, Expression> Item = CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
+
+        private static readonly TokenListParser<SimpleToken, Expression> Factor =
+            Parse.Ref(() => Expression).BetweenParenthesis()
+                .Or(Item);
+
+        private static readonly TokenListParser<SimpleToken, Expression> Operand =
+            (from op in Negate
+                from factor in Factor
+                select MakeUnary(op, factor)).Or(Factor).Named("expression");
+
+        private static readonly TokenListParser<SimpleToken, Expression> InnerTerm = Operand;
 
         private static readonly TokenListParser<SimpleToken, Expression> Term = Parse.Chain(Multiply.Or(Divide), InnerTerm, MakeBinary);
 
@@ -148,6 +160,11 @@ namespace Iridio.Parsing
         private static Expression MakeBinary(Operator operatorName, Expression leftOperand, Expression rightOperand)
         {
             return new BinaryExpression(operatorName, leftOperand, rightOperand);
+        }
+
+        private static Expression MakeUnary(Operator operatorName, Expression factor)
+        {
+            return new UnaryExpression(operatorName, factor);
         }
     }
 }

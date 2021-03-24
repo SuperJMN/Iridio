@@ -37,6 +37,11 @@ namespace Iridio.Binding
             expression.Right.Accept(this);
         }
 
+        public void Visit(UnaryExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Visit(EchoStatement echo)
         {
             sa.TabPrint($"<{echo.Message}>");
