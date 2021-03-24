@@ -1,7 +1,12 @@
+using System;
+using System.Globalization;
+using System.Linq;
 using Iridio.Parsing.Model;
 using Iridio.Tokenization;
+using MoreLinq;
 using Optional;
 using Superpower;
+using Superpower.Model;
 using Superpower.Parsers;
 
 namespace Iridio.Parsing
@@ -37,7 +42,7 @@ namespace Iridio.Parsing
             Token.EqualTo(SimpleToken.Integer).Apply(Numerics.IntegerInt32);
 
         private static readonly TokenListParser<SimpleToken, double> Double =
-            Token.EqualTo(SimpleToken.Integer).Apply(Numerics.DecimalDouble);
+            Token.EqualTo(SimpleToken.Double).Apply(TextParsers.DoubleParser);
 
         public static readonly TokenListParser<SimpleToken, Expression> TextExpression =
             Text.Select(x => (Expression) new StringExpression(x));
@@ -98,7 +103,7 @@ namespace Iridio.Parsing
             from expr in Expression
             select (Statement) new AssignmentStatement(identifier, expr);
 
-        private static readonly TokenListParser<SimpleToken, Expression> InnerTerm = CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
+        public static readonly TokenListParser<SimpleToken, Expression> InnerTerm = CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
 
         private static readonly TokenListParser<SimpleToken, Expression> Term = Parse.Chain(Multiply.Or(Divide), InnerTerm, MakeBinary);
 

@@ -14,10 +14,12 @@ namespace Iridio.Tests.Execution
     {
         [Theory]
         [InlineData("a=5", 5)]
+        [InlineData("a=5d", 5d)]
         [InlineData("a=1+2", 3)]
         [InlineData("a=5-7", -2)]
         [InlineData("a=3*2", 6)]
         [InlineData("a=6/2", 3)]
+        [InlineData("a=5d/2", 2.5D)]
         public async Task SimpleAssignment(string source, object value)
         {
             var vars = await Run(Main(source));

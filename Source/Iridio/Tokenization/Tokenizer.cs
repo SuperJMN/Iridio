@@ -1,6 +1,5 @@
 using Iridio.Parsing;
 using Superpower;
-using Superpower.Model;
 using Superpower.Parsers;
 using Superpower.Tokenizers;
 
@@ -32,20 +31,11 @@ namespace Iridio.Tokenization
                 .Match(Character.EqualTo(';'), SimpleToken.Semicolon)
                 .Match(Span.EqualTo("if"), SimpleToken.If, true)
                 .Match(Span.EqualTo("else"), SimpleToken.Else, true)
-                .Match(DoubleParser, SimpleToken.Double)
+                .Match(TextParsers.DoubleParser, SimpleToken.Double)
                 .Match(Numerics.Integer, SimpleToken.Integer)
                 .Match(Span.Regex(IdentifierRegex), SimpleToken.Identifier)
                 .Build();
             return builder;
-        }
-
-        private static TextParser<double> DoubleParser
-        {
-            get
-            {
-                var decimalDouble = Numerics.DecimalDouble;
-                return decimalDouble.Then(d => Character.EqualToIgnoreCase('d').Select(c => d));
-            }
         }
 
         public static string IdentifierRegex => @"[A-Za-z_]+[\dA-Za-z_]*";

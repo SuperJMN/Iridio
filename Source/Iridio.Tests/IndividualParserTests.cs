@@ -27,5 +27,14 @@ namespace Iridio.Tests
     }";
             var parsed = ParserDefinitions.IfStatement.Parse(Tokenizer.Create().Tokenize(input));
         }
+
+        [Fact]
+        public void DoubleTest()
+        {
+            var input = "10.5d";
+            var tokenizer = Tokenizer.Create();
+            var tokens = tokenizer.Tokenize(input);
+            var result = ParserDefinitions.DoubleExpression.Parse(tokens);
+        }
     }
 }
