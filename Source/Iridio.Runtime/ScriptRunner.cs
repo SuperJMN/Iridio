@@ -182,6 +182,8 @@ namespace Iridio.Runtime
             {
                 case BoundBinaryExpression boundBinaryExpression:
                     return await Evaluate(boundBinaryExpression);
+                case BoundBooleanValueExpression boundBooleanValueExpression:
+                    return await Evaluate(boundBooleanValueExpression);
                 case BoundIdentifier boundIdentifier:
                     return Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
@@ -190,6 +192,10 @@ namespace Iridio.Runtime
                     return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
+                case BoundCallExpression boundCallExpression:
+                    break;
+                case BoundCondition boundCondition:
+                    break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Either.Success<RunError, object>(boundNumericExpression.Value);
                 case BoundDoubleExpression boundDoubleExpression:
@@ -197,6 +203,11 @@ namespace Iridio.Runtime
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private async Task<Either<RunError, object>> Evaluate(BoundBooleanValueExpression expr)
+        {
+            return expr.Value;
         }
 
         private async Task<Either<RunError, object>> Evaluate(BoundBinaryExpression boundBinaryExpression)
@@ -230,7 +241,7 @@ namespace Iridio.Runtime
                     return (a, b) => a == b;
 
                 case "!=":
-                    return (a, b) => a == b;
+                    return (a, b) => a != b;
 
                 default:
                     throw new ArgumentOutOfRangeException();

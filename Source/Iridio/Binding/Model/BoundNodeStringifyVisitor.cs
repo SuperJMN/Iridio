@@ -1,10 +1,9 @@
 ﻿using System.Globalization;
 using System.Linq;
-using Iridio.Binding.Model;
 using Iridio.Common.Utils;
 using MoreLinq;
 
-namespace Iridio.Binding
+namespace Iridio.Binding.Model
 {
     public class BoundNodeStringifyVisitor : IBoundNodeVisitor
     {
@@ -120,6 +119,11 @@ namespace Iridio.Binding
         public void Visit(BoundBinaryExpression functionDeclaration)
         {
             throw new System.NotImplementedException();
+        }
+
+        public void Visit(BoundBooleanValueExpression expression)
+        {
+            sa.Print(expression.Value.ToString());
         }
 
         public void Visit(BoundIdentifier boundIdentifier)

@@ -26,7 +26,7 @@ namespace Iridio.Parsing
         private static readonly TokenListParser<SimpleToken, Operator> And = Token.EqualTo(SimpleToken.And).Value(new Operator("&&"));
         private static readonly TokenListParser<SimpleToken, Operator> Or = Token.EqualTo(SimpleToken.Or).Value(new Operator("||"));
         private static readonly TokenListParser<SimpleToken, Operator> Not = Token.EqualTo(SimpleToken.Exclamation).Value(new Operator("!"));
-        
+
         private static readonly TokenListParser<SimpleToken, string> Identifier =
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
 
@@ -55,6 +55,10 @@ namespace Iridio.Parsing
 
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierExpression =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
+
+        public static readonly TokenListParser<SimpleToken, Expression> BoleanValueExpression =
+            Token.EqualTo(SimpleToken.True).Value((Expression)new BooleanValueExpression(true))
+                .Or(Token.EqualTo(SimpleToken.False).Value((Expression)new BooleanValueExpression(false)));
 
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
             .ManyDelimitedBy(Token.EqualTo(SimpleToken.Comma))
@@ -104,7 +108,12 @@ namespace Iridio.Parsing
             select (Statement) new AssignmentStatement(identifier, expr);
 
 
-        private static readonly TokenListParser<SimpleToken, Expression> Item = CallExpression.Try().Or(IntegerExpression).Or(DoubleExpression).Or(TextExpression).Or(IdentifierExpression);
+        private static readonly TokenListParser<SimpleToken, Expression> Item = CallExpression.Try()
+            .Or(IntegerExpression)
+            .Or(DoubleExpression)
+            .Or(TextExpression)
+            .Or(IdentifierExpression)
+            .Or(BoleanValueExpression);
 
         private static readonly TokenListParser<SimpleToken, Expression> Factor =
             Parse.Ref(() => Expression).BetweenParenthesis()

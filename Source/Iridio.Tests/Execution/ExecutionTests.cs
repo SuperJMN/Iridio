@@ -26,6 +26,8 @@ namespace Iridio.Tests.Execution
         [InlineData("a = 12!=4", true)]
         [InlineData("a = 4==4", true)]
         [InlineData("a = true", true)]
+        //[InlineData("a = true || false", true)]
+        //[InlineData("a = true && false", false)]
         public async Task SimpleAssignment(string source, object value)
         {
             var vars = await Run(Main(source));

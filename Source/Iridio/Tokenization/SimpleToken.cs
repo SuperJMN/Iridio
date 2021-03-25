@@ -32,6 +32,8 @@ namespace Iridio.Tokenization
         Plus,
         Hyphen,
         Asterisk,
-        Slash
+        Slash,
+        False,
+        True
     }
 }

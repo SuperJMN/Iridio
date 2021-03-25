@@ -42,6 +42,11 @@ namespace Iridio.Binding
             throw new System.NotImplementedException();
         }
 
+        public void Visit(BooleanValueExpression expression)
+        {
+            sa.Print(expression.Value.ToString());
+        }
+
         public void Visit(EchoStatement echo)
         {
             sa.TabPrint($"<{echo.Message}>");

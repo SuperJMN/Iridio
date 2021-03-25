@@ -86,23 +86,23 @@ namespace Iridio.Binding
 
         private BoundExpression Bind(Expression expression)
         {
-            switch (expression)
+            return expression switch
             {
-                case BinaryExpression binaryExpression:
-                    return Bind(binaryExpression);
-                case CallExpression callExpression:
-                    return Bind(callExpression);
-                case IdentifierExpression identifierExpression:
-                    return Bind(identifierExpression);
-                case IntegerExpression numericExpression:
-                    return Bind(numericExpression);
-                case StringExpression stringExpression:
-                    return Bind(stringExpression);
-                case DoubleExpression doubleExpression:
-                    return Bind(doubleExpression);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(expression));
-            }
+                BinaryExpression binaryExpression => Bind(binaryExpression),
+                BooleanValueExpression booleanValueExpression => Bind(booleanValueExpression),
+                CallExpression callExpression => Bind(callExpression),
+                IdentifierExpression identifierExpression => Bind(identifierExpression),
+                IntegerExpression numericExpression => Bind(numericExpression),
+                StringExpression stringExpression => Bind(stringExpression),
+                UnaryExpression unaryExpression => throw new NotImplementedException(),
+                DoubleExpression doubleExpression => Bind(doubleExpression),
+                _ => throw new ArgumentOutOfRangeException(nameof(expression))
+            };
+        }
+
+        private BoundExpression Bind(BooleanValueExpression booleanValueExpression)
+        {
+            return new BoundBooleanValueExpression(booleanValueExpression.Value);
         }
 
         private BoundExpression Bind(BinaryExpression binaryExpression)
@@ -179,32 +179,6 @@ namespace Iridio.Binding
         private BoundStatement Bind(CallStatement callStatement)
         {
             return new BoundCallStatement(Bind(callStatement.Call));
-        }
-    }
-
-    public class BoundBinaryExpression : BoundExpression
-    {
-        public BoundExpression Left { get; }
-        public Operator Op { get; }
-        public BoundExpression Right { get; }
-
-        public BoundBinaryExpression(BoundExpression left, Operator op, BoundExpression right)
-        {
-            Left = left;
-            Op = op;
-            Right = right;
-        }
-
-        public override void Accept(IBoundNodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-    }
-
-    internal class BoundEmptyCallExpression : BoundCallExpression
-    {
-        public override void Accept(IBoundNodeVisitor visitor)
-        {
         }
     }
 }
