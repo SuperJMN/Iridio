@@ -2,10 +2,10 @@ namespace Iridio.Parsing.Model
 {
     public class UnaryExpression : Expression
     {
-        public Operator Op { get; }
+        public UnaryOperator Op { get; }
         public Expression Expression { get; }
 
-        public UnaryExpression(Operator op, Expression expression)
+        public UnaryExpression(UnaryOperator op, Expression expression)
         {
             Op = op;
             Expression = expression;

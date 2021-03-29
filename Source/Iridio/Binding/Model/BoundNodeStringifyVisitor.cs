@@ -28,7 +28,7 @@ namespace Iridio.Binding.Model
         {
             sa.Print("(");
             c.Left.Accept(this);
-            sa.Print(" " + c.Op.Op + " ");
+            sa.Print(" " + c.Op.Symbol + " ");
             c.Right.Accept(this);
             sa.Print(")");
         }
@@ -124,6 +124,11 @@ namespace Iridio.Binding.Model
         public void Visit(BoundBooleanValueExpression expression)
         {
             sa.Print(expression.Value.ToString());
+        }
+
+        public void Visit(BoundUnaryExpression expression)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Visit(BoundIdentifier boundIdentifier)

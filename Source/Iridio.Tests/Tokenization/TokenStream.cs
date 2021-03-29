@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Iridio.Tests.Tokenization;
 using Iridio.Tokenization;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Tokenization
 {
     static class TokenStream
     {

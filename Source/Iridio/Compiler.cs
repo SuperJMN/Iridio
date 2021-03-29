@@ -35,33 +35,4 @@ namespace Iridio
             return compileResult;
         }
     }
-
-    public class BindError : CompilerError
-    {
-        public BinderErrors Errors { get; }
-
-        public BindError(BinderErrors errors)
-        {
-            Errors = errors;
-        }
-    }
-
-    public class ParseError : CompilerError
-    {
-        public ParsingError Error { get; }
-
-        public ParseError(ParsingError error)
-        {
-            Error = error;
-        }
-
-        public override string ToString()
-        {
-            return Error.ToString();
-        }
-    }
-
-    public abstract class CompilerError
-    {
-    }
 }

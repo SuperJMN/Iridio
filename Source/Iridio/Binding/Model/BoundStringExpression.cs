@@ -1,6 +1,4 @@
-﻿using Iridio.Binding.Model;
-
-namespace Iridio.Binding
+﻿namespace Iridio.Binding.Model
 {
     public class BoundStringExpression : BoundExpression
     {

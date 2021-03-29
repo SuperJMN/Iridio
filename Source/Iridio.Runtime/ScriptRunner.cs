@@ -118,57 +118,6 @@ namespace Iridio.Runtime
             //return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeError.Concat);
         }
 
-        private Either<RunError, bool> Compare(object a, object b, Operator op)
-        {
-            if (a is string strA && b is string strB)
-            {
-                if (op.Op == "==")
-                {
-                    return Either.Success<RunError, bool>(strB.Equals(strA));
-                }
-
-                if (op.Op == "!=")
-                {
-                    return Either.Success<RunError, bool>(!strB.Equals(strA));
-                }
-            }
-
-            if (a is int x && b is int y)
-            {
-                if (op.Op == ">")
-                {
-                    return Either.Success<RunError, bool>(x > y);
-                }
-
-                if (op.Op == "<")
-                {
-                    return Either.Success<RunError, bool>(x < y);
-                }
-
-                if (op.Op == "==")
-                {
-                    return Either.Success<RunError, bool>(x == y);
-                }
-
-                if (op.Op == "!=")
-                {
-                    return Either.Success<RunError, bool>(x != y);
-                }
-
-                if (op.Op == ">=")
-                {
-                    return Either.Success<RunError, bool>(x >= y);
-                }
-
-                if (op.Op == "<=")
-                {
-                    return Either.Success<RunError, bool>(x <= y);
-                }
-            }
-
-            return Either.Error<RunError, bool>(new TypeMismatch());
-        }
-
         private async Task<Either<RunError, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
         {
             var evaluation = await Evaluate(boundAssignmentStatement.Expression);
@@ -198,11 +147,19 @@ namespace Iridio.Runtime
                     break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Either.Success<RunError, object>(boundNumericExpression.Value);
+                case BoundUnaryExpression boundUnaryExpression:
+                    return await Evaluate(boundUnaryExpression);
                 case BoundDoubleExpression boundDoubleExpression:
                     return Either.Success<RunError, object>(boundDoubleExpression.Value);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private async Task<Either<RunError, object>> Evaluate(BoundUnaryExpression boundUnaryExpression)
+        {
+            return (await Evaluate(boundUnaryExpression.Expression))
+                .MapRight(o => boundUnaryExpression.Op.Calculate(o));
         }
 
         private async Task<Either<RunError, object>> Evaluate(BoundBooleanValueExpression expr)
@@ -212,47 +169,19 @@ namespace Iridio.Runtime
 
         private async Task<Either<RunError, object>> Evaluate(BoundBinaryExpression boundBinaryExpression)
         {
-            var func = GetOperation(boundBinaryExpression.Op);
-
             var leftEither = await Evaluate(boundBinaryExpression.Left);
             var esr = await leftEither.MapRight(async a =>
             {
                 var rightEither = await Evaluate(boundBinaryExpression.Right);
-                return rightEither.MapRight(b => func(a, b));
+                return rightEither.MapRight(b => boundBinaryExpression.Op.Calculate(a, b));
             }).RightTask();
 
             return esr;
         }
 
-        private Func<dynamic, dynamic, object> GetOperation(Operator op)
+        private Func<dynamic, dynamic, object> GetOperation(BinaryOperator op)
         {
-            switch (op.Op)
-            {
-                case "+":
-                    return (a, b) => a + b;
-                case "-":
-                    return (a, b) => a - b;
-                case "*":
-                    return (a, b) => a * b;
-                case "/":
-                    return (a, b) => a / b;
-
-                case "==":
-                    return (a, b) => a == b;
-
-                case "!=":
-                    return (a, b) => a != b;
-
-                case "&&":
-                    return (a, b) => a && b;
-
-                case "||":
-                    return (a, b) => a || b;
-
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return op.Calculate;
         }
 
         private Either<RunError, object> Evaluate(BoundStringExpression boundStringExpression)
@@ -308,10 +237,5 @@ namespace Iridio.Runtime
 
             return Either.Error<Errors, object>(new Errors(new BinderError(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'")));
         }
-    }
-
-    internal class Success
-    {
-        public static Success Value = new Success();
     }
 }

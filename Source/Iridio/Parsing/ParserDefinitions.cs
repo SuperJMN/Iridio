@@ -13,19 +13,19 @@ namespace Iridio.Parsing
 {
     public class ParserDefinitions
     {
-        private static readonly TokenListParser<SimpleToken, Operator> Multiply = Token.EqualTo(SimpleToken.Asterisk).Value(new Operator("*"));
-        private static readonly TokenListParser<SimpleToken, Operator> Divide = Token.EqualTo(SimpleToken.Slash).Value(new Operator("/"));
-        private static readonly TokenListParser<SimpleToken, Operator> Add = Token.EqualTo(SimpleToken.Plus).Value(new Operator("+"));
-        private static readonly TokenListParser<SimpleToken, Operator> Subtract = Token.EqualTo(SimpleToken.Hyphen).Value(new Operator("-"));
-        private static readonly TokenListParser<SimpleToken, Operator> Lte = Token.EqualTo(SimpleToken.LessOrEqual).Value(new Operator("<="));
-        private static readonly TokenListParser<SimpleToken, Operator> Lt = Token.EqualTo(SimpleToken.Less).Value(new Operator("<"));
-        private static readonly TokenListParser<SimpleToken, Operator> Gt = Token.EqualTo(SimpleToken.Greater).Value(new Operator(">"));
-        private static readonly TokenListParser<SimpleToken, Operator> Gte = Token.EqualTo(SimpleToken.GreaterOrEqual).Value(new Operator(">="));
-        private static readonly TokenListParser<SimpleToken, Operator> Eq = Token.EqualTo(SimpleToken.EqualEqual).Value(new Operator("=="));
-        private static readonly TokenListParser<SimpleToken, Operator> Neq = Token.EqualTo(SimpleToken.NotEqual).Value(new Operator("!="));
-        private static readonly TokenListParser<SimpleToken, Operator> And = Token.EqualTo(SimpleToken.And).Value(new Operator("&&"));
-        private static readonly TokenListParser<SimpleToken, Operator> Or = Token.EqualTo(SimpleToken.Or).Value(new Operator("||"));
-        private static readonly TokenListParser<SimpleToken, Operator> Not = Token.EqualTo(SimpleToken.Exclamation).Value(new Operator("!"));
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Add = Token.EqualTo(SimpleToken.Plus).Value(BinaryOperator.Add);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Subtract = Token.EqualTo(SimpleToken.Hyphen).Value(BinaryOperator.Subtract);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Multiply = Token.EqualTo(SimpleToken.Asterisk).Value(BinaryOperator.Multiply);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Divide = Token.EqualTo(SimpleToken.Slash).Value(BinaryOperator.Divide);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Lte = Token.EqualTo(SimpleToken.LessOrEqual).Value(BinaryOperator.LessThanOrEqual);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Lt = Token.EqualTo(SimpleToken.Less).Value(BinaryOperator.LessThan);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Gt = Token.EqualTo(SimpleToken.Greater).Value(BinaryOperator.GreaterThan);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Gte = Token.EqualTo(SimpleToken.GreaterOrEqual).Value(BinaryOperator.GreaterThanOrEqual);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Eq = Token.EqualTo(SimpleToken.EqualEqual).Value(BinaryOperator.Equal);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Neq = Token.EqualTo(SimpleToken.NotEqual).Value(BinaryOperator.NotEqual);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> And = Token.EqualTo(SimpleToken.And).Value(BinaryOperator.And);
+        private static readonly TokenListParser<SimpleToken, BinaryOperator> Or = Token.EqualTo(SimpleToken.Or).Value(BinaryOperator.Or);
+        private static readonly TokenListParser<SimpleToken, UnaryOperator> Not = Token.EqualTo(SimpleToken.Exclamation).Value(UnaryOperator.Not);
 
         private static readonly TokenListParser<SimpleToken, string> Identifier =
             Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
@@ -56,7 +56,7 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierExpression =
             Identifier.Select(x => (Expression) new IdentifierExpression(x));
 
-        public static readonly TokenListParser<SimpleToken, Expression> BoleanValueExpression =
+        public static readonly TokenListParser<SimpleToken, Expression> BooleanValueExpression =
             Token.EqualTo(SimpleToken.True).Value((Expression)new BooleanValueExpression(true))
                 .Or(Token.EqualTo(SimpleToken.False).Value((Expression)new BooleanValueExpression(false)));
 
@@ -73,18 +73,6 @@ namespace Iridio.Parsing
             Else = from keyword in Token.EqualTo(SimpleToken.Else)
                 from block in Block
                 select block;
-
-        private static readonly TokenListParser<SimpleToken, Operator> BooleanOperators =
-            Token.EqualTo(SimpleToken.EqualEqual)
-                .Or(Token.EqualTo(SimpleToken.And))
-                .Or(Token.EqualTo(SimpleToken.Or))
-                .Or(Token.EqualTo(SimpleToken.Not))
-                .Or(Token.EqualTo(SimpleToken.NotEqual))
-                .Or(Token.EqualTo(SimpleToken.Greater))
-                .Or(Token.EqualTo(SimpleToken.Less))
-                .Or(Token.EqualTo(SimpleToken.LessOrEqual))
-                .Or(Token.EqualTo(SimpleToken.GreaterOrEqual))
-                .Select(token => new Operator(token.ToStringValue()));
 
         private static readonly TokenListParser<SimpleToken, Expression> Condition =
             Parse.Ref(() => Expression)
@@ -113,7 +101,7 @@ namespace Iridio.Parsing
             .Or(DoubleExpression)
             .Or(TextExpression)
             .Or(IdentifierExpression)
-            .Or(BoleanValueExpression);
+            .Or(BooleanValueExpression);
 
         private static readonly TokenListParser<SimpleToken, Expression> Factor =
             Parse.Ref(() => Expression).BetweenParenthesis()
@@ -166,14 +154,14 @@ namespace Iridio.Parsing
                 select new IridioSyntax(functions))
             .AtEnd();
 
-        private static Expression MakeBinary(Operator operatorName, Expression leftOperand, Expression rightOperand)
+        private static Expression MakeBinary(BinaryOperator binaryOperatorName, Expression leftOperand, Expression rightOperand)
         {
-            return new BinaryExpression(operatorName, leftOperand, rightOperand);
+            return new BinaryExpression(binaryOperatorName, leftOperand, rightOperand);
         }
 
-        private static Expression MakeUnary(Operator operatorName, Expression factor)
+        private static Expression MakeUnary(UnaryOperator binaryOperatorName, Expression factor)
         {
-            return new UnaryExpression(operatorName, factor);
+            return new UnaryExpression(binaryOperatorName, factor);
         }
     }
 }

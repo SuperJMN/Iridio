@@ -19,7 +19,6 @@ namespace Iridio.Tokenization
                 .Match(Character.EqualTo('/'), SimpleToken.Slash)
                 .Match(Character.EqualTo('*'), SimpleToken.Asterisk)
                 .Match(Character.EqualTo(':'), SimpleToken.Colon)
-                .Match(Character.EqualTo('!'), SimpleToken.Exclamation)
                 .Match(Character.EqualTo(','), SimpleToken.Comma)
                 .Match(Character.EqualTo('='), SimpleToken.Equal)
                 .Match(Character.EqualTo('('), SimpleToken.OpenParen)
@@ -53,7 +52,7 @@ namespace Iridio.Tokenization
                 .Match(Span.EqualTo("<="), SimpleToken.LessOrEqual)
                 .Match(Character.EqualTo('>'), SimpleToken.Greater)
                 .Match(Character.EqualTo('<'), SimpleToken.Less)
-                .Match(Span.EqualTo("!"), SimpleToken.Not)
+                .Match(Span.EqualTo("!"), SimpleToken.Exclamation)
                 ;
 
             return builder;

@@ -1,18 +1,12 @@
-﻿using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using DynamicData;
 using FluentAssertions;
 using Iridio.Tokenization;
-using MoreLinq;
-using MoreLinq.Extensions;
-using Superpower.Parsers;
 using Xunit;
 using Tokenizer = Iridio.Tokenization.Tokenizer;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Tokenization
 {
     public class TokenizationTests
     {

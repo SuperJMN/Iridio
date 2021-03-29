@@ -6,7 +6,7 @@ using Bogus;
 using Iridio.Tokenization;
 using Optional.Collections;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Tokenization
 {
     class TokenizerFuzzer
     {

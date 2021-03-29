@@ -1,12 +1,12 @@
 namespace Iridio.Parsing.Model
 {
-    public class Operator
+    public abstract class Operator
     {
-        public string Op { get; }
-
-        public Operator(string op)
+        protected Operator(string symbol)
         {
-            Op = op;
+            Symbol = symbol;
         }
+
+        public string Symbol { get; }
     }
 }

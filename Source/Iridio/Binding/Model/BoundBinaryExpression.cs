@@ -1,15 +1,14 @@
-﻿using Iridio.Binding.Model;
-using Iridio.Parsing.Model;
+﻿using Iridio.Parsing.Model;
 
-namespace Iridio.Binding
+namespace Iridio.Binding.Model
 {
     public class BoundBinaryExpression : BoundExpression
     {
         public BoundExpression Left { get; }
-        public Operator Op { get; }
+        public BinaryOperator Op { get; }
         public BoundExpression Right { get; }
 
-        public BoundBinaryExpression(BoundExpression left, Operator op, BoundExpression right)
+        public BoundBinaryExpression(BoundExpression left, BinaryOperator op, BoundExpression right)
         {
             Left = left;
             Op = op;

@@ -33,7 +33,7 @@ namespace Iridio.Binding
         public void Visit(BinaryExpression expression)
         {
             expression.Left.Accept(this);
-            sa.Print(" " + expression.Op.Op + " ");
+            sa.Print(" " + expression.Op.Symbol + " ");
             expression.Right.Accept(this);
         }
 

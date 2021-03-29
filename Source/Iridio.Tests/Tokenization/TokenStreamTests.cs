@@ -4,7 +4,7 @@ using FluentAssertions;
 using Iridio.Tokenization;
 using Xunit;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Tokenization
 {
     public class TokenStreamTests
     {

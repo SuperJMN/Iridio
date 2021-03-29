@@ -37,7 +37,7 @@ namespace Iridio.Tests
         public void IfWithoutElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new BinaryExpression(new Operator("=="),new IdentifierExpression("a"),
+            var condition = new BinaryExpression(BinaryOperator.Equal, new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             sut.Visit(new IfStatement(condition, CreateBlock(), CreateBlock().None()));
             sut.ToString().Should().Be("if (a == b)\r\n{\r\n}");
@@ -47,7 +47,7 @@ namespace Iridio.Tests
         public void IfWithElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new BinaryExpression(new Operator("=="), new IdentifierExpression("a"),
+            var condition = new BinaryExpression(BinaryOperator.Equal, new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             sut.Visit(new IfStatement(condition, CreateBlock(), CreateBlock().Some()));
             sut.ToString().Should().Be("if (a == b)\r\n{\r\n}\r\nelse\r\n{\r\n}");
@@ -57,7 +57,7 @@ namespace Iridio.Tests
         public void FunctionWithIfElse()
         {
             var sut = new SyntaxStringifyVisitor();
-            var condition = new BinaryExpression(new Operator("=="), new IdentifierExpression("a"),
+            var condition = new BinaryExpression(BinaryOperator.Equal, new IdentifierExpression("a"),
                 new IdentifierExpression("b"));
             var ifStatement = new IfStatement(condition, CreateBlock(), CreateBlock().Some());
             var function = GetFunctionDeclaration(ifStatement);

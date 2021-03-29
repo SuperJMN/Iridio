@@ -2,11 +2,11 @@ namespace Iridio.Parsing.Model
 {
     public class BinaryExpression : Expression
     {
-        public Operator Op { get; }
+        public BinaryOperator Op { get; }
         public Expression Left { get; }
         public Expression Right { get; }
 
-        public BinaryExpression(Operator op, Expression left, Expression right)
+        public BinaryExpression(BinaryOperator op, Expression left, Expression right)
         {
             Op = op;
             Left = left;

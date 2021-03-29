@@ -34,8 +34,7 @@ namespace Iridio.Binding
             initializedVariables.Clear();
             errors.Clear();
 
-            var procs = syntax.Procedures.Select(Bind);
-            var boundProcedures = procs.ToList();
+            var boundProcedures = syntax.Procedures.Select(Bind).ToList();
             var main = boundProcedures.FirstOrNone(b => b.Name == "Main");
             main.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, "Main procedure is undefined")));
 
@@ -94,10 +93,15 @@ namespace Iridio.Binding
                 IdentifierExpression identifierExpression => Bind(identifierExpression),
                 IntegerExpression numericExpression => Bind(numericExpression),
                 StringExpression stringExpression => Bind(stringExpression),
-                UnaryExpression unaryExpression => throw new NotImplementedException(),
+                UnaryExpression unaryExpression => Bind(unaryExpression),
                 DoubleExpression doubleExpression => Bind(doubleExpression),
                 _ => throw new ArgumentOutOfRangeException(nameof(expression))
             };
+        }
+
+        private BoundExpression Bind(UnaryExpression unaryExpression)
+        {
+            return new BoundUnaryExpression(Bind(unaryExpression.Expression), unaryExpression.Op);
         }
 
         private BoundExpression Bind(BooleanValueExpression booleanValueExpression)
