@@ -30,16 +30,7 @@ namespace Iridio.Tests.Execution
         [InlineData("a = true && false;", false)]
         [InlineData("a = !true;", false)]
         [InlineData("a = !false;", true)]
-        [InlineData(@"a=0; 
-b = 5;
-if (b == 1) 
-{ 
-	a = 2; 
-} 
-else 
-{ 
-	a = 6; 
-}", 2)]
+        [InlineData("a=0; b = 1; if (b == 1)  { a = 2; }  else  { a = 6; }", 2)]
         [InlineData("a=0; b = 5; if (b == 1) { a = 2; } else { a = 6; }", 6)]
         public async Task SimpleAssignment(string source, object value)
         {
