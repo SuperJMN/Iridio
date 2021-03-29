@@ -13,23 +13,34 @@ namespace Iridio.Tests.Execution
     public class ExecutionTests
     {
         [Theory]
-        [InlineData("a=5", 5)]
-        [InlineData("a=5d", 5d)]
-        [InlineData("a=1+2", 3)]
-        [InlineData("a=5-7", -2)]
-        [InlineData("a=3*2", 6)]
-        [InlineData("a=6/2", 3)]
-        [InlineData("a=5d/2", 2.5D)]
-        [InlineData("a=12/2*3", 18)]
-        [InlineData("a=12/(2*3)", 2)]
-        [InlineData("a = 12==4", false)]
-        [InlineData("a = 12!=4", true)]
-        [InlineData("a = 4==4", true)]
-        [InlineData("a = true", true)]
-        [InlineData("a = true || false", true)]
-        [InlineData("a = true && false", false)]
-        [InlineData("a = !true", false)]
-        [InlineData("a = !false", true)]
+        [InlineData("a = 5;", 5)]
+        [InlineData("a = 5d;", 5d)]
+        [InlineData("a = 1+2;", 3)]
+        [InlineData("a = 5-7;", -2)]
+        [InlineData("a = 3*2;", 6)]
+        [InlineData("a = 6/2;", 3)]
+        [InlineData("a = 5d/2;", 2.5D)]
+        [InlineData("a = 12/2*3;", 18)]
+        [InlineData("a = 12/(2*3);", 2)]
+        [InlineData("a = 12==4;", false)]
+        [InlineData("a = 12!=4;", true)]
+        [InlineData("a = 4==4;", true)]
+        [InlineData("a = true;", true)]
+        [InlineData("a = true || false;", true)]
+        [InlineData("a = true && false;", false)]
+        [InlineData("a = !true;", false)]
+        [InlineData("a = !false;", true)]
+        [InlineData(@"a=0; 
+b = 5;
+if (b == 1) 
+{ 
+	a = 2; 
+} 
+else 
+{ 
+	a = 6; 
+}", 2)]
+        [InlineData("a=0; b = 5; if (b == 1) { a = 2; } else { a = 6; }", 6)]
         public async Task SimpleAssignment(string source, object value)
         {
             var vars = await Run(Main(source));
@@ -41,7 +52,7 @@ namespace Iridio.Tests.Execution
 
         private static string Main(string content)
         {
-            return $"Main {{ {content}; }}";
+            return $"Main {{ {content} }}";
         }
 
         private static async Task<Either<RuntimeError, Runtime.ExecutionSummary>> Run(string source)

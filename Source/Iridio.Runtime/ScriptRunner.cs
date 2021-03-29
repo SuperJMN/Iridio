@@ -112,10 +112,8 @@ namespace Iridio.Runtime
 
         private async Task<Either<RunError, bool>> IsMet(BoundExpression condition)
         {
-            return true;
-            //var left = await Evaluate(condition.Left);
-            //var right = await Evaluate(condition.Right);
-            //return CombineExtensions.Combine(left, right, (x, y) => Compare(x, y, condition.Op), RuntimeError.Concat);
+            return (await Evaluate(condition))
+                .MapRight(o => (bool)o);
         }
 
         private async Task<Either<RunError, Success>> Execute(BoundAssignmentStatement boundAssignmentStatement)
@@ -134,7 +132,7 @@ namespace Iridio.Runtime
                 case BoundBooleanValueExpression boundBooleanValueExpression:
                     return await Evaluate(boundBooleanValueExpression);
                 case BoundIdentifier boundIdentifier:
-                    return Evaluate(boundIdentifier);
+                    return await Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
                     return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
@@ -228,14 +226,14 @@ namespace Iridio.Runtime
             }
         }
 
-        private Either<RunError, object> Evaluate(BoundIdentifier identifier)
+        private async Task<Either<RunError, object>> Evaluate(BoundIdentifier identifier)
         {
             if (Variables.TryGetValue(identifier.Identifier, out var val))
             {
-                return Either.Success<Errors, object>(val);
+                return Either.Success<RunError, object>(val);
             }
 
-            return Either.Error<Errors, object>(new Errors(new BinderError(ErrorKind.VariableNotFound, $"Could not find variable '{identifier.Identifier}'")));
+            return Either.Error<RunError, object>(new ReferenceToUnsetVariable(identifier.Identifier));
         }
     }
 }
