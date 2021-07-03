@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Iridio.Binding;
 using Iridio.Binding.Model;
-using Iridio.Common;
 using Iridio.Parsing;
-using Zafiro.Core.FileSystem;
+using Iridio.Preprocessor;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio
@@ -14,13 +12,13 @@ namespace Iridio
     {
         private readonly IParser parser;
         private readonly IBinder binder;
-        private readonly Preprocessor preprocessor;
+        private readonly NewPreprocessor preprocessor;
 
-        public Compiler(IFileSystemOperations fileSystemOperations, IEnumerable<IFunctionDeclaration> functionDeclarations)
+        public Compiler(IEnumerable<IFunctionDeclaration> functionDeclarations)
         {
             parser = new Parser();
             binder = new Binder(functionDeclarations);
-            preprocessor = new Preprocessor(fileSystemOperations);
+            preprocessor = new NewPreprocessor(new TextFileFactory(), new DirectoryContext());
         }
 
         public Either<CompilerError, Script> Compile(string path)
@@ -28,10 +26,10 @@ namespace Iridio
             var processed = preprocessor.Process(path);
 
             var compileResult = parser
-                .Parse(processed)
-                .MapLeft(pe => (CompilerError)new ParseError(pe))
+                .Parse(processed.Join())
+                .MapLeft(pe => (CompilerError) new ParseError(pe))
                 .MapRight(parsed => binder.Bind(parsed)
-                    .MapLeft(errors => (CompilerError)new BindError(errors)));
+                    .MapLeft(errors => (CompilerError) new BindError(errors)));
 
             return compileResult;
         }

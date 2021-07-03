@@ -1,3 +1,6 @@
+using Iridio.Tokenization;
+using Superpower.Model;
+
 namespace Iridio.Parsing.Model
 {
     public class Procedure : ISyntax
@@ -5,9 +8,9 @@ namespace Iridio.Parsing.Model
         public string Name { get; }
         public Block Block { get; }
 
-        public Procedure(string name, Block block)
+        public Procedure(Token<SimpleToken> name, Block block)
         {
-            Name = name;
+            Name = name.ToStringValue();
             Block = block;
         }
 

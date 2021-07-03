@@ -1,9 +1,5 @@
-using System;
-using System.Globalization;
-using System.Linq;
 using Iridio.Parsing.Model;
 using Iridio.Tokenization;
-using MoreLinq;
 using Optional;
 using Superpower;
 using Superpower.Model;
@@ -27,8 +23,8 @@ namespace Iridio.Parsing
         private static readonly TokenListParser<SimpleToken, BinaryOperator> Or = Token.EqualTo(SimpleToken.Or).Value(BinaryOperator.Or);
         private static readonly TokenListParser<SimpleToken, UnaryOperator> Not = Token.EqualTo(SimpleToken.Exclamation).Value(UnaryOperator.Not);
 
-        private static readonly TokenListParser<SimpleToken, string> Identifier =
-            Token.EqualTo(SimpleToken.Identifier).Select(x => x.ToStringValue());
+        private static readonly TokenListParser<SimpleToken, Token<SimpleToken>> Identifier =
+            Token.EqualTo(SimpleToken.Identifier);
 
         private static readonly TokenListParser<SimpleToken, string> Text = Token.EqualTo(SimpleToken.Text)
             .Select(x => Unwrap(x.ToStringValue()));

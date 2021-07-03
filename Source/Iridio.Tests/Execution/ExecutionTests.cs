@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Iridio.Binding;
 using Iridio.Common;
 using Iridio.Runtime;
 using Moq;
@@ -61,9 +59,9 @@ namespace Iridio.Tests.Execution
                 new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
 
             };
-            var compiler = new Compiler(fsoMock.Object, functions);
+            var compiler = new Compiler(functions);
 
-   
+
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
 
             return await runtime.Run("file");

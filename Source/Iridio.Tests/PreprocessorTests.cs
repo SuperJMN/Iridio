@@ -1,142 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Iridio.Parsing;
+using Iridio.Preprocessor;
 using Xunit;
-using Zafiro.Core.FileSystem;
+using Zafiro.Core.Mixins;
 
 namespace Iridio.Tests
 {
     public class PreprocessorTests
     {
         [Theory]
-        [InlineData("#include file1.rdo\r\nTwo", "One\r\nTwo")]
-        [InlineData("#include file1.rdo\r\n#include Subdir\\file2.rdo\r\nFour", "One\r\nTwo\r\nThree\r\nFour")]
-        public void Verify2(string input, string expected)
+        [InlineData(new[] {"main.rdo:Hi"}, "Hi")]
+        [InlineData(new[] {"main.rdo:#include other.txt\nMario", "other.txt:Hi"}, "Hi\nMario")]
+        public void Include(string[] files, string expected)
         {
-            var sut = CreateSut(input);
+            var sut = CreateSut(files);
 
             var result = sut.Process("main.rdo");
-
-            result.Should().Be(expected);
+            result.Join().Should().Be(expected);
         }
 
-        private IPreprocessor CreateSut(string mainContent)
+        private static Dictionary<string, string> BuildFileSystemDictionary(string[] files)
         {
-            var mock = new TestingFileSystemOperations(mainContent);
-            return new Preprocessor(mock);
+            return files.Select(s =>
+            {
+                var strings = s.Split(":");
+                return (strings[0], strings[1]);
+            }).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
         }
 
-        private class TestingFileSystemOperations : IFileSystemOperations
+        private IPreprocessor CreateSut(string[] filesystem)
         {
-            private readonly ICollection<string> workingDirsHistory = new List<string>() { "" };
-
-            private IDictionary<string, string> fileSystem;
-
-            public TestingFileSystemOperations(string mainContent)
-            {
-                fileSystem = new Dictionary<string, string>()
-                {
-                    { "main.rdo", mainContent },
-                    { "file1.rdo", "One" },
-                    { "Subdir\\file2.rdo", "#include file3.rdo\r\nThree" },
-                    { "Subdir\\file3.rdo", "Two" },
-                };
-            }
-
-            public Task Copy(string source, string destination, CancellationToken cancellationToken = new CancellationToken())
-            {
-                throw new NotImplementedException();
-            }
-
-            public Task CopyDirectory(string source, string destination, string fileSearchPattern = null,
-                CancellationToken cancellationToken = new CancellationToken())
-            {
-                throw new NotImplementedException();
-            }
-
-            public Task DeleteDirectory(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool DirectoryExists(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool FileExists(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void CreateDirectory(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void EnsureDirectoryExists(string directoryPath)
-            {
-                throw new NotImplementedException();
-            }
-
-            public Task DeleteFile(string filePath)
-            {
-                throw new NotImplementedException();
-            }
-
-            public string GetTempFileName()
-            {
-                throw new NotImplementedException();
-            }
-
-            public string ReadAllText(string path)
-            {
-                var key = Path.Combine(WorkingDirectory, path);
-                return fileSystem[key];
-            }
-
-            public void WriteAllText(string path, string text)
-            {
-                throw new NotImplementedException();
-            }
-
-            public IEnumerable<string> QueryDirectory(string root, Func<string, bool> selector = null)
-            {
-                throw new NotImplementedException();
-            }
-
-            public Stream OpenForWrite(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public string GetTempDirectoryName()
-            {
-                throw new NotImplementedException();
-            }
-
-            public Stream OpenForRead(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public Task Truncate(string path)
-            {
-                throw new NotImplementedException();
-            }
-
-            public string WorkingDirectory
-            {
-                get => workingDirsHistory.LastOrDefault();
-                set => workingDirsHistory.Add(value);
-            }
+            var directoryContext = new TestDirectoryContext();
+            ITextFileFactory testFileFactory = new TestFileFactory(BuildFileSystemDictionary(filesystem));
+            return new NewPreprocessor(testFileFactory, directoryContext);
         }
     }
 
+    internal class TestDirectoryContext : IDirectoryContext
+    {
+        private readonly ICollection<string> workingDirsHistory = new List<string> {""};
 
+        public string WorkingDirectory
+        {
+            get => workingDirsHistory.LastOrDefault();
+            set => workingDirsHistory.Add(value);
+        }
+    }
+
+    internal class TestFileFactory : ITextFileFactory
+    {
+        private readonly Dictionary<string, string> dictionary;
+
+        public TestFileFactory(Dictionary<string, string> dictionary)
+        {
+            this.dictionary = dictionary;
+        }
+
+        public ITextFile Get(string path)
+        {
+            return new TestTextFile(dictionary[path]);
+        }
+    }
+
+    internal class TestTextFile : ITextFile
+    {
+        private readonly string contents;
+
+        public TestTextFile(string contents)
+        {
+            this.contents = contents;
+        }
+
+        public IEnumerable<string> Lines()
+        {
+            return contents.Lines();
+        }
+    }
 }
