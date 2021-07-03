@@ -4,18 +4,18 @@ namespace Iridio.Runtime
 {
     public class ReferenceToUnsetVariable : RunError
     {
-        public string VariableName { get; }
+        public string[] VariableNames { get; }
 
-        public ReferenceToUnsetVariable(string variableName)
+        public ReferenceToUnsetVariable(params string[] variableNames)
         {
-            VariableName = variableName;
+            VariableNames = variableNames;
         }
 
         public override IEnumerable<string> Items => new[] {ToString()};
 
         public override string ToString()
         {
-            return $"Usage of unset variable '{VariableName}'";
+            return $"Usage of unset variable '{VariableNames}'";
         }
     }
 }

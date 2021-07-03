@@ -11,7 +11,7 @@ namespace Iridio.Tokenization
         {
             var builder = new TokenizerBuilder<SimpleToken>()
                 .Match(Span.Regex(@"""((?:""""|[^""])*)"""), SimpleToken.Text)
-                .Match(ExtraParsers.SpanBetween('<', '>'), SimpleToken.Echo)
+                .Match(ExtraParsers.SpanBetween("<<", ">>"), SimpleToken.Echo)
                 .Ignore(Span.WhiteSpace)
                 .BooleanOperators()
                 .Match(Character.EqualTo('-'), SimpleToken.Hyphen)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
@@ -15,10 +16,10 @@ namespace Iridio
         private readonly IBinder binder;
         private readonly Preprocessor preprocessor;
 
-        public Compiler(IFileSystemOperations fileSystemOperations)
+        public Compiler(IFileSystemOperations fileSystemOperations, IEnumerable<IFunctionDeclaration> functionDeclarations)
         {
             parser = new Parser();
-            binder = new Binder(Enumerable.Empty<IFunctionDeclaration>());
+            binder = new Binder(functionDeclarations);
             preprocessor = new Preprocessor(fileSystemOperations);
         }
 

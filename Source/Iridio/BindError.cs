@@ -1,4 +1,5 @@
-﻿using Iridio.Binding;
+﻿using System.Linq;
+using Iridio.Binding;
 
 namespace Iridio
 {
@@ -9,6 +10,11 @@ namespace Iridio
         public BindError(BinderErrors errors)
         {
             Errors = errors;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(";", Errors.Select(x => x.ToString()));
         }
     }
 }

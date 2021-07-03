@@ -24,15 +24,6 @@ namespace Iridio.Binding.Model
             sa.Print(";");
         }
 
-        public void Visit(BoundCondition c)
-        {
-            sa.Print("(");
-            c.Left.Accept(this);
-            sa.Print(" " + c.Op.Symbol + " ");
-            c.Right.Accept(this);
-            sa.Print(")");
-        }
-
         public void Visit(BoundEchoStatement echo)
         {
         }

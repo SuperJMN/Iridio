@@ -127,7 +127,7 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> Expression = Disjunction;
 
         private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo)
-            .Apply(ExtraParsers.SpanBetween('<', '>'))
+            .Apply(ExtraParsers.SpanBetween("<<", ">>"))
             .Select(span => (Statement) new EchoStatement(span.ToStringValue()));
 
         public static readonly TokenListParser<SimpleToken, Statement> SingleSentence =

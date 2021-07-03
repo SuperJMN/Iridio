@@ -172,7 +172,7 @@ namespace Iridio.Binding
 
         private BoundBlock Bind(Block block)
         {
-            return new BoundBlock(block.Statements.Select(Bind));
+            return new(block.Statements.Select(Bind).ToList());
         }
 
         private BoundStatement Bind(EchoStatement echoStatement)

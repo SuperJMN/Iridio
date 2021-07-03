@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Iridio.Binding;
 using Iridio.Common;
 using Iridio.Runtime;
 using Moq;
@@ -32,6 +34,8 @@ namespace Iridio.Tests.Execution
         [InlineData("a = !false;", true)]
         [InlineData("a=0; b = 1; if (b == 1)  { a = 2; }  else  { a = 6; }", 2)]
         [InlineData("a=0; b = 5; if (b == 1) { a = 2; } else { a = 6; }", 6)]
+        [InlineData("b=1; c=2; a = Add(b, c);", 3)]
+        [InlineData("b=\"Hello\"; a = \"{b} world!\";", "Hello world!")]
         public async Task SimpleAssignment(string source, object value)
         {
             var vars = await Run(Main(source));
@@ -51,9 +55,16 @@ namespace Iridio.Tests.Execution
             var fsoMock = new Mock<IFileSystemOperations>();
             fsoMock.Setup(fso => fso.ReadAllText(It.IsAny<string>())).Returns(source);
             fsoMock.SetupGet(x => x.WorkingDirectory).Returns("");
-            var compiler = new Compiler(fsoMock.Object);
 
-            var runtime = new IridioRuntime(compiler, new ScriptRunner(Enumerable.Empty<IFunction>()));
+            var functions = new List<IFunction>
+            {
+                new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
+
+            };
+            var compiler = new Compiler(fsoMock.Object, functions);
+
+   
+            var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
 
             return await runtime.Run("file");
         }

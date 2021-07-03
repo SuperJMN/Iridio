@@ -5,10 +5,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
-using Iridio.Parsing.Model;
 using Optional.Async.Extensions;
 using Optional.Collections;
 using Optional.Unsafe;
@@ -130,9 +128,9 @@ namespace Iridio.Runtime
                 case BoundBinaryExpression boundBinaryExpression:
                     return await Evaluate(boundBinaryExpression);
                 case BoundBooleanValueExpression boundBooleanValueExpression:
-                    return await Evaluate(boundBooleanValueExpression);
+                    return Evaluate(boundBooleanValueExpression);
                 case BoundIdentifier boundIdentifier:
-                    return await Evaluate(boundIdentifier);
+                    return Evaluate(boundIdentifier);
                 case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
                     return await Evaluate(boundBuiltInFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
@@ -140,8 +138,6 @@ namespace Iridio.Runtime
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
                 case BoundCallExpression boundCallExpression:
-                    break;
-                case BoundCondition boundCondition:
                     break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Either.Success<RunError, object>(boundNumericExpression.Value);
@@ -160,7 +156,7 @@ namespace Iridio.Runtime
                 .MapRight(o => boundUnaryExpression.Op.Calculate(o));
         }
 
-        private async Task<Either<RunError, object>> Evaluate(BoundBooleanValueExpression expr)
+        private Either<RunError, object> Evaluate(BoundBooleanValueExpression expr)
         {
             return expr.Value;
         }
@@ -177,17 +173,12 @@ namespace Iridio.Runtime
             return esr;
         }
 
-        private Func<dynamic, dynamic, object> GetOperation(BinaryOperator op)
-        {
-            return op.Calculate;
-        }
-
         private Either<RunError, object> Evaluate(BoundStringExpression boundStringExpression)
         {
             var str = boundStringExpression.String;
             var evaluator = new StringEvaluator();
             var either = evaluator.Evaluate(str, variables);
-            return either.MapRight(s => (object)s);
+            return either.MapRight(Either.Success<RunError, object>);
         }
 
         private async Task<Either<RunError, object>> Evaluate(BoundProcedureCallExpression call)
@@ -226,7 +217,7 @@ namespace Iridio.Runtime
             }
         }
 
-        private async Task<Either<RunError, object>> Evaluate(BoundIdentifier identifier)
+        private Either<RunError, object> Evaluate(BoundIdentifier identifier)
         {
             if (Variables.TryGetValue(identifier.Identifier, out var val))
             {

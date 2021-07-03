@@ -4,7 +4,6 @@
     {
         void Visit(Script script);
         void Visit(BoundAssignmentStatement assignment);
-        void Visit(BoundCondition boundScript);
         void Visit(BoundEchoStatement echo);
         void Visit(BoundIfStatement boundScript);
         void Visit(BoundProcedure procedure);
