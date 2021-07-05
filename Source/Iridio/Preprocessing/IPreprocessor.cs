@@ -1,4 +1,6 @@
-﻿namespace Iridio.Parsing
+﻿using Iridio.Parsing;
+
+namespace Iridio.Preprocessing
 {
     public interface IPreprocessor
     {

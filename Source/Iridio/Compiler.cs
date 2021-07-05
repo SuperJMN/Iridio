@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using Iridio.Binding;
+﻿using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Parsing;
-using Iridio.Preprocessor;
+using Iridio.Preprocessing;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio
@@ -12,13 +11,13 @@ namespace Iridio
     {
         private readonly IParser parser;
         private readonly IBinder binder;
-        private readonly NewPreprocessor preprocessor;
+        private readonly IPreprocessor preprocessor;
 
-        public Compiler(IEnumerable<IFunctionDeclaration> functionDeclarations)
+        public Compiler(IPreprocessor preprocessor, IBinder binder, IParser parser)
         {
-            parser = new Parser();
-            binder = new Binder(functionDeclarations);
-            preprocessor = new NewPreprocessor(new TextFileFactory(), new DirectoryContext());
+            this.parser = parser;
+            this.binder = binder;
+            this.preprocessor = preprocessor;
         }
 
         public Either<CompilerError, Script> Compile(string path)

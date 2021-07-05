@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Iridio.Preprocessor
+namespace Iridio.Preprocessing
 {
     public class TextFile : ITextFile
     {

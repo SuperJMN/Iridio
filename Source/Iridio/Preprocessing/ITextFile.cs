@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Iridio.Preprocessor
+namespace Iridio.Preprocessing
 {
     public interface ITextFile
     {

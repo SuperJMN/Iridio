@@ -4,41 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Iridio.Parsing;
-using Serilog;
 
-namespace Iridio.Preprocessor
+namespace Iridio.Preprocessing
 {
-    public class DirectorySwitch : IDisposable
-    {
-        private readonly IDirectoryContext directoryContext;
-        private readonly string oldDirectory;
-
-        public DirectorySwitch(IDirectoryContext directoryContext, string directory)
-        {
-            this.directoryContext = directoryContext;
-            Log.Debug("Switching to " + directory);
-            oldDirectory = directoryContext.WorkingDirectory;
-            directoryContext.WorkingDirectory = directory;
-        }
-
-        public void Dispose()
-        {
-            Log.Debug("Returning to " + oldDirectory);
-            directoryContext.WorkingDirectory = oldDirectory;
-        }
-    }
-
-    public interface IDirectoryContext
-    {
-        string WorkingDirectory { get; set; }
-    }
-
-    public class NewPreprocessor : IPreprocessor
+    public class Preprocessor : IPreprocessor
     {
         private readonly ITextFileFactory fileFactory;
         private readonly IDirectoryContext directoryContext;
 
-        public NewPreprocessor(ITextFileFactory fileFactory, IDirectoryContext directoryContext)
+        public Preprocessor(ITextFileFactory fileFactory, IDirectoryContext directoryContext)
         {
             this.fileFactory = fileFactory;
             this.directoryContext = directoryContext;
@@ -82,35 +56,6 @@ namespace Iridio.Preprocessor
             }
 
             return new[] {line};
-        }
-    }
-
-    public interface ITextFileFactory
-    {
-        ITextFile Get(string path);
-    }
-
-    public class TextFileFactory : ITextFileFactory
-    {
-        public ITextFile Get(string path)
-        {
-            return new TextFile(path);
-        }
-    }
-
-    public class TaggedLine
-    {
-        public string Content { get; }
-        public string Path { get; }
-        public int Line { get; }
-
-        public bool IsComment => Regex.IsMatch(Content, @"(?<!\S)\s*(//.*)");
-
-        public TaggedLine(string content, string path, int line)
-        {
-            Content = content;
-            Path = path;
-            Line = line;
         }
     }
 }

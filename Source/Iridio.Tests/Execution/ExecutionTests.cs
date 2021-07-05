@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Iridio.Binding;
 using Iridio.Common;
+using Iridio.Parsing;
+using Iridio.Preprocessing;
 using Iridio.Runtime;
-using Moq;
 using Xunit;
-using Zafiro.Core.FileSystem;
+using Zafiro.Core.Mixins;
 using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Tests.Execution
@@ -50,21 +53,34 @@ namespace Iridio.Tests.Execution
 
         private static async Task<Either<RuntimeError, Runtime.ExecutionSummary>> Run(string source)
         {
-            var fsoMock = new Mock<IFileSystemOperations>();
-            fsoMock.Setup(fso => fso.ReadAllText(It.IsAny<string>())).Returns(source);
-            fsoMock.SetupGet(x => x.WorkingDirectory).Returns("");
-
             var functions = new List<IFunction>
             {
                 new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
-
             };
-            var compiler = new Compiler(functions);
 
+            var preprocessor = new TestPreprocessor(source);
+
+            var compiler = new Compiler(preprocessor,
+                new Binder(functions), new Parser());
 
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
 
             return await runtime.Run("file");
+        }
+
+        public class TestPreprocessor : IPreprocessor
+        {
+            private readonly string source;
+
+            public TestPreprocessor(string source)
+            {
+                this.source = source;
+            }
+
+            public CompilerInput Process(string path)
+            {
+                return new CompilerInput(source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)));
+            }
         }
     }
 }

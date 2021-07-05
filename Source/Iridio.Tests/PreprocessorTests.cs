@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Iridio.Parsing;
-using Iridio.Preprocessor;
+using Iridio.Preprocessing;
 using Xunit;
 using Zafiro.Core.Mixins;
 
@@ -34,48 +33,48 @@ namespace Iridio.Tests
         {
             var directoryContext = new TestDirectoryContext();
             ITextFileFactory testFileFactory = new TestFileFactory(BuildFileSystemDictionary(filesystem));
-            return new NewPreprocessor(testFileFactory, directoryContext);
-        }
-    }
-
-    internal class TestDirectoryContext : IDirectoryContext
-    {
-        private readonly ICollection<string> workingDirsHistory = new List<string> {""};
-
-        public string WorkingDirectory
-        {
-            get => workingDirsHistory.LastOrDefault();
-            set => workingDirsHistory.Add(value);
-        }
-    }
-
-    internal class TestFileFactory : ITextFileFactory
-    {
-        private readonly Dictionary<string, string> dictionary;
-
-        public TestFileFactory(Dictionary<string, string> dictionary)
-        {
-            this.dictionary = dictionary;
+            return new Preprocessor(testFileFactory, directoryContext);
         }
 
-        public ITextFile Get(string path)
+        private class TestDirectoryContext : IDirectoryContext
         {
-            return new TestTextFile(dictionary[path]);
-        }
-    }
+            private readonly ICollection<string> workingDirsHistory = new List<string> {""};
 
-    internal class TestTextFile : ITextFile
-    {
-        private readonly string contents;
-
-        public TestTextFile(string contents)
-        {
-            this.contents = contents;
+            public string WorkingDirectory
+            {
+                get => workingDirsHistory.LastOrDefault();
+                set => workingDirsHistory.Add(value);
+            }
         }
 
-        public IEnumerable<string> Lines()
+        private class TestFileFactory : ITextFileFactory
         {
-            return contents.Lines();
+            private readonly Dictionary<string, string> dictionary;
+
+            public TestFileFactory(Dictionary<string, string> dictionary)
+            {
+                this.dictionary = dictionary;
+            }
+
+            public ITextFile Get(string path)
+            {
+                return new TestTextFile(dictionary[path]);
+            }
+        }
+
+        private class TestTextFile : ITextFile
+        {
+            private readonly string contents;
+
+            public TestTextFile(string contents)
+            {
+                this.contents = contents;
+            }
+
+            public IEnumerable<string> Lines()
+            {
+                return contents.Lines();
+            }
         }
     }
 }
