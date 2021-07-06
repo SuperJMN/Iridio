@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Zafiro.Core.Patterns.Either;
+using CSharpFunctionalExtensions;
 
 namespace Iridio.Runtime
 {
@@ -14,17 +14,19 @@ namespace Iridio.Runtime
             this.runner = runner;
         }
 
-        public async Task<Either<RuntimeError, ExecutionSummary>> Run(string source)
+        public async Task<Result<ExecutionSummary, RuntimeError>> Run(string source)
         {
-            return await compiler.Compile(source)
-                .MapLeft(x => (RuntimeError)new RuntimeCompileError(x))
-                .MapRight(async script =>
+            var result = await compiler.Compile(source)
+                .MapError(x => (RuntimeError) new RuntimeCompileError(x))
+                .Bind(async script =>
                 {
                     var runResult = await runner.Run(script);
 
                     return runResult
-                        .MapLeft(x => (RuntimeError)new ExecutionFailed(x));
-                }).RightTask();
+                        .MapError(x => (RuntimeError) new ExecutionFailed(x));
+                });
+
+            return result;
         }
     }
 }

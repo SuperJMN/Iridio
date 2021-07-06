@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Iridio.Common.Utils;
-using Iridio.Parsing;
 using Iridio.Parsing.Model;
 using MoreLinq;
 
@@ -39,7 +39,7 @@ namespace Iridio.Binding
 
         public void Visit(UnaryExpression expression)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Visit(BooleanValueExpression expression)
@@ -49,7 +49,7 @@ namespace Iridio.Binding
 
         public void Visit(EchoStatement echo)
         {
-            sa.TabPrint($"<{echo.Message}>");
+            sa.TabPrint($"'{echo.Message}'");
         }
 
         public void Visit(IfStatement ifs)

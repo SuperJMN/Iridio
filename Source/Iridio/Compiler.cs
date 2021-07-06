@@ -1,8 +1,8 @@
-﻿using Iridio.Binding;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio
 {
@@ -20,15 +20,19 @@ namespace Iridio
             this.preprocessor = preprocessor;
         }
 
-        public Either<CompilerError, Script> Compile(string path)
+        public Result<Script, CompilerError> Compile(string path)
         {
             var processed = preprocessor.Process(path);
 
             var compileResult = parser
                 .Parse(processed.Join())
-                .MapLeft(pe => (CompilerError) new ParseError(pe))
-                .MapRight(parsed => binder.Bind(parsed)
-                    .MapLeft(errors => (CompilerError) new BindError(errors)));
+                .MapError(pe => (CompilerError) new ParseError(pe))
+                .Bind(parsed =>
+                {
+                    return binder
+                        .Bind(parsed)
+                        .MapError(errors => (CompilerError) new BindError(errors));
+                });
 
             return compileResult;
         }

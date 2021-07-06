@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Zafiro.Core.Patterns.Either;
+using CSharpFunctionalExtensions;
 
 namespace Iridio.Runtime
 {
     public interface IIridioRuntime
     {
-        Task<Either<RuntimeError, ExecutionSummary>> Run(string source);
+        Task<Result<ExecutionSummary, RuntimeError>> Run(string source);
     }
 }

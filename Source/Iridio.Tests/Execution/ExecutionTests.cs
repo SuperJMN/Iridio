@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
+using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Binding;
 using Iridio.Common;
 using Iridio.Parsing;
@@ -9,7 +11,6 @@ using Iridio.Preprocessing;
 using Iridio.Runtime;
 using Xunit;
 using Zafiro.Core.Mixins;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Tests.Execution
 {
@@ -37,13 +38,14 @@ namespace Iridio.Tests.Execution
         [InlineData("a=0; b = 5; if (b == 1) { a = 2; } else { a = 6; }", 6)]
         [InlineData("b=1; c=2; a = Add(b, c);", 3)]
         [InlineData("b=\"Hello\"; a = \"{b} world!\";", "Hello world!")]
-        public async Task SimpleAssignment(string source, object value)
+        public async Task SimpleAssignment(string source, object expected)
         {
             var vars = await Run(Main(source));
             vars
-                .MapRight(x => x.Variables["a"])
-                .Should()
-                .Be(Either.Success<RuntimeError, object>(value));
+                .Map(x => x.Variables["a"])
+                .Should().BeSuccess()
+                .And
+                .Subject.Value.Should().Be(expected);
         }
 
         private static string Main(string content)
@@ -51,7 +53,7 @@ namespace Iridio.Tests.Execution
             return $"Main {{ {content} }}";
         }
 
-        private static async Task<Either<RuntimeError, Runtime.ExecutionSummary>> Run(string source)
+        private static async Task<Result<Runtime.ExecutionSummary, RuntimeError>> Run(string source)
         {
             var functions = new List<IFunction>
             {

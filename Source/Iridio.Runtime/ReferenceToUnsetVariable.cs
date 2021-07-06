@@ -15,7 +15,7 @@ namespace Iridio.Runtime
 
         public override string ToString()
         {
-            return $"Usage of unset variable '{VariableNames}'";
+            return $"Usage of unset variable: {string.Join(", ", VariableNames)}";
         }
     }
 }

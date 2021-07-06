@@ -4,7 +4,6 @@ using System.Linq;
 using FluentAssertions;
 using Iridio.Tokenization;
 using Xunit;
-using Tokenizer = Iridio.Tokenization.Tokenizer;
 
 namespace Iridio.Tests.Tokenization
 {
@@ -25,6 +24,7 @@ namespace Iridio.Tests.Tokenization
         [InlineData("\"Hello \"\"boy\"\"\"", SimpleToken.Text)]
         [InlineData("{", SimpleToken.OpenBrace)]
         [InlineData("}", SimpleToken.CloseBrace)]
+        [InlineData("'Comment'", SimpleToken.Echo)]
         public void Tokenize(string input, SimpleToken token)
         {
             var sut = Tokenizer.Create();

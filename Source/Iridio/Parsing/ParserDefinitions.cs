@@ -122,8 +122,8 @@ namespace Iridio.Parsing
 
         public static readonly TokenListParser<SimpleToken, Expression> Expression = Disjunction;
 
-        private static readonly TokenListParser<SimpleToken, Statement> EchoSentence = Token.EqualTo(SimpleToken.Echo)
-            .Apply(ExtraParsers.SpanBetween("<<", ">>"))
+        private static readonly TokenListParser<SimpleToken, Statement> EchoStatement = Token.EqualTo(SimpleToken.Echo)
+            .Apply(ExtraParsers.SpanBetween("'", "'"))
             .Select(span => (Statement) new EchoStatement(span.ToStringValue()));
 
         public static readonly TokenListParser<SimpleToken, Statement> SingleSentence =
@@ -133,7 +133,7 @@ namespace Iridio.Parsing
 
         public static readonly TokenListParser<SimpleToken, Statement> Sentence = IfStatement.Try().Or(SingleSentence);
 
-        public static readonly TokenListParser<SimpleToken, Statement> Statement = Sentence.Try().Or(EchoSentence);
+        public static readonly TokenListParser<SimpleToken, Statement> Statement = Sentence.Try().Or(EchoStatement);
 
         public static readonly TokenListParser<SimpleToken, Block> Block =
             from statements in Statement.Many()

@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
+using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Parsing;
 using Xunit;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Tests
 {
@@ -17,10 +18,11 @@ namespace Iridio.Tests
             var sut = new Parser();
             var parse = sut.Parse(input);
             var result = parse
-                .MapRight(script => script.Stringyfy())
-                .Handle(error => error.Message);
+                .Check(script => Result.Success<string, ParsingError>(script.Stringyfy()));
 
-            result.Should().Be(expected);
+            result.Should().BeSuccess()
+                .And
+                .Subject.Value.Should().Be(expected);
         }
 
         public static IEnumerable<object[]> TestData()

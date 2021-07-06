@@ -4,7 +4,7 @@ namespace Iridio.Parsing.Model
 {
     public class UnaryOperator : Operator
     {
-        public static UnaryOperator Not = new("!", (a) => !a);
+        public static UnaryOperator Not = new("!", a => !a);
 
         public Func<dynamic, object> Calculate { get; }
 

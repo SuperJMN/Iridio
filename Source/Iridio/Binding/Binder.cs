@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional.Collections;
 using Optional.Unsafe;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding
 {
@@ -28,7 +28,7 @@ namespace Iridio.Binding
             functions = functionDeclarations.ToDictionary(d => d.Name, d => d);
         }
 
-        public Either<BinderErrors, Script> Bind(IridioSyntax syntax)
+        public Result<Script, BinderErrors> Bind(IridioSyntax syntax)
         {
             procedures.Clear();
             initializedVariables.Clear();
@@ -40,11 +40,11 @@ namespace Iridio.Binding
 
             if (errors.Any())
             {
-                return Either.Error<BinderErrors, Script>(new BinderErrors(errors));
+                return Result.Failure<Script, BinderErrors>(new BinderErrors(errors));
             }
 
             var script = new Script(boundProcedures, main.ValueOrFailure());
-            return Either.Success<BinderErrors, Script>(script);
+            return Result.Success<Script, BinderErrors>(script);
         }
 
         private BoundProcedure Bind(Procedure proc)

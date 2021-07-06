@@ -1,10 +1,10 @@
-﻿using Iridio.Parsing.Model;
-using Zafiro.Core.Patterns.Either;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Parsing.Model;
 
 namespace Iridio.Parsing
 {
     public interface IParser
     {
-        Either<ParsingError, IridioSyntax> Parse(string source);
+        Result<IridioSyntax, ParsingError> Parse(string source);
     }
 }
