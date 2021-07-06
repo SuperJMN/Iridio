@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional.Collections;
 using Optional.Unsafe;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Binding
 {
     public class Binder : IBinder
     {
         private readonly IDictionary<string, IFunctionDeclaration> functions;
-        private readonly Collection<Error> errors = new Collection<Error>();
+        private readonly Collection<BinderError> errors = new Collection<BinderError>();
 
         private readonly IDictionary<string, BoundProcedure> procedures =
             new Dictionary<string, BoundProcedure>();
@@ -28,31 +28,30 @@ namespace Iridio.Binding
             functions = functionDeclarations.ToDictionary(d => d.Name, d => d);
         }
 
-        public Either<Errors, Script> Bind(IridioSyntax syntax)
+        public Result<Script, BinderErrors> Bind(IridioSyntax syntax)
         {
             procedures.Clear();
             initializedVariables.Clear();
             errors.Clear();
 
-            var procs = syntax.Procedures.Select(Bind);
-            var boundProcedures = procs.ToList();
+            var boundProcedures = syntax.Procedures.Select(Bind).ToList();
             var main = boundProcedures.FirstOrNone(b => b.Name == "Main");
-            main.MatchNone(() => errors.Add(new Error(ErrorKind.UndefinedMainFunction, "Main procedure is undefined")));
+            main.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, "Main procedure is undefined")));
 
             if (errors.Any())
             {
-                return Either.Error<Errors, Script>(new Errors(errors));
+                return Result.Failure<Script, BinderErrors>(new BinderErrors(errors));
             }
 
             var script = new Script(boundProcedures, main.ValueOrFailure());
-            return Either.Success<Errors, Script>(script);
+            return Result.Success<Script, BinderErrors>(script);
         }
 
         private BoundProcedure Bind(Procedure proc)
         {
             if (functions.ContainsKey(proc.Name))
             {
-                AddError(new Error(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Name));
+                AddError(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Name));
             }
 
             var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList()));
@@ -86,22 +85,33 @@ namespace Iridio.Binding
 
         private BoundExpression Bind(Expression expression)
         {
-            switch (expression)
+            return expression switch
             {
-                case CallExpression callExpression:
-                    return Bind(callExpression);
-                case IdentifierExpression identifierExpression:
-                    return Bind(identifierExpression);
+                BinaryExpression binaryExpression => Bind(binaryExpression),
+                BooleanValueExpression booleanValueExpression => Bind(booleanValueExpression),
+                CallExpression callExpression => Bind(callExpression),
+                IdentifierExpression identifierExpression => Bind(identifierExpression),
+                IntegerExpression numericExpression => Bind(numericExpression),
+                StringExpression stringExpression => Bind(stringExpression),
+                UnaryExpression unaryExpression => Bind(unaryExpression),
+                DoubleExpression doubleExpression => Bind(doubleExpression),
+                _ => throw new ArgumentOutOfRangeException(nameof(expression))
+            };
+        }
 
-                case IntegerExpression numericExpression:
-                    return Bind(numericExpression);
-                case StringExpression stringExpression:
-                    return Bind(stringExpression);
-                case DoubleExpression doubleExpression:
-                    return Bind(doubleExpression);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(expression));
-            }
+        private BoundExpression Bind(UnaryExpression unaryExpression)
+        {
+            return new BoundUnaryExpression(Bind(unaryExpression.Expression), unaryExpression.Op);
+        }
+
+        private BoundExpression Bind(BooleanValueExpression booleanValueExpression)
+        {
+            return new BoundBooleanValueExpression(booleanValueExpression.Value);
+        }
+
+        private BoundExpression Bind(BinaryExpression binaryExpression)
+        {
+            return new BoundBinaryExpression(Bind(binaryExpression.Left), binaryExpression.Op, Bind(binaryExpression.Right));
         }
 
         private BoundExpression Bind(DoubleExpression doubleExpression)
@@ -119,7 +129,7 @@ namespace Iridio.Binding
         {
             var references = References.FromString(str);
             var notInitialized = references.Where(s => !initializedVariables.Contains(s));
-            notInitialized.ForEach(s => AddError(new Error(ErrorKind.ReferenceToUninitializedVariable, s)));
+            notInitialized.ForEach(s => AddError(new BinderError(ErrorKind.ReferenceToUninitializedVariable, s)));
         }
 
         private BoundExpression Bind(IntegerExpression integerExpression)
@@ -137,9 +147,9 @@ namespace Iridio.Binding
             return new BoundIdentifier(identifierExpression.Identifier);
         }
 
-        private void AddError(Error error)
+        private void AddError(BinderError binderError)
         {
-            errors.Add(error);
+            errors.Add(binderError);
         }
 
         private BoundCallExpression Bind(CallExpression callExpression)
@@ -150,7 +160,7 @@ namespace Iridio.Binding
 
             var funcOrPro = func.Else(() => proc);
 
-            funcOrPro.MatchNone(() => errors.Add(new Error(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Name)));
+            funcOrPro.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Name)));
 
             return funcOrPro.ValueOr(new BoundEmptyCallExpression());
         }
@@ -162,12 +172,7 @@ namespace Iridio.Binding
 
         private BoundBlock Bind(Block block)
         {
-            return new BoundBlock(block.Statements.Select(Bind));
-        }
-
-        private BoundCondition Bind(Condition ifStatementCondition)
-        {
-            return new BoundCondition(Bind(ifStatementCondition.Left), ifStatementCondition.Op, Bind(ifStatementCondition.Right));
+            return new(block.Statements.Select(Bind).ToList());
         }
 
         private BoundStatement Bind(EchoStatement echoStatement)
@@ -178,13 +183,6 @@ namespace Iridio.Binding
         private BoundStatement Bind(CallStatement callStatement)
         {
             return new BoundCallStatement(Bind(callStatement.Call));
-        }
-    }
-
-    internal class BoundEmptyCallExpression : BoundCallExpression
-    {
-        public override void Accept(IBoundNodeVisitor visitor)
-        {
         }
     }
 }

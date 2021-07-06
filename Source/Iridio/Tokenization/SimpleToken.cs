@@ -25,7 +25,14 @@ namespace Iridio.Tokenization
         If,
         Else,
         NotEqual,
-        AnythingButBrackets,
-        Double
+        Double,
+        And,
+        Or,
+        Plus,
+        Hyphen,
+        Asterisk,
+        Slash,
+        False,
+        True
     }
 }

@@ -7,14 +7,14 @@ namespace Iridio
 {
     public static class FormattingExtensions
     {
-        public static string AsString(this IBoundNode node)
+        public static string Stringyfy(this IBoundNode node)
         {
             var visitor = new BoundNodeStringifyVisitor();
             node.Accept(visitor);
             return visitor.ToString();
         }
 
-        public static string AsString(this ISyntax node)
+        public static string Stringyfy(this ISyntax node)
         {
             var visitor = new SyntaxStringifyVisitor();
             node.Accept(visitor);

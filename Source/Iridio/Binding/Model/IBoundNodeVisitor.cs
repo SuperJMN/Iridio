@@ -4,7 +4,6 @@
     {
         void Visit(Script script);
         void Visit(BoundAssignmentStatement assignment);
-        void Visit(BoundCondition boundScript);
         void Visit(BoundEchoStatement echo);
         void Visit(BoundIfStatement boundScript);
         void Visit(BoundProcedure procedure);
@@ -16,5 +15,8 @@
         void Visit(BoundBuiltInFunctionCallExpression functionDeclaration);
         void Visit(BoundProcedureCallExpression callExpression);
         void Visit(BoundDoubleExpression doubleExpression);
+        void Visit(BoundBinaryExpression functionDeclaration);
+        void Visit(BoundBooleanValueExpression expression);
+        void Visit(BoundUnaryExpression expression);
     }
 }

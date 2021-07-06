@@ -1,11 +1,10 @@
-﻿using Iridio.Binding.Model;
-using Iridio.Common;
-using Zafiro.Core.Patterns.Either;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Binding.Model;
 
 namespace Iridio
 {
     public interface ICompiler
     {
-        Either<Errors, Script> Compile(string path);
+        Result<Script, CompilerError> Compile(string path);
     }
 }

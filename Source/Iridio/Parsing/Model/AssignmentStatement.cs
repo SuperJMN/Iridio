@@ -1,3 +1,6 @@
+using Iridio.Tokenization;
+using Superpower.Model;
+
 namespace Iridio.Parsing.Model
 {
     public class AssignmentStatement : Statement
@@ -5,9 +8,9 @@ namespace Iridio.Parsing.Model
         public string Variable { get; }
         public Expression Expression { get; }
 
-        public AssignmentStatement(string variable, Expression expression)
+        public AssignmentStatement(Token<SimpleToken> variable, Expression expression)
         {
-            Variable = variable;
+            Variable = variable.ToStringValue();
             Expression = expression;
         }
 

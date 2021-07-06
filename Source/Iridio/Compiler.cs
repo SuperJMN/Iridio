@@ -1,10 +1,8 @@
-﻿using System.Linq;
+﻿using CSharpFunctionalExtensions;
 using Iridio.Binding;
 using Iridio.Binding.Model;
-using Iridio.Common;
 using Iridio.Parsing;
-using Zafiro.Core.FileSystem;
-using Zafiro.Core.Patterns.Either;
+using Iridio.Preprocessing;
 
 namespace Iridio
 {
@@ -13,23 +11,28 @@ namespace Iridio
     {
         private readonly IParser parser;
         private readonly IBinder binder;
-        private readonly Preprocessor preprocessor;
+        private readonly IPreprocessor preprocessor;
 
-        public Compiler()
+        public Compiler(IPreprocessor preprocessor, IBinder binder, IParser parser)
         {
-            parser = new Parser();
-            binder = new Binder(Enumerable.Empty<IFunctionDeclaration>());
-            preprocessor = new Preprocessor(new FileSystemOperations());
+            this.parser = parser;
+            this.binder = binder;
+            this.preprocessor = preprocessor;
         }
 
-        public Either<Errors, Script> Compile(string path)
+        public Result<Script, CompilerError> Compile(string path)
         {
             var processed = preprocessor.Process(path);
 
             var compileResult = parser
-                .Parse(processed)
-                .MapLeft(_ => new Errors(ErrorKind.UnableToParse))
-                .MapRight(parsed => binder.Bind(parsed));
+                .Parse(processed.Stringify())
+                .MapError(pe => (CompilerError) new ParseError(pe, processed))
+                .Bind(parsed =>
+                {
+                    return binder
+                        .Bind(parsed)
+                        .MapError(errors => (CompilerError) new BindError(errors));
+                });
 
             return compileResult;
         }

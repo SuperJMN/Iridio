@@ -11,11 +11,14 @@ namespace Iridio.Tokenization
         {
             var builder = new TokenizerBuilder<SimpleToken>()
                 .Match(Span.Regex(@"""((?:""""|[^""])*)"""), SimpleToken.Text)
-                .Match(ExtraParsers.SpanBetween('<', '>'), SimpleToken.Echo)
+                .Match(ExtraParsers.SpanBetween("'", "'"), SimpleToken.Echo)
                 .Ignore(Span.WhiteSpace)
                 .BooleanOperators()
+                .Match(Character.EqualTo('-'), SimpleToken.Hyphen)
+                .Match(Character.EqualTo('+'), SimpleToken.Plus)
+                .Match(Character.EqualTo('/'), SimpleToken.Slash)
+                .Match(Character.EqualTo('*'), SimpleToken.Asterisk)
                 .Match(Character.EqualTo(':'), SimpleToken.Colon)
-                .Match(Character.EqualTo('!'), SimpleToken.Exclamation)
                 .Match(Character.EqualTo(','), SimpleToken.Comma)
                 .Match(Character.EqualTo('='), SimpleToken.Equal)
                 .Match(Character.EqualTo('('), SimpleToken.OpenParen)
@@ -27,8 +30,10 @@ namespace Iridio.Tokenization
                 .Match(Character.EqualTo(';'), SimpleToken.Semicolon)
                 .Match(Span.EqualTo("if"), SimpleToken.If, true)
                 .Match(Span.EqualTo("else"), SimpleToken.Else, true)
+                .Match(Span.EqualTo("true"), SimpleToken.True, true)
+                .Match(Span.EqualTo("false"), SimpleToken.False, true)
+                .Match(TextParsers.DoubleParser, SimpleToken.Double)
                 .Match(Numerics.Integer, SimpleToken.Integer)
-                .Match(Numerics.DecimalDouble, SimpleToken.Double)
                 .Match(Span.Regex(IdentifierRegex), SimpleToken.Identifier)
                 .Build();
             return builder;
@@ -39,12 +44,15 @@ namespace Iridio.Tokenization
         private static TokenizerBuilder<SimpleToken> BooleanOperators(this TokenizerBuilder<SimpleToken> builder)
         {
             builder
+                .Match(Span.EqualTo("&&"), SimpleToken.And)
+                .Match(Span.EqualTo("||"), SimpleToken.Or)
                 .Match(Span.EqualTo("=="), SimpleToken.EqualEqual)
                 .Match(Span.EqualTo("!="), SimpleToken.NotEqual)
                 .Match(Span.EqualTo(">="), SimpleToken.GreaterOrEqual)
                 .Match(Span.EqualTo("<="), SimpleToken.LessOrEqual)
                 .Match(Character.EqualTo('>'), SimpleToken.Greater)
                 .Match(Character.EqualTo('<'), SimpleToken.Less)
+                .Match(Span.EqualTo("!"), SimpleToken.Exclamation)
                 ;
 
             return builder;

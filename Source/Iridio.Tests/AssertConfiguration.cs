@@ -6,7 +6,7 @@ namespace Iridio.Tests
 {
     public static class AssertConfiguration 
     {
-        public static Func<EquivalencyAssertionOptions<Error>, EquivalencyAssertionOptions<Error>> ForErrors
+        public static Func<EquivalencyAssertionOptions<BinderError>, EquivalencyAssertionOptions<BinderError>> ForErrors
         {
             get { return options => options.Excluding(error => error.AdditionalData); }
         }

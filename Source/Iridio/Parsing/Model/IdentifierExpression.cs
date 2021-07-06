@@ -1,12 +1,15 @@
+using Iridio.Tokenization;
+using Superpower.Model;
+
 namespace Iridio.Parsing.Model
 {
     public class IdentifierExpression : Expression
     {
         public string Identifier { get; }
 
-        public IdentifierExpression(string identifier)
+        public IdentifierExpression(Token<SimpleToken> identifier)
         {
-            Identifier = identifier;
+            Identifier = identifier.ToStringValue();
         }
 
         public override string ToString()

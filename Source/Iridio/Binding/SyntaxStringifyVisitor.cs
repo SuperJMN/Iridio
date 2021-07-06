@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Iridio.Common.Utils;
 using Iridio.Parsing.Model;
 using MoreLinq;
@@ -24,29 +25,38 @@ namespace Iridio.Binding
             sa.Print(";");
         }
 
-        public void Visit(Condition c)
-        {
-            sa.Print("(");
-            c.Left.Accept(this);
-            sa.Print(" " + c.Op.Op + " ");
-            c.Right.Accept(this);
-            sa.Print(")");
-        }
-
         public void Visit(DoubleExpression doubleExpression)
         {
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
+        public void Visit(BinaryExpression expression)
+        {
+            expression.Left.Accept(this);
+            sa.Print(" " + expression.Op.Symbol + " ");
+            expression.Right.Accept(this);
+        }
+
+        public void Visit(UnaryExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(BooleanValueExpression expression)
+        {
+            sa.Print(expression.Value.ToString());
+        }
+
         public void Visit(EchoStatement echo)
         {
-            sa.TabPrint($"<{echo.Message}>");
+            sa.TabPrint($"'{echo.Message}'");
         }
 
         public void Visit(IfStatement ifs)
         {
-            sa.TabPrint("if ");
+            sa.TabPrint("if (");
             ifs.Condition.Accept(this);
+            sa.Print(")");
             ifs.TrueBlock.Accept(this);
             ifs.FalseBlock.MatchSome(b =>
             {

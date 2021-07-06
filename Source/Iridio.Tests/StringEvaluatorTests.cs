@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
+using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Runtime;
-using Iridio.Runtime.ReturnValues;
-using Optional;
 using Xunit;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Tests
 {
@@ -22,8 +21,10 @@ namespace Iridio.Tests
             };
 
             var actual = sut.Evaluate("Hello {replaced}, {{non_replaced}}, {{{replaced_between_braces}}}", dict);
-            var expected = Either.Success<RuntimeErrors, string>("Hello mate, {non_replaced}, {boy!}");
-            actual.Should().BeEquivalentTo(expected);
+            var expected = Result.Success<string, RuntimeErrors>("Hello mate, {non_replaced}, {boy!}");
+            actual.Should().BeSuccess()
+                .And
+                .Subject.Value.Should().Be("Hello mate, {non_replaced}, {boy!}");
         }
 
         [Fact]
@@ -33,10 +34,7 @@ namespace Iridio.Tests
             var dict = new Dictionary<string, object>();
 
             var actual = sut.Evaluate("This will {fail}", dict);
-            var expected = Either.Error<RuntimeErrors, string>(new RuntimeErrors(new ReferenceToUnsetVariable("fail")));
-            actual.Should().BeEquivalentTo(expected, options => options
-                .ComparingByMembers(typeof(Either<,>))
-                .ComparingByMembers(typeof(Option<RuntimeErrors>)));
+            actual.Should().BeFailure();
         }
     }
 }

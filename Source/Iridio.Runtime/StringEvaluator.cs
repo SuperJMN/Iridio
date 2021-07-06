@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Iridio.Runtime.ReturnValues;
+using CSharpFunctionalExtensions;
 using Zafiro.Core.Mixins;
-using Zafiro.Core.Patterns.Either;
 
 namespace Iridio.Runtime
 {
@@ -11,7 +10,7 @@ namespace Iridio.Runtime
     {
         private const string Pattern = "(?<=(?<!{)(?:{{)*){([^{}]*)}(?=(?:}})*(?!}))";
 
-        public Either<RuntimeErrors, string> Evaluate(string str, IDictionary<string, object> dictionary)
+        public Result<string, RunError> Evaluate(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
             var refs = matches.Cast<Match>().Select(x => x.Groups[1].Value);
@@ -19,8 +18,7 @@ namespace Iridio.Runtime
             var notFound = refs.Except(dictionary.Keys).ToList();
             if (notFound.Any())
             {
-                var errors = notFound.Select(nf => new ReferenceToUnsetVariable(nf));
-                return new RuntimeErrors(errors);
+                return new ReferenceToUnsetVariable(notFound.ToArray());
             }
 
             var replace = Replace(str, dictionary);

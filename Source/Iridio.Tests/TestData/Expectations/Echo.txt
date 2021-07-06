@@ -1,4 +1,4 @@
 ﻿Main
 {
-	<Doing something>
+	'Doing something'
 }

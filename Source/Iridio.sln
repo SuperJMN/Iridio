@@ -10,10 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Zafiro", "Zafiro", "{6C9CCFED-83B4-45DF-8E5F-A9FCB94ED594}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zafiro.Core", "Zafiro\Source\Zafiro.Core\Zafiro.Core.csproj", "{978BB7B1-F301-45A8-A900-7F5BE00AB687}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio", "Iridio\Iridio.csproj", "{BCB71DDF-9109-4921-B4AC-D71C1FE3DF39}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iridio.Runtime", "Iridio.Runtime\Iridio.Runtime.csproj", "{9DA69809-D40B-45CD-B084-4C543BD48FF0}"
@@ -28,10 +24,6 @@ Global
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C729DA6-FB4F-4AA2-85C4-E24BF3875267}.Release|Any CPU.Build.0 = Release|Any CPU
-		{978BB7B1-F301-45A8-A900-7F5BE00AB687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{978BB7B1-F301-45A8-A900-7F5BE00AB687}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{978BB7B1-F301-45A8-A900-7F5BE00AB687}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{978BB7B1-F301-45A8-A900-7F5BE00AB687}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BCB71DDF-9109-4921-B4AC-D71C1FE3DF39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCB71DDF-9109-4921-B4AC-D71C1FE3DF39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCB71DDF-9109-4921-B4AC-D71C1FE3DF39}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,9 +35,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{978BB7B1-F301-45A8-A900-7F5BE00AB687} = {6C9CCFED-83B4-45DF-8E5F-A9FCB94ED594}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FD31FC40-E9B8-495A-AB8C-D149C8C4A4A4}
