@@ -48,6 +48,34 @@ namespace Iridio.Tests.Execution
                 .Subject.Value.Should().Be(expected);
         }
 
+        [Fact]
+        public void Syntax_error_has_correct_position_information()
+        {
+            var dictionary = new Dictionary<string, string>
+            {
+                {"file.rdo", "Main { \n#include child.rdo\n }"},
+                {"child.rdo", "a = 10;\nFAIL ME BIG TIME!;"}
+            };
+            var sut = CreateSut(dictionary);
+
+            var result = sut.Compile("file.rdo");
+
+            result.Should().BeFailure()
+                .And
+                .Subject.Error.Should().BeOfType<ParseError>()
+                .Which.Location.Should()
+                .BeEquivalentTo(new Location(new Position(2, 1), "child.rdo", "FAIL ME BIG TIME!;"));
+        }
+
+        private static Compiler CreateSut(Dictionary<string, string> dictionary)
+        {
+            var preprocessor = new Preprocessor(new DictionaryBasedTextFileFactory(dictionary),
+                new InMemoryDirectoryContext());
+            var functionDeclarations = Enumerable.Empty<IFunctionDeclaration>();
+            var sut = new Compiler(preprocessor, new Binder(functionDeclarations), new Parser());
+            return sut;
+        }
+
         private static string Main(string content)
         {
             return $"Main {{ {content} }}";
@@ -81,7 +109,7 @@ namespace Iridio.Tests.Execution
 
             public CompilerInput Process(string path)
             {
-                return new CompilerInput(source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)));
+                return new CompilerInput(source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)).ToList());
             }
         }
     }

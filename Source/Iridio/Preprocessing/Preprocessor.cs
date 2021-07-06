@@ -20,7 +20,7 @@ namespace Iridio.Preprocessing
 
         public CompilerInput Process(string path)
         {
-            return new(ProcessCore(path));
+            return new(ProcessCore(path).ToList());
         }
 
         private IEnumerable<TaggedLine> ProcessCore(string path)

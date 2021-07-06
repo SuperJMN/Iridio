@@ -2,12 +2,15 @@
 {
     public class ParsingError
     {
-        public string Message { get; }
+        public Position Position { get; }
 
-        public ParsingError(string message)
+        public ParsingError(Position position, string message)
         {
+            Position = position;
             Message = message;
         }
+
+        public string Message { get; }
 
         public override string ToString()
         {

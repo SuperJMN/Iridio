@@ -17,7 +17,7 @@ namespace Iridio.Tests
             var sut = CreateSut(files);
 
             var result = sut.Process("main.rdo");
-            result.Join().Should().Be(expected);
+            result.Stringify().Should().Be(expected);
         }
 
         private static Dictionary<string, string> BuildFileSystemDictionary(string[] files)
@@ -31,50 +31,51 @@ namespace Iridio.Tests
 
         private IPreprocessor CreateSut(string[] filesystem)
         {
-            var directoryContext = new TestDirectoryContext();
-            ITextFileFactory testFileFactory = new TestFileFactory(BuildFileSystemDictionary(filesystem));
+            var directoryContext = new InMemoryDirectoryContext();
+            ITextFileFactory testFileFactory =
+                new DictionaryBasedTextFileFactory(BuildFileSystemDictionary(filesystem));
             return new Preprocessor(testFileFactory, directoryContext);
         }
+    }
 
-        private class TestDirectoryContext : IDirectoryContext
+    internal class DictionaryBasedTextFileFactory : ITextFileFactory
+    {
+        private readonly Dictionary<string, string> dictionary;
+
+        public DictionaryBasedTextFileFactory(Dictionary<string, string> dictionary)
         {
-            private readonly ICollection<string> workingDirsHistory = new List<string> {""};
-
-            public string WorkingDirectory
-            {
-                get => workingDirsHistory.LastOrDefault();
-                set => workingDirsHistory.Add(value);
-            }
+            this.dictionary = dictionary;
         }
 
-        private class TestFileFactory : ITextFileFactory
+        public ITextFile Get(string path)
         {
-            private readonly Dictionary<string, string> dictionary;
+            return new InMemoryTextFile(dictionary[path]);
+        }
+    }
 
-            public TestFileFactory(Dictionary<string, string> dictionary)
-            {
-                this.dictionary = dictionary;
-            }
+    internal class InMemoryTextFile : ITextFile
+    {
+        private readonly string contents;
 
-            public ITextFile Get(string path)
-            {
-                return new TestTextFile(dictionary[path]);
-            }
+        public InMemoryTextFile(string contents)
+        {
+            this.contents = contents;
         }
 
-        private class TestTextFile : ITextFile
+        public IEnumerable<string> Lines()
         {
-            private readonly string contents;
+            return contents.Lines();
+        }
+    }
 
-            public TestTextFile(string contents)
-            {
-                this.contents = contents;
-            }
+    internal class InMemoryDirectoryContext : IDirectoryContext
+    {
+        private readonly ICollection<string> workingDirsHistory = new List<string> {""};
 
-            public IEnumerable<string> Lines()
-            {
-                return contents.Lines();
-            }
+        public string WorkingDirectory
+        {
+            get => workingDirsHistory.LastOrDefault();
+            set => workingDirsHistory.Add(value);
         }
     }
 }

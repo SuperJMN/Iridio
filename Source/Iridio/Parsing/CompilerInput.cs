@@ -6,16 +6,16 @@ namespace Iridio.Parsing
 {
     public class CompilerInput
     {
-        private readonly IEnumerable<TaggedLine> taggedLines;
+        public IList<TaggedLine> TaggedLines { get; }
 
-        public CompilerInput(IEnumerable<TaggedLine> taggedLines)
+        public CompilerInput(IList<TaggedLine> taggedLines)
         {
-            this.taggedLines = taggedLines;
+            TaggedLines = taggedLines;
         }
 
-        public string Join()
+        public string Stringify()
         {
-            return string.Join("\n", taggedLines.Select(x => x.Content));
+            return string.Join("\n", TaggedLines.Select(x => x.Content));
         }
     }
 }

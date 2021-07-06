@@ -25,8 +25,8 @@ namespace Iridio
             var processed = preprocessor.Process(path);
 
             var compileResult = parser
-                .Parse(processed.Join())
-                .MapError(pe => (CompilerError) new ParseError(pe))
+                .Parse(processed.Stringify())
+                .MapError(pe => (CompilerError) new ParseError(pe, processed))
                 .Bind(parsed =>
                 {
                     return binder
