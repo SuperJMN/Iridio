@@ -28,10 +28,6 @@ stages:
         submodules: recursive            
       - task: NuGetToolInstaller@1
         displayName: 'Install NuGet'
-      - task: NuGetCommand@2
-        displayName: 'Restore packages'
-        inputs:
-          restoreSolution: 'Source\Iris.sln'
       - task: DotNetCoreCLI@2
         inputs:
             command: 'pack'
@@ -41,7 +37,7 @@ stages:
       - task: CopyFiles@2
         inputs:
           SourceFolder: 'Source'
-          Contents: '**\Iris*.nupkg'
+          Contents: '**\Iridio*.nupkg'
           TargetFolder: '$(build.artifactstagingdirectory)'
           flattenFolders: true
       - task: PublishBuildArtifacts@1
