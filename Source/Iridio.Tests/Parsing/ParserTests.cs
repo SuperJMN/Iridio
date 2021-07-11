@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
+using Iridio.Core;
 using Iridio.Parsing;
 using Xunit;
 

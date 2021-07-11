@@ -12,15 +12,16 @@ namespace Iridio.Tests
         [Theory]
         [InlineData(new[] {"main.rdo:Hi"}, "Hi")]
         [InlineData(new[] {"main.rdo:#include other.txt\nMario", "other.txt:Hi"}, "Hi\nMario")]
+        [InlineData(new[] {"main.rdo:// Comment\nHi all!"}, "Hi all!")]
         public void Include(string[] files, string expected)
         {
             var sut = CreateSut(files);
 
             var result = sut.Process("main.rdo");
-            result.Stringify().Should().Be(expected);
+            result.Text.Should().Be(expected);
         }
 
-        private static Dictionary<string, string> BuildFileSystemDictionary(string[] files)
+        private static Dictionary<string, string> BuildFileSystemDictionary(IEnumerable<string> files)
         {
             return files.Select(s =>
             {
@@ -32,8 +33,7 @@ namespace Iridio.Tests
         private IPreprocessor CreateSut(string[] filesystem)
         {
             var directoryContext = new InMemoryDirectoryContext();
-            ITextFileFactory testFileFactory =
-                new DictionaryBasedTextFileFactory(BuildFileSystemDictionary(filesystem));
+            ITextFileFactory testFileFactory = new DictionaryBasedTextFileFactory(BuildFileSystemDictionary(filesystem));
             return new Preprocessor(testFileFactory, directoryContext);
         }
     }

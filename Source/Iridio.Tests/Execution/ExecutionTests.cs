@@ -6,6 +6,7 @@ using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Binding;
 using Iridio.Common;
+using Iridio.Core;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
 using Iridio.Runtime;
@@ -107,9 +108,10 @@ namespace Iridio.Tests.Execution
                 this.source = source;
             }
 
-            public CompilerInput Process(string path)
+            public PreprocessedSource Process(string path)
             {
-                return new CompilerInput(source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)).ToList());
+                return new PreprocessedSource(
+                    source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)).ToList());
             }
         }
     }

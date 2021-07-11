@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Iridio.Binding;
 
-namespace Iridio
+namespace Iridio.Core
 {
     public class BindError : CompilerError
     {

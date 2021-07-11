@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
+using Iridio.Core;
 
 namespace Iridio
 {

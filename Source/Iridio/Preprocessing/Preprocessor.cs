@@ -18,7 +18,7 @@ namespace Iridio.Preprocessing
             this.directoryContext = directoryContext;
         }
 
-        public CompilerInput Process(string path)
+        public PreprocessedSource Process(string path)
         {
             return new(ProcessCore(path).ToList());
         }
@@ -33,7 +33,6 @@ namespace Iridio.Preprocessing
             using (new DirectorySwitch(directoryContext, newDir))
             {
                 return from line in TaggedLines(file)
-                    where !line.IsComment
                     from expanded in Expand(line)
                     select expanded;
             }

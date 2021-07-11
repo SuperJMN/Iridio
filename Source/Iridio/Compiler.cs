@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Iridio.Binding;
 using Iridio.Binding.Model;
+using Iridio.Core;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
 
@@ -22,11 +23,11 @@ namespace Iridio
 
         public Result<Script, CompilerError> Compile(string path)
         {
-            var processed = preprocessor.Process(path);
+            var preprocessed = preprocessor.Process(path);
 
             var compileResult = parser
-                .Parse(processed.Stringify())
-                .MapError(pe => (CompilerError) new ParseError(pe, processed))
+                .Parse(preprocessed.Text)
+                .MapError(error => (CompilerError) new ParseError(error, Location.From(error.Position, preprocessed)))
                 .Bind(parsed =>
                 {
                     return binder

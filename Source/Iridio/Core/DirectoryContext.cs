@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Iridio.Preprocessing;
 
-namespace Iridio
+namespace Iridio.Core
 {
     public class DirectoryContext : IDirectoryContext
     {

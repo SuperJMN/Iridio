@@ -1,4 +1,6 @@
-﻿namespace Iridio.Runtime
+﻿using Iridio.Core;
+
+namespace Iridio.Runtime
 {
     internal class RuntimeCompileError : RuntimeError
     {

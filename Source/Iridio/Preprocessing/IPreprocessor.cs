@@ -4,6 +4,6 @@ namespace Iridio.Preprocessing
 {
     public interface IPreprocessor
     {
-        CompilerInput Process(string path);
+        PreprocessedSource Process(string path);
     }
 }

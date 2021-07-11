@@ -4,18 +4,18 @@ using Iridio.Preprocessing;
 
 namespace Iridio.Parsing
 {
-    public class CompilerInput
+    public class PreprocessedSource
     {
         public IList<TaggedLine> TaggedLines { get; }
 
-        public CompilerInput(IList<TaggedLine> taggedLines)
+        public PreprocessedSource(IList<TaggedLine> taggedLines)
         {
             TaggedLines = taggedLines;
         }
 
-        public string Stringify()
+        public string Text
         {
-            return string.Join("\n", TaggedLines.Select(x => x.Content));
+            get { return string.Join("\n", TaggedLines.Where(t => !t.IsComment).Select(x => x.Content)); }
         }
     }
 }
