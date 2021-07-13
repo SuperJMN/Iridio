@@ -134,8 +134,6 @@ namespace Iridio.Runtime
                     return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
-                case BoundCallExpression boundCallExpression:
-                    break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:
@@ -192,9 +190,11 @@ namespace Iridio.Runtime
         {
             var function = Maybe.From(functions.FirstOrDefault(f => f.Name == call.Function.Name));
 
-            return await function
+            var result = await function
                 .ToResult((RunError) new UndeclaredFunction(call.Function.Name))
-                .Map(f => Call(f, call.Parameters));
+                .Bind(f => Call(f, call.Parameters));
+
+            return result;
         }
 
         private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters)
@@ -204,8 +204,7 @@ namespace Iridio.Runtime
 
             try
             {
-                return await combined.Bind(async p =>
-                    Result.Success<object, RunError>(await function.Invoke(p.ToArray())));
+                return await combined.Map(p => function.Invoke(p.ToArray()));
             }
             catch (Exception ex)
             {
