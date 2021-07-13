@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using CSharpFunctionalExtensions;
 using Iridio.Common.Utils;
 using Iridio.Parsing.Model;
 using MoreLinq;
@@ -55,7 +56,7 @@ namespace Iridio.Binding
             ifStatement.Condition.Accept(this);
             sa.Print(")");
             ifStatement.TrueBlock.Accept(this);
-            ifStatement.FalseBlock.MatchSome(b =>
+            ifStatement.FalseBlock.Execute(b =>
             {
                 sa.NewLine();
                 sa.TabPrint("else");

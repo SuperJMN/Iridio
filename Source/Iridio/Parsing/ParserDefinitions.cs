@@ -1,6 +1,6 @@
+using CSharpFunctionalExtensions;
 using Iridio.Parsing.Model;
 using Iridio.Tokenization;
-using Optional;
 using Superpower;
 using Superpower.Model;
 using Superpower.Parsers;
@@ -79,7 +79,7 @@ namespace Iridio.Parsing
             from cond in Condition
             from ifStatements in Block
             from elseStatement in Else.OptionalOrDefault()
-            select (Statement) new IfStatement(cond, ifStatements, elseStatement.SomeNotNull());
+            select (Statement) new IfStatement(cond, ifStatements, Maybe<Block>.From(elseStatement));
 
         public static readonly TokenListParser<SimpleToken, Statement>
             CallSentence = from expression in Parse.Ref(() => CallExpression)

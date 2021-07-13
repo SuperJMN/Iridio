@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Bogus;
+using CSharpFunctionalExtensions;
 using Iridio.Tokenization;
-using Optional.Collections;
+using Zafiro.Core.Patterns;
 
 namespace Iridio.Tests.Tokenization
 {
@@ -41,9 +42,10 @@ namespace Iridio.Tests.Tokenization
 
         private string GetString(SimpleToken simpleToken)
         {
-            var value = DictionaryExtensions.GetValueOrNone(dictionary, simpleToken)
+            var value = dictionary.TryGetValue(simpleToken)
                 .Map(toString => toString())
-                .ValueOr("");
+                .Unwrap("");
+
             return value;
         }
     }
