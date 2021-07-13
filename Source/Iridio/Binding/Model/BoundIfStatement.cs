@@ -1,4 +1,4 @@
-﻿using Optional;
+﻿using CSharpFunctionalExtensions;
 
 namespace Iridio.Binding.Model
 {
@@ -6,9 +6,9 @@ namespace Iridio.Binding.Model
     {
         public BoundExpression Condition { get; }
         public BoundBlock TrueBlock { get; }
-        public Option<BoundBlock> FalseBlock { get; }
+        public Maybe<BoundBlock> FalseBlock { get; }
 
-        public BoundIfStatement(BoundExpression condition, BoundBlock trueBlock, Option<BoundBlock> falseBlock)
+        public BoundIfStatement(BoundExpression condition, BoundBlock trueBlock, Maybe<BoundBlock> falseBlock)
         {
             Condition = condition;
             TrueBlock = trueBlock;

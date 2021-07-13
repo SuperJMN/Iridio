@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
-using Optional.Async.Extensions;
-using Optional.Collections;
 using Zafiro.Core;
 
 namespace Iridio.Runtime
@@ -88,25 +86,25 @@ namespace Iridio.Runtime
 
         private async Task<Result<Success, RunError>> Execute(BoundIfStatement boundIfStatement)
         {
-            var eitherComparison = await IsMet(boundIfStatement.Condition);
+            var eval = await Eval(boundIfStatement.Condition);
 
-            return await eitherComparison.Bind(async isMet =>
+            var result = await eval.Bind(async isMet =>
             {
                 if (isMet)
                 {
-                    var executeResult = await Execute(boundIfStatement.TrueBlock);
-
-                    return executeResult;
+                    return await Execute(boundIfStatement.TrueBlock);
                 }
 
-                var optionalTask = boundIfStatement.FalseBlock.Map(Execute);
-                var task = optionalTask.Match(t => t,
-                    () => Task.FromResult(Result.Success<Success, RunError>(Success.Value)));
-                return await task;
+                var elseExecution = await boundIfStatement.FalseBlock
+                    .Map(async block => await Execute(block));
+
+                return elseExecution.Unwrap(r => Success.Value);
             });
+
+            return result;
         }
 
-        private async Task<Result<bool, RunError>> IsMet(BoundExpression condition)
+        private async Task<Result<bool, RunError>> Eval(BoundExpression condition)
         {
             return (await Evaluate(condition))
                 .Bind(o => Result.Success<bool, RunError>((bool) o));
@@ -136,8 +134,6 @@ namespace Iridio.Runtime
                     return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundCustomCallExpression:
                     return await Evaluate(boundCustomCallExpression);
-                case BoundCallExpression boundCallExpression:
-                    break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:
@@ -190,11 +186,15 @@ namespace Iridio.Runtime
             return execute.Check(Result.Success<object, RunError>);
         }
 
-        private Task<Result<object, RunError>> Evaluate(BoundBuiltInFunctionCallExpression call)
+        private async Task<Result<object, RunError>> Evaluate(BoundBuiltInFunctionCallExpression call)
         {
-            var function = OptionCollectionExtensions.FirstOrNone(functions, f => f.Name == call.Function.Name);
-            return function.MatchAsync(f => Call(f, call.Parameters),
-                () => Result.Failure<object, RunError>(new UndeclaredFunction(call.Function.Name)));
+            var function = Maybe.From(functions.FirstOrDefault(f => f.Name == call.Function.Name));
+
+            var result = await function
+                .ToResult((RunError) new UndeclaredFunction(call.Function.Name))
+                .Bind(f => Call(f, call.Parameters));
+
+            return result;
         }
 
         private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters)
@@ -204,8 +204,7 @@ namespace Iridio.Runtime
 
             try
             {
-                return await combined.Bind(async p =>
-                    Result.Success<object, RunError>(await function.Invoke(p.ToArray())));
+                return await combined.Map(p => function.Invoke(p.ToArray()));
             }
             catch (Exception ex)
             {

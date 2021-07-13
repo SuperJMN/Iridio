@@ -1,5 +1,5 @@
 using System;
-using Optional;
+using CSharpFunctionalExtensions;
 
 namespace Iridio.Parsing.Model
 {
@@ -7,9 +7,9 @@ namespace Iridio.Parsing.Model
     {
         public Expression Condition { get; }
         public Block TrueBlock { get; }
-        public Option<Block> FalseBlock { get; }
+        public Maybe<Block> FalseBlock { get; }
 
-        public IfStatement(Expression cond, Block trueBlock, Option<Block> falseBlock)
+        public IfStatement(Expression cond, Block trueBlock, Maybe<Block> falseBlock)
         {
             Condition = cond ?? throw new ArgumentNullException(nameof(cond));
             TrueBlock = trueBlock ?? throw new ArgumentNullException(nameof(trueBlock));
