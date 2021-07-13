@@ -70,8 +70,9 @@ namespace Iridio.Tests.Execution
 
         private static Compiler CreateSut(Dictionary<string, string> dictionary)
         {
-            var preprocessor = new Preprocessor(new DictionaryBasedTextFileFactory(dictionary),
-                new InMemoryDirectoryContext());
+            var testFileSystem = new TestFileSystem(dictionary);
+
+            var preprocessor = new Preprocessor(testFileSystem);
             var functionDeclarations = Enumerable.Empty<IFunctionDeclaration>();
             var sut = new Compiler(preprocessor, new Binder(functionDeclarations), new Parser());
             return sut;

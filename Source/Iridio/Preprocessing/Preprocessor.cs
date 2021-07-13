@@ -9,13 +9,11 @@ namespace Iridio.Preprocessing
 {
     public class Preprocessor : IPreprocessor
     {
-        private readonly ITextFileFactory fileFactory;
-        private readonly IDirectoryContext directoryContext;
+        private readonly IFileSystem fileSystem;
 
-        public Preprocessor(ITextFileFactory fileFactory, IDirectoryContext directoryContext)
+        public Preprocessor(IFileSystem fileSystem)
         {
-            this.fileFactory = fileFactory;
-            this.directoryContext = directoryContext;
+            this.fileSystem = fileSystem;
         }
 
         public PreprocessedSource Process(string path)
@@ -27,10 +25,10 @@ namespace Iridio.Preprocessing
         {
             var directoryName = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
 
-            var newDir = Path.Combine(directoryContext.WorkingDirectory, directoryName);
+            var newDir = Path.Combine(fileSystem.WorkingDirectory, directoryName);
             var file = Path.GetFileName(path);
 
-            using (new DirectorySwitch(directoryContext, newDir))
+            using (new DirectorySwitch(fileSystem, newDir))
             {
                 return from line in TaggedLines(file)
                     from expanded in Expand(line)
@@ -40,7 +38,7 @@ namespace Iridio.Preprocessing
 
         private IEnumerable<TaggedLine> TaggedLines(string path)
         {
-            return fileFactory.Get(path)
+            return fileSystem.Get(path)
                 .Lines()
                 .Select((s, i) => new TaggedLine(s, path, i + 1));
         }
@@ -56,5 +54,10 @@ namespace Iridio.Preprocessing
 
             return new[] {line};
         }
+    }
+
+    public interface IFileSystem : IDirectoryContext
+    {
+        ITextFile Get(string path);
     }
 }

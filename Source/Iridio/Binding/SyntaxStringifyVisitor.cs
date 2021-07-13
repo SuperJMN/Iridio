@@ -10,18 +10,15 @@ namespace Iridio.Binding
     {
         private readonly IStringAssistant sa = new LineEatingStringAssistant(new StringAssistant());
 
-        public void Visit(IridioSyntax boundScript)
+        public void Visit(IridioSyntax iridioSyntax)
         {
-            boundScript.Procedures.ForEach(function =>
-            {
-                function.Accept(this);
-            });
+            iridioSyntax.Procedures.ForEach(function => { function.Accept(this); });
         }
 
-        public void Visit(AssignmentStatement a)
+        public void Visit(AssignmentStatement assignmentStatement)
         {
-            sa.TabPrint(a.Variable + " = ");
-            a.Expression.Accept(this);
+            sa.TabPrint(assignmentStatement.Variable + " = ");
+            assignmentStatement.Expression.Accept(this);
             sa.Print(";");
         }
 
@@ -30,21 +27,21 @@ namespace Iridio.Binding
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
-        public void Visit(BinaryExpression expression)
+        public void Visit(BinaryExpression binaryExpression)
         {
-            expression.Left.Accept(this);
-            sa.Print(" " + expression.Op.Symbol + " ");
-            expression.Right.Accept(this);
+            binaryExpression.Left.Accept(this);
+            sa.Print(" " + binaryExpression.Op.Symbol + " ");
+            binaryExpression.Right.Accept(this);
         }
 
-        public void Visit(UnaryExpression expression)
+        public void Visit(UnaryExpression unaryExpression)
         {
             throw new NotImplementedException();
         }
 
-        public void Visit(BooleanValueExpression expression)
+        public void Visit(BooleanValueExpression booleanValueExpression)
         {
-            sa.Print(expression.Value.ToString());
+            sa.Print(booleanValueExpression.Value.ToString());
         }
 
         public void Visit(EchoStatement echo)
@@ -52,13 +49,13 @@ namespace Iridio.Binding
             sa.TabPrint($"'{echo.Message}'");
         }
 
-        public void Visit(IfStatement ifs)
+        public void Visit(IfStatement ifStatement)
         {
             sa.TabPrint("if (");
-            ifs.Condition.Accept(this);
+            ifStatement.Condition.Accept(this);
             sa.Print(")");
-            ifs.TrueBlock.Accept(this);
-            ifs.FalseBlock.MatchSome(b =>
+            ifStatement.TrueBlock.Accept(this);
+            ifStatement.FalseBlock.MatchSome(b =>
             {
                 sa.NewLine();
                 sa.TabPrint("else");
@@ -67,10 +64,10 @@ namespace Iridio.Binding
             });
         }
 
-        public void Visit(Procedure fd)
+        public void Visit(Procedure procedure)
         {
-            sa.Print(fd.Name);
-            fd.Block.Accept(this);
+            sa.Print(procedure.Name);
+            procedure.Block.Accept(this);
         }
 
         public void Visit(Block block)
@@ -93,9 +90,9 @@ namespace Iridio.Binding
             sa.NewLine();
         }
 
-        public void Visit(IntegerExpression ne)
+        public void Visit(IntegerExpression integerExpression)
         {
-            sa.Print(ne.Value.ToString());
+            sa.Print(integerExpression.Value.ToString());
         }
 
         public void Visit(CallExpression callExpression)
@@ -109,23 +106,21 @@ namespace Iridio.Binding
             sa.Print(")");
         }
 
-        public void Visit(CallStatement st)
+        public void Visit(CallStatement callStatement)
         {
             sa.TabPrint("");
-            st.Call.Accept(this);
+            callStatement.Call.Accept(this);
             sa.Print(";");
         }
 
-        public void Visit(StringExpression strExpr)
+        public void Visit(StringExpression stringExpression)
         {
-            sa.Print("\"" + strExpr.String + "\"");
-
+            sa.Print("\"" + stringExpression.String + "\"");
         }
 
-        public void Visit(IdentifierExpression identifier)
+        public void Visit(IdentifierExpression identifierExpression)
         {
-            sa.Print(identifier.Identifier);
-
+            sa.Print(identifierExpression.Identifier);
         }
 
         public override string ToString()

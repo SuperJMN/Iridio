@@ -8,7 +8,7 @@ namespace Iridio.Preprocessing
         private readonly IDirectoryContext directoryContext;
         private readonly string oldDirectory;
 
-        public DirectorySwitch(IDirectoryContext directoryContext, string directory)
+        public DirectorySwitch(IFileSystem directoryContext, string directory)
         {
             this.directoryContext = directoryContext;
             Log.Debug("Switching to " + directory);

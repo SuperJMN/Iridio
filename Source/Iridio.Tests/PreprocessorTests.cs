@@ -2,8 +2,8 @@
 using System.Linq;
 using FluentAssertions;
 using Iridio.Preprocessing;
+using Iridio.Tests.Execution;
 using Xunit;
-using Zafiro.Core.Mixins;
 
 namespace Iridio.Tests
 {
@@ -32,50 +32,7 @@ namespace Iridio.Tests
 
         private IPreprocessor CreateSut(string[] filesystem)
         {
-            var directoryContext = new InMemoryDirectoryContext();
-            ITextFileFactory testFileFactory = new DictionaryBasedTextFileFactory(BuildFileSystemDictionary(filesystem));
-            return new Preprocessor(testFileFactory, directoryContext);
-        }
-    }
-
-    internal class DictionaryBasedTextFileFactory : ITextFileFactory
-    {
-        private readonly Dictionary<string, string> dictionary;
-
-        public DictionaryBasedTextFileFactory(Dictionary<string, string> dictionary)
-        {
-            this.dictionary = dictionary;
-        }
-
-        public ITextFile Get(string path)
-        {
-            return new InMemoryTextFile(dictionary[path]);
-        }
-    }
-
-    internal class InMemoryTextFile : ITextFile
-    {
-        private readonly string contents;
-
-        public InMemoryTextFile(string contents)
-        {
-            this.contents = contents;
-        }
-
-        public IEnumerable<string> Lines()
-        {
-            return contents.Lines();
-        }
-    }
-
-    internal class InMemoryDirectoryContext : IDirectoryContext
-    {
-        private readonly ICollection<string> workingDirsHistory = new List<string> {""};
-
-        public string WorkingDirectory
-        {
-            get => workingDirsHistory.LastOrDefault();
-            set => workingDirsHistory.Add(value);
+            return new Preprocessor(new TestFileSystem(BuildFileSystemDictionary(filesystem)));
         }
     }
 }

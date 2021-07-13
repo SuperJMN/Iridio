@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using Iridio.Common.Utils;
 using MoreLinq;
@@ -17,10 +18,10 @@ namespace Iridio.Binding.Model
             });
         }
 
-        public void Visit(BoundAssignmentStatement a)
+        public void Visit(BoundAssignmentStatement assignmentStatement)
         {
-            sa.TabPrint(a.Variable + " = ");
-            a.Expression.Accept(this);
+            sa.TabPrint(assignmentStatement.Variable + " = ");
+            assignmentStatement.Expression.Accept(this);
             sa.Print(";");
         }
 
@@ -28,12 +29,12 @@ namespace Iridio.Binding.Model
         {
         }
 
-        public void Visit(BoundIfStatement ifs)
+        public void Visit(BoundIfStatement ifStatement)
         {
             sa.TabPrint("if ");
-            ifs.Condition.Accept(this);
-            ifs.TrueBlock.Accept(this);
-            ifs.FalseBlock.MatchSome(b =>
+            ifStatement.Condition.Accept(this);
+            ifStatement.TrueBlock.Accept(this);
+            ifStatement.FalseBlock.MatchSome(b =>
             {
                 sa.NewLine();
                 sa.TabPrint("else");
@@ -73,17 +74,17 @@ namespace Iridio.Binding.Model
             sa.Print(ne.Value.ToString());
         }
 
-        public void Visit(BoundCallStatement st)
+        public void Visit(BoundCallStatement callStatement)
         {
             sa.TabPrint("");
-            st.Call.Accept(this);
+            callStatement.Call.Accept(this);
             sa.Print(";");
         }
 
-        public void Visit(BoundBuiltInFunctionCallExpression functionDeclaration)
+        public void Visit(BoundBuiltInFunctionCallExpression functionCallExpression)
         {
-            sa.Print(functionDeclaration.Function.Name + "(");
-            functionDeclaration.Parameters.ToList().ForEach(ex =>
+            sa.Print(functionCallExpression.Function.Name + "(");
+            functionCallExpression.Parameters.ToList().ForEach(ex =>
             {
                 ex.Accept(this);
                 sa.Print(", ");
@@ -91,10 +92,10 @@ namespace Iridio.Binding.Model
             sa.Print(")");
         }
 
-        public void Visit(BoundProcedureCallExpression callExpression)
+        public void Visit(BoundProcedureCallExpression procedureCallExpression)
         {
-            sa.Print(callExpression.Procedure.Name + "(");
-            callExpression.Parameters.ToList().ForEach(ex =>
+            sa.Print(procedureCallExpression.Procedure.Name + "(");
+            procedureCallExpression.Parameters.ToList().ForEach(ex =>
             {
                 ex.Accept(this);
                 sa.Print(", ");
@@ -107,29 +108,29 @@ namespace Iridio.Binding.Model
             sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
-        public void Visit(BoundBinaryExpression functionDeclaration)
+        public void Visit(BoundBinaryExpression binaryExpression)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public void Visit(BoundBooleanValueExpression expression)
+        public void Visit(BoundBooleanValueExpression booleanValueExpression)
         {
-            sa.Print(expression.Value.ToString());
+            sa.Print(booleanValueExpression.Value.ToString());
         }
 
-        public void Visit(BoundUnaryExpression expression)
+        public void Visit(BoundUnaryExpression unaryExpression)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public void Visit(BoundIdentifier boundIdentifier)
+        public void Visit(BoundIdentifier identifier)
         {
-            sa.Print(boundIdentifier.Identifier);
+            sa.Print(identifier.Identifier);
         }
 
-        public void Visit(BoundStringExpression strExpr)
+        public void Visit(BoundStringExpression stringExpression)
         {
-            sa.Print("\"" + strExpr.String + "\"");
+            sa.Print("\"" + stringExpression.String + "\"");
         }
 
         public override string ToString()
