@@ -1,16 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Binding;
 using Iridio.Common;
-using Iridio.Core;
 using Iridio.Parsing;
-using Iridio.Preprocessing;
 using Iridio.Runtime;
-using Iridio.Tests.TestDoubles;
 using Xunit;
 
 namespace Iridio.Tests.Execution
@@ -49,39 +45,6 @@ namespace Iridio.Tests.Execution
                 .Subject.Value.Should().Be(expected);
         }
 
-        [Fact]
-        public void Syntax_error_has_correct_position_information()
-        {
-            var dictionary = new Dictionary<string, string>
-            {
-                {"file.rdo", "Main { \n#include child.rdo\n }"},
-                {"child.rdo", "a = 10;\nFAIL ME BIG TIME!;"}
-            };
-            var sut = CreateSut(dictionary);
-
-            var result = sut.Compile(new SourceCode(new List<Line>
-            {
-                new Line("Main {", "file.rdo", 1),
-                new Line("a = 10;", "child.rdo", 1),
-                new Line("FAIL ME BIG TIME!;", "child.rdo", 2)
-            }));
-
-            result.Should().BeFailure()
-                .And
-                .Subject.Error.Should().BeOfType<ParseError>()
-                .Which.Location.Should()
-                .BeEquivalentTo(new Location(new Position(2, 1), "child.rdo", "FAIL ME BIG TIME!;"));
-        }
-
-        private static SourceCodeSourceCodeCompiler CreateSut(Dictionary<string, string> dictionary)
-        {
-            var testFileSystem = new TestFileSystem(dictionary);
-
-            var preprocessor = new Preprocessor(testFileSystem);
-            var functionDeclarations = Enumerable.Empty<IFunctionDeclaration>();
-            var sut = new SourceCodeSourceCodeCompiler(new Binder(functionDeclarations), new Parser());
-            return sut;
-        }
 
         private static string Main(string content)
         {
@@ -95,7 +58,7 @@ namespace Iridio.Tests.Execution
                 new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
             };
 
-            var compiler = new SourceCodeSourceCodeCompiler(new Binder(functions), new Parser());
+            var compiler = new SourceCodeCompiler(new Binder(functions), new Parser());
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
             return await runtime.Run(SourceCode.FromString(source));
         }

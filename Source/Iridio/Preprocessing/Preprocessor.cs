@@ -40,7 +40,7 @@ namespace Iridio.Preprocessing
         {
             return fileSystem.Get(path)
                 .Lines()
-                .Select((s, i) => new Line(s, path, i + 1));
+                .Select((s, i) => new Line(s, i + 1, path));
         }
 
         private IEnumerable<Line> Expand(Line line)

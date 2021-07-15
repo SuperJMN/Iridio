@@ -22,7 +22,7 @@ namespace Iridio.Tests.Execution
         //{
         //    IEnumerable<ProcedureDeclaration> funcs = new[] { new ProcedureDeclaration(typeof(IntTask)), new ProcedureDeclaration(typeof(StringTask)), };
         //    var runner = new Runner(funcs);
-        //    var sourceCodeCompiler = new SourceCodeSourceCodeCompiler(new Parser(), new FileSystemOperations());
+        //    var sourceCodeCompiler = new SourceCodeCompiler(new Parser(), new FileSystemOperations());
         //    var script = sourceCodeCompiler.Compile("Root.txt");
         //    var dictionary = new Dictionary<string, object>();
         //    await runner.Run(script, dictionary);

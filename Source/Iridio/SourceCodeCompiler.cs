@@ -6,12 +6,12 @@ using Iridio.Parsing;
 
 namespace Iridio
 {
-    public class SourceCodeSourceCodeCompiler : ISourceCodeCompiler
+    public class SourceCodeCompiler : ISourceCodeCompiler
     {
         private readonly IParser parser;
         private readonly IBinder binder;
 
-        public SourceCodeSourceCodeCompiler(IBinder binder, IParser parser)
+        public SourceCodeCompiler(IBinder binder, IParser parser)
         {
             this.parser = parser;
             this.binder = binder;
@@ -21,7 +21,7 @@ namespace Iridio
         {
             var compileResult = parser
                 .Parse(sourceCode.Text)
-                .MapError(error => (CompilerError) new ParseError(error, Location.From(error.Position, sourceCode)))
+                .MapError(error => (CompilerError) new ParseError(SourceUnit.From(error.Position, sourceCode), error.Message))
                 .Bind(parsed =>
                 {
                     return binder
