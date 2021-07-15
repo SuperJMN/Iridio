@@ -2,7 +2,7 @@
 using Iridio.Preprocessing;
 using Zafiro.Core.Mixins;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.TestDoubles
 {
     internal class InMemoryTextFile : ITextFile
     {

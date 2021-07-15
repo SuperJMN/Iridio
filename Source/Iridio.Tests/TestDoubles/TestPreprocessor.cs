@@ -3,7 +3,7 @@ using Iridio.Parsing;
 using Iridio.Preprocessing;
 using Zafiro.Core.Mixins;
 
-namespace Iridio.Tests.Execution
+namespace Iridio.Tests.TestDoubles
 {
     public class TestPreprocessor : IPreprocessor
     {

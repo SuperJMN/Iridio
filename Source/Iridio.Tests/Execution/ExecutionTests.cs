@@ -10,6 +10,7 @@ using Iridio.Core;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
 using Iridio.Runtime;
+using Iridio.Tests.TestDoubles;
 using Xunit;
 
 namespace Iridio.Tests.Execution

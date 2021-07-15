@@ -5,7 +5,7 @@ using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Runtime;
 using Xunit;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Extra
 {
     public class StringEvaluatorTests
     {

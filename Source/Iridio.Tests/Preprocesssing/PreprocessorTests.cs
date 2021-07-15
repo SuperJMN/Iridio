@@ -2,10 +2,10 @@
 using System.Linq;
 using FluentAssertions;
 using Iridio.Preprocessing;
-using Iridio.Tests.Execution;
+using Iridio.Tests.TestDoubles;
 using Xunit;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Preprocesssing
 {
     public class PreprocessorTests
     {
