@@ -10,8 +10,8 @@ using Iridio.Core;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
 using Iridio.Runtime;
+using Iridio.Tests.TestDoubles;
 using Xunit;
-using Zafiro.Core.Mixins;
 
 namespace Iridio.Tests.Execution
 {
@@ -95,29 +95,9 @@ namespace Iridio.Tests.Execution
                 new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
             };
 
-            var preprocessor = new TestPreprocessor(source);
-
             var compiler = new Compiler(new Binder(functions), new Parser());
-
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
-
             return await runtime.Run(new SourceCode(SourceCode.FromString(source)));
-        }
-
-        public class TestPreprocessor : IPreprocessor
-        {
-            private readonly string source;
-
-            public TestPreprocessor(string source)
-            {
-                this.source = source;
-            }
-
-            public SourceCode Process(string path)
-            {
-                return new SourceCode(
-                    source.Lines().Select((s, i) => new Line(s, "fake", i + 1)).ToList());
-            }
         }
     }
 }
