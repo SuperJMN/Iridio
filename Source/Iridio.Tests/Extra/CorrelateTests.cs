@@ -5,7 +5,7 @@ using Iridio.Tests.Tokenization;
 using Iridio.Tokenization;
 using Xunit;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Extra
 {
     public class CorrelateTests
     {

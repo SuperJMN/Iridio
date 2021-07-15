@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Iridio.Common.Utils;
 using Xunit;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Execution
 {
     public class RunTests
     {

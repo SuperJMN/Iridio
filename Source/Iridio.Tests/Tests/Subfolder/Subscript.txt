@@ -1,4 +1,0 @@
-﻿[Key:Value2]
-
-<Hello>
-!"..\Back.txt";

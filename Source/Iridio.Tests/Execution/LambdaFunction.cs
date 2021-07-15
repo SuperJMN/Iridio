@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Iridio.Common;
 using Iridio.Parsing.Model;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Execution
 {
     public class LambdaFunction<T1, T2, T3> : IFunction
     {

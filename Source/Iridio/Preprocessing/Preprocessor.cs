@@ -55,9 +55,4 @@ namespace Iridio.Preprocessing
             return new[] {line};
         }
     }
-
-    public interface IFileSystem : IDirectoryContext
-    {
-        ITextFile Get(string path);
-    }
 }

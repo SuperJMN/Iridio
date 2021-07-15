@@ -2,7 +2,7 @@
 using System.Linq;
 using Iridio.Preprocessing;
 
-namespace Iridio.Tests.Execution
+namespace Iridio.Tests.TestDoubles
 {
     internal class TestFileSystem : IFileSystem
     {

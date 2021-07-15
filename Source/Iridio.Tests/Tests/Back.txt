@@ -1,2 +1,0 @@
-﻿[Key:Value3]
-FunctionCall(1, 2);

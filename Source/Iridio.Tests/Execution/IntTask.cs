@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Iridio.Tests
+namespace Iridio.Tests.Execution
 {
     public class IntTask
     {
