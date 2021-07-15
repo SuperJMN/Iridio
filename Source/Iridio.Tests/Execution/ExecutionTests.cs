@@ -73,13 +73,13 @@ namespace Iridio.Tests.Execution
                 .BeEquivalentTo(new Location(new Position(2, 1), "child.rdo", "FAIL ME BIG TIME!;"));
         }
 
-        private static Compiler CreateSut(Dictionary<string, string> dictionary)
+        private static SourceCodeSourceCodeCompiler CreateSut(Dictionary<string, string> dictionary)
         {
             var testFileSystem = new TestFileSystem(dictionary);
 
             var preprocessor = new Preprocessor(testFileSystem);
             var functionDeclarations = Enumerable.Empty<IFunctionDeclaration>();
-            var sut = new Compiler(new Binder(functionDeclarations), new Parser());
+            var sut = new SourceCodeSourceCodeCompiler(new Binder(functionDeclarations), new Parser());
             return sut;
         }
 
@@ -95,9 +95,9 @@ namespace Iridio.Tests.Execution
                 new LambdaFunction<int, int, int>("Add", (a, b) => a + b)
             };
 
-            var compiler = new Compiler(new Binder(functions), new Parser());
+            var compiler = new SourceCodeSourceCodeCompiler(new Binder(functions), new Parser());
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
-            return await runtime.Run(new SourceCode(SourceCode.FromString(source)));
+            return await runtime.Run(SourceCode.FromString(source));
         }
     }
 }

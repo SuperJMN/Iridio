@@ -6,12 +6,12 @@ using Iridio.Parsing;
 
 namespace Iridio
 {
-    public class Compiler : ICompiler
+    public class SourceCodeSourceCodeCompiler : ISourceCodeCompiler
     {
         private readonly IParser parser;
         private readonly IBinder binder;
 
-        public Compiler(IBinder binder, IParser parser)
+        public SourceCodeSourceCodeCompiler(IBinder binder, IParser parser)
         {
             this.parser = parser;
             this.binder = binder;

@@ -5,7 +5,7 @@ using Iridio.Parsing;
 
 namespace Iridio
 {
-    public interface ICompiler
+    public interface ISourceCodeCompiler
     {
         Result<Script, CompilerError> Compile(SourceCode sourceCode);
     }

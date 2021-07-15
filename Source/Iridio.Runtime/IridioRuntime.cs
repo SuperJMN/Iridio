@@ -6,18 +6,18 @@ namespace Iridio.Runtime
 {
     public class IridioRuntime : IIridioRuntime
     {
-        private readonly ICompiler compiler;
+        private readonly ISourceCodeCompiler sourceCodeCompiler;
         private readonly IScriptRunner runner;
 
-        public IridioRuntime(ICompiler compiler, IScriptRunner runner)
+        public IridioRuntime(ISourceCodeCompiler sourceCodeCompiler, IScriptRunner runner)
         {
-            this.compiler = compiler;
+            this.sourceCodeCompiler = sourceCodeCompiler;
             this.runner = runner;
         }
 
         public async Task<Result<ExecutionSummary, RuntimeError>> Run(SourceCode sourceCode)
         {
-            var result = await compiler.Compile(sourceCode)
+            var result = await sourceCodeCompiler.Compile(sourceCode)
                 .MapError(x => (RuntimeError) new RuntimeCompileError(x))
                 .Bind(async script =>
                 {
