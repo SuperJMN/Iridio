@@ -11,7 +11,6 @@ using Iridio.Parsing;
 using Iridio.Preprocessing;
 using Iridio.Runtime;
 using Xunit;
-using Zafiro.Core.Mixins;
 
 namespace Iridio.Tests.Execution
 {
@@ -83,7 +82,7 @@ namespace Iridio.Tests.Execution
             return $"Main {{ {content} }}";
         }
 
-        private static async Task<Result<Runtime.ExecutionSummary, RuntimeError>> Run(string source)
+        private static async Task<Result<ExecutionSummary, RuntimeError>> Run(string source)
         {
             var functions = new List<IFunction>
             {
@@ -98,22 +97,6 @@ namespace Iridio.Tests.Execution
             var runtime = new IridioRuntime(compiler, new ScriptRunner(functions));
 
             return await runtime.Run("file");
-        }
-
-        public class TestPreprocessor : IPreprocessor
-        {
-            private readonly string source;
-
-            public TestPreprocessor(string source)
-            {
-                this.source = source;
-            }
-
-            public PreprocessedSource Process(string path)
-            {
-                return new PreprocessedSource(
-                    source.Lines().Select((s, i) => new TaggedLine(s, "fake", i + 1)).ToList());
-            }
         }
     }
 }
