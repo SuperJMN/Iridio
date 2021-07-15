@@ -4,7 +4,7 @@ namespace Iridio.Runtime
 {
     public class TypeMismatch : RunError
     {
-        public override IEnumerable<string> Items => new[] { this.ToString() };
+        public override IEnumerable<string> Items => new[] {ToString()};
 
         public override string ToString()
         {

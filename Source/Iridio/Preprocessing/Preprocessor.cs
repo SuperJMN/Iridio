@@ -16,12 +16,12 @@ namespace Iridio.Preprocessing
             this.fileSystem = fileSystem;
         }
 
-        public PreprocessedSource Process(string path)
+        public SourceCode Process(string path)
         {
             return new(ProcessCore(path).ToList());
         }
 
-        private IEnumerable<TaggedLine> ProcessCore(string path)
+        private IEnumerable<Line> ProcessCore(string path)
         {
             var directoryName = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
 
@@ -30,20 +30,20 @@ namespace Iridio.Preprocessing
 
             using (new DirectorySwitch(fileSystem, newDir))
             {
-                return from line in TaggedLines(file)
+                return from line in Lines(file)
                     from expanded in Expand(line)
                     select expanded;
             }
         }
 
-        private IEnumerable<TaggedLine> TaggedLines(string path)
+        private IEnumerable<Line> Lines(string path)
         {
             return fileSystem.Get(path)
                 .Lines()
-                .Select((s, i) => new TaggedLine(s, path, i + 1));
+                .Select((s, i) => new Line(s, path, i + 1));
         }
 
-        private IEnumerable<TaggedLine> Expand(TaggedLine line)
+        private IEnumerable<Line> Expand(Line line)
         {
             var match = Regex.Match(line.Content, @"#include\s+(.*)");
             if (match.Success)

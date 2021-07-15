@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Iridio.Parsing;
 
 namespace Iridio.Runtime
 {
@@ -14,9 +15,9 @@ namespace Iridio.Runtime
             this.runner = runner;
         }
 
-        public async Task<Result<ExecutionSummary, RuntimeError>> Run(string source)
+        public async Task<Result<ExecutionSummary, RuntimeError>> Run(SourceCode sourceCode)
         {
-            var result = await compiler.Compile(source)
+            var result = await compiler.Compile(sourceCode)
                 .MapError(x => (RuntimeError) new RuntimeCompileError(x))
                 .Bind(async script =>
                 {

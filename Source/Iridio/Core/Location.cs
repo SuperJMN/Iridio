@@ -17,10 +17,10 @@ namespace Iridio.Core
             Content = content;
         }
 
-        public static Location From(Position position, PreprocessedSource preprocessedSource)
+        public static Location From(Position position, SourceCode sourceCode)
         {
-            var taggedLine = preprocessedSource.TaggedLines[position.Line - 1];
-            var location = new Location(new Position(taggedLine.Line, position.Column), taggedLine.Path,
+            var taggedLine = sourceCode.TaggedLines[position.Line - 1];
+            var location = new Location(new Position(taggedLine.Number, position.Column), taggedLine.Path,
                 taggedLine.Content);
             return location;
         }
