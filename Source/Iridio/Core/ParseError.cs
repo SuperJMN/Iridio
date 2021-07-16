@@ -1,24 +1,20 @@
-﻿using Iridio.Parsing;
-
-namespace Iridio.Core
+﻿namespace Iridio.Core
 {
     public class ParseError : CompilerError
     {
-        private readonly ParsingError error;
-
-        public ParseError(ParsingError error, Location location)
+        public ParseError(SourceUnit sourceUnit, string errorMessage)
         {
-            this.error = error;
-            Location = location;
+            Message = errorMessage;
+            SourceUnit = sourceUnit;
         }
 
-        public Location Location { get; }
+        public SourceUnit SourceUnit { get; }
 
-        public string Message => error.Message;
+        public string Message { get; }
 
         public override string ToString()
         {
-            return $"Syntax error at {Location}: {Message}";
+            return $"Syntax error at {SourceUnit}: {Message}";
         }
     }
 }

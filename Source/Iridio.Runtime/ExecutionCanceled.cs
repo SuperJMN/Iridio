@@ -11,7 +11,7 @@ namespace Iridio.Runtime
             Message = message;
         }
 
-        public override IEnumerable<string> Items => new[]{ this.ToString() };
+        public override IEnumerable<string> Items => new[] {ToString()};
 
         public override string ToString()
         {

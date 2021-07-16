@@ -4,7 +4,7 @@ using Iridio.Core;
 
 namespace Iridio
 {
-    public interface ICompiler
+    public interface IPathBasedCompiler
     {
         Result<Script, CompilerError> Compile(string path);
     }
