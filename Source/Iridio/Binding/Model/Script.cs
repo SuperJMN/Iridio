@@ -5,12 +5,10 @@ namespace Iridio.Binding.Model
     public class Script : IBoundNode
     {
         public IEnumerable<BoundProcedure> Procedures { get; }
-        public BoundProcedure MainProcedure { get; }
 
-        public Script(IEnumerable<BoundProcedure> procedures, BoundProcedure mainProcedure)
+        public Script(IEnumerable<BoundProcedure> procedures)
         {
             Procedures = procedures;
-            MainProcedure = mainProcedure;
         }
 
         public override string ToString()

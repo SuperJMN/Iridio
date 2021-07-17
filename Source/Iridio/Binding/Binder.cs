@@ -8,7 +8,6 @@ using Iridio.Common;
 using Iridio.Parsing.Model;
 using MoreLinq;
 using Optional.Collections;
-using Optional.Unsafe;
 
 namespace Iridio.Binding
 {
@@ -43,7 +42,7 @@ namespace Iridio.Binding
                 return Result.Failure<Script, BinderErrors>(new BinderErrors(errors));
             }
 
-            var script = new Script(boundProcedures, main.ValueOrFailure());
+            var script = new Script(boundProcedures);
             return Result.Success<Script, BinderErrors>(script);
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -12,11 +11,10 @@ using Zafiro.Core;
 
 namespace Iridio.Runtime
 {
-    // ReSharper disable once UnusedType.Global
     public class ScriptRunner : IScriptRunner
     {
         private readonly IEnumerable<IFunction> functions;
-        private readonly IDictionary<string, object> variables = new Dictionary<string, object>();
+        private IDictionary<string, object> variables;
         private readonly ISubject<string> messages = new Subject<string>();
 
         public ScriptRunner(IEnumerable<IFunction> functions)
@@ -31,12 +29,20 @@ namespace Iridio.Runtime
 
         public IObservable<string> Messages => messages.AsObservable();
 
-        public IReadOnlyDictionary<string, object> Variables => new ReadOnlyDictionary<string, object>(variables);
-
-        private async Task<Result<ExecutionSummary, RunError>> Execute(Script compiled)
+        private async Task<Result<ExecutionSummary, RunError>> Execute(Script script)
         {
-            var execute = await Execute(compiled.MainProcedure);
-            return execute.Map(x => new ExecutionSummary(variables));
+            variables = new Dictionary<string, object>();
+
+            return await GetMain(script)
+                .Bind(Execute)
+                .Map(_ => new ExecutionSummary(variables));
+        }
+
+        private Result<BoundProcedure, RunError> GetMain(Script script)
+        {
+            return script.Procedures
+                .TryFirst(x => x.Name == "Main")
+                .ToResult((RunError) new MainProcedureNotFound());
         }
 
         private Task<Result<Success, RunError>> Execute(BoundProcedure main)
@@ -222,7 +228,7 @@ namespace Iridio.Runtime
 
         private Result<object, RunError> Evaluate(BoundIdentifier identifier)
         {
-            if (Variables.TryGetValue(identifier.Identifier, out var val))
+            if (variables.TryGetValue(identifier.Identifier, out var val))
             {
                 return Result.Success<object, RunError>(val);
             }
