@@ -13,9 +13,9 @@ namespace Iridio.Parsing
     {
         public Result<IridioSyntax, ParsingError> Parse(string source)
         {
-            var tokenization = Tokenizer.Create().Tokenize(source);
             try
             {
+                var tokenization = Tokenizer.Create().Tokenize(source);
                 var parsed = ParserDefinitions.Parser.Parse(tokenization);
                 return Result.Success<IridioSyntax, ParsingError>(parsed);
             }
