@@ -10,14 +10,15 @@ namespace Iridio.Tests.Preprocesssing
     public class PreprocessorTests
     {
         [Theory]
-        [InlineData(new[] {"main.rdo:Hi"}, "Hi")]
-        [InlineData(new[] {"main.rdo:#include other.txt\nMario", "other.txt:Hi"}, "Hi\nMario")]
-        [InlineData(new[] {"main.rdo:// Comment\nHi all!"}, "Hi all!")]
-        public void Include(string[] files, string expected)
+        [InlineData("main.rdo", new[] {"main.rdo:Hi"}, "Hi")]
+        [InlineData("main.rdo", new[] {"main.rdo:#include other.txt\nMario", "other.txt:Hi"}, "Hi\nMario")]
+        [InlineData("main.rdo", new[] {"main.rdo:// Comment\nHi all!"}, "Hi all!")]
+        [InlineData("root\\subdir\\main.rdo", new[] {"root\\subdir\\main.rdo:#include ..\\other.rdo", "root\\other.rdo:Hi"}, "Hi")]
+        public void Include(string mainScript, string[] files, string expected)
         {
             var sut = CreateSut(files);
 
-            var result = sut.Process("main.rdo");
+            var result = sut.Process(mainScript);
             result.Text.Should().Be(expected);
         }
 
@@ -33,6 +34,13 @@ namespace Iridio.Tests.Preprocesssing
         private IPreprocessor CreateSut(string[] filesystem)
         {
             return new Preprocessor(new TestFileSystem(BuildFileSystemDictionary(filesystem)));
+        }
+
+        [Fact(Skip = "Uses local file")]
+        public void Integration()
+        {
+            var sut = new Preprocessor(new FileSystem());
+            var result = sut.Process(@"C:\Users\JMN\Extended\Fast\Repos\WOA-Project\Deployment-Feed\Devices\Lumia\950s\Cityman\Main.txt");
         }
     }
 }

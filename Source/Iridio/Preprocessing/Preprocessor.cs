@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Iridio.Parsing;
@@ -23,17 +21,17 @@ namespace Iridio.Preprocessing
 
         private IEnumerable<Line> ProcessCore(string path)
         {
-            var directoryName = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
-
-            var newDir = Path.Combine(fileSystem.WorkingDirectory, directoryName);
-            var file = Path.GetFileName(path);
-
-            using (new DirectorySwitch(fileSystem, newDir))
+            using (var pr = new DirectoryContext(fileSystem, path))
             {
-                return from line in Lines(file)
-                    from expanded in Expand(line)
-                    select expanded;
+                return ProcessFile(pr.FileName).ToList();
             }
+        }
+
+        private IEnumerable<Line> ProcessFile(string file)
+        {
+            return from line in Lines(file)
+                from expanded in Expand(line)
+                select expanded;
         }
 
         private IEnumerable<Line> Lines(string path)
