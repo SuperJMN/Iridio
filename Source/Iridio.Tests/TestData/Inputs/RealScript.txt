@@ -1,39 +1,172 @@
-﻿Main
+﻿
+Common
 {
 	packages = "Packages";
-	content = "..\Content";
+	content =   "..\..\Content";
+
+	efiEspPart = "Disk={Disk}, Name='EFIESP'";
+	efiEspRoot = GetPartitionRoot("{efiEspPart}");
+}
+
+ShowReadme
+{
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "Changelog.zip"), "{packages}");
+	DisplayMarkdown("{packages}\Changelog\changelog.md");
+}
+
+InstallDevMenu
+{
 	
-	<Fetching resources>
-	Unzip("http://ww1.microchip.com/downloads/en//softwarelibrary/obj-lan95xx-windows/lan9500-wdf-v18.12.18.0.zip", "{packages}\Drivers", "LAN95XX");
-	Unzip("http://ww1.microchip.com/downloads/en//softwarelibrary/obj-lan78xx-windows/lan7800-wdf-v18.12.14.0.zip", "{packages}\Drivers", "LAN78XX");
-	Unzip("https://pi64.win/wp-content/uploads/2019/02/usb-drivers.zip", "{packages}\Drivers", "USB");
-	Unzip(GitHub("andreiw", "RaspberryPiPkg"), "{packages}", "RaspberryPiPkg");
-	Unzip(GitHubLatestReleaseAsset("driver1998", "bsp", "rpi-arm64-bsp.zip"), "{packages}\Drivers", "BSP");
+	CopyDirectory("{content}\Developer Menu", "{efiEspRoot}\Windows\System32\BOOT");
 	
-	DisplayMarkdown("{packages}\Drivers\USB\license.md");
+	devMenuGuid = "7619dccc-fafe-11d9-b411-000476eba25f";
+	efiBcdStore = "{efiEspRoot}\EFI\Microsoft\Boot\BCD";
 	
-	<Preparing disk layout>
-	Flash("{content}\gpt.zip", "{Disk}");
-	windowsPart = CreateGptPartition("{Disk}", "Basic");
-	Format("{windowsPart}", "Ntfs", "Windows");
+	BcdEditCreate("{efiBcdStore}", "{devMenuGuid}", "/d ""Developer Menu"" /application BOOTAPP");
+	BcdEdit("{efiBcdStore}", "/set {{{devMenuGuid}}} path \Windows\System32\BOOT\developermenu.efi");
+	BcdEdit("{efiBcdStore}", "/set {{{devMenuGuid}}} device partition={efiEspRoot}");
+	BcdEdit("{efiBcdStore}", "/set {{{devMenuGuid}}} nointegritychecks on");
+	BcdEdit("{efiBcdStore}", "/displayorder {{{devMenuGuid}}} /addlast");
+}
+
+PrepareDisk
+{
+	'Preparing partition layout'
 	
-	systemPart = "Disk={Disk}, Label='EFIESP'";
+	RemovePartition("Disk={Disk}, Name='Windows'");
+	RemovePartition("Disk={Disk}, Name='SYSTEM'");
 	
-	windowsRoot = GetPartitionRoot("Disk={Disk}, Label='Windows'");
+	data = "Disk={Disk}, Name='Data'";
+	if (PartitionExists(data)) 
+	{
+		AllocateSpace(data, "{DeploymentSize}");
+	}
+
+	if (Size(GetDiskSize(Disk), "{DeploymentSize}GB") >= 0)
+	{
+		Fail("Could not allocate {DeploymentSize}GB for the deployment");
+	}
+		
+	systemPart = CreateGptPartition("{Disk}", "Esp", "SYSTEM", "100MB");
+	CreateGptPartition("{Disk}", "Reserved", "MSR", "16MB");
+	windowsPart = CreateGptPartition("{Disk}", "Basic", "Windows");
+	
 	systemRoot = GetPartitionRoot("{systemPart}");
+	windowsRoot = GetPartitionRoot("{windowsPart}");
 	
-	<Copying UEFI>
-	CopyDirectory(DateConventionDirectoryMostRecent("{packages}\RaspberryPiPkg\Binary\prebuilt"), "{packages}\UEFI");
-	CopyDirectory("{packages}\UEFI\RELEASE", "{systemRoot}");
-	
-	<Deploying Windows>
+	Format("{systemPart}", "Fat32", "SYSTEM");
+	Format("{windowsPart}", "Ntfs", "Windows");
+}
+
+DeployWindows
+{
+
 	ApplyWindowsImage("{WimFilePath}", "{WimFileIndex}", "{windowsRoot}");
 	MakeWindowsBootable("{systemRoot}", "{windowsRoot}\Windows");
 	SetGptType("{systemPart}", "Esp");
+}
+
+InstallBootShim
+{
+	Copy("{content}\BootShim.efi", "{efiEspRoot}\EFI\Boot\BootShim.efi");
+}
+
+CopyDpp
+{
+	'Saludos'
+	dppRoot = GetPartitionRoot("{dpp}");
+	CopyDirectory("{dppRoot}", "{windowsRoot}\DPP");
+	Unmount("{dpp}");
+}
+
+ConfigureBcd
+{
 	
-	<Injecting drivers>
-	InjectDrivers("{windowsRoot}", "{packages}\Drivers\BSP");
-	InjectDrivers("{windowsRoot}", "{packages}\Drivers\LAN95XX\ndis650\arm64");
-	InjectDrivers("{windowsRoot}", "{packages}\Drivers\LAN78XX\ndis650\arm64");
-	InjectDrivers("{windowsRoot}", "{packages}\Drivers\USB");
-}   
+	bcdWoa = "7619dcca-fafe-11d9-b411-000476eba25f";
+	bcdWinMobile = "7619dcc9-fafe-11d9-b411-000476eba25f";
+	efiBcdStore = "{efiEspRoot}\EFI\Microsoft\Boot\BCD";
+	
+	BcdEditCreate("{efiBcdStore}", "{bcdWoa}", "/d ""Windows 10"" /application BOOTAPP");
+	BcdEdit("{efiBcdStore}", "/set {{{bcdWoa}}} path \EFI\boot\BootShim.efi");
+	BcdEdit("{efiBcdStore}", "/set {{{bcdWoa}}} device partition={efiEspRoot}");
+	BcdEdit("{efiBcdStore}", "/set {{{bcdWoa}}} nointegritychecks on");
+	
+	BcdEdit("{efiBcdStore}", "/set {{{bcdWinMobile}}} path dummy");
+	BcdEdit("{efiBcdStore}", "/set {{{bcdWinMobile}}} description ""Dummy, please ignore""");
+	
+	BcdEdit("{efiBcdStore}", "/set {{bootmgr}} displaybootmenu on");
+	BcdEdit("{efiBcdStore}", "/deletevalue {{bootmgr}} customactions");
+	BcdEdit("{efiBcdStore}", "/deletevalue {{bootmgr}} processcustomactionsfirst");
+	
+	BcdEdit("{efiBcdStore}", "/displayorder {{{bcdWoa}}}");
+	BcdEdit("{efiBcdStore}", "/displayorder {{{bcdWinMobile}}} /addlast");
+	BcdEdit("{efiBcdStore}", "/default {{{bcdWoa}}}");
+	BcdEdit("{efiBcdStore}", "/timeout 30");
+}
+
+InjectDriversProc
+{
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "HARDWARE.INPUT.SYNAPTICS_RMI4_F12_WIN10.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "DEVICE.SOC_QC8994.CITYMAN.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "HARDWARE.USB.MMO_USBC.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "OEM.SOC_QC8994.MMO.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "OEM.SOC_QC8994.MMO_MINIMAL.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "GRAPHICS.SOC_QC8994.MMO_DESKTOP.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "HARDWARE.CAMERA.MMO_8994.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.8994.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.8994_MINIMAL.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.BASE.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.BASE_MINIMAL.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.LATE_SOC.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.MMO.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "PLATFORM.SOC_QC8994.MMO_DESKTOP.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.BASE.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.EXTRAS.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.MMO_EXTRAS.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.MOBILE_BRIDGE.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.MOBILE_COMPONENTS.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.MOBILE_RIL.zip"), "{packages}");
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia-Drivers", "SUPPORT.DESKTOP.MOBILE_RIL_EXTRAS.zip"), "{packages}");
+		
+	InjectDrivers("{windowsRoot}", "{packages}\HARDWARE.INPUT.SYNAPTICS_RMI4_F12_WIN10");
+	InjectDrivers("{windowsRoot}", "{packages}\DEVICE.SOC_QC8994.CITYMAN");
+	InjectDrivers("{windowsRoot}", "{packages}\HARDWARE.USB.MMO_USBC");
+	InjectDrivers("{windowsRoot}", "{packages}\OEM.SOC_QC8994.MMO");
+	InjectDrivers("{windowsRoot}", "{packages}\OEM.SOC_QC8994.MMO_MINIMAL");
+	InjectDrivers("{windowsRoot}", "{packages}\GRAPHICS.SOC_QC8994.MMO_DESKTOP");
+	InjectDrivers("{windowsRoot}", "{packages}\HARDWARE.CAMERA.MMO_8994");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.8994");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.8994_MINIMAL");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.BASE");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.BASE_MINIMAL");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.LATE_SOC");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.MMO");
+	InjectDrivers("{windowsRoot}", "{packages}\PLATFORM.SOC_QC8994.MMO_DESKTOP");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.BASE");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.EXTRAS");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.MMO_EXTRAS");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.MOBILE_BRIDGE");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.MOBILE_COMPONENTS");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.MOBILE_RIL");
+	InjectDrivers("{windowsRoot}", "{packages}\SUPPORT.DESKTOP.MOBILE_RIL_EXTRAS");
+}
+
+InstallUefi
+{
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia950XLPkg", "MSM8994.UEFI.Lumia.950.XL.zip"), "{packages}");
+	Copy("{packages}\MSM8994.UEFI.Lumia.950.XL\ELF\UEFI.elf", "{efiEspRoot}\");
+}
+
+Main
+{
+	Common();
+	ShowReadme();
+	ConfigureBcd();
+	InstallDevMenu();
+	PrepareDisk();
+	DeployWindows();
+	InjectDriversProc();
+	InstallBootShim();
+	InstallUefi();	
+	CopyDpp();	
+}

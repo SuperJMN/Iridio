@@ -1,4 +1,6 @@
-﻿Main
+﻿InstallUefi
 {
-	'Doing something'
+	'Installing UEFI'
+	Unzip(GitHubLatestReleaseAsset("WOA-Project", "Lumia950XLPkg", "MSM8994.UEFI.Lumia.950.XL.zip"), "{packages}");
+	Copy("{packages}\MSM8994.UEFI.Lumia.950.XL\ELF\UEFI.elf", "{efiEspRoot}\");
 }

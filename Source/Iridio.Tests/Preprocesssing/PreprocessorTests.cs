@@ -13,7 +13,6 @@ namespace Iridio.Tests.Preprocesssing
         [InlineData("main.rdo", new[] {"main.rdo:Hi"}, "Hi")]
         [InlineData("main.rdo", new[] {"main.rdo:#include other.txt\nMario", "other.txt:Hi"}, "Hi\nMario")]
         [InlineData("main.rdo", new[] {"main.rdo:// Comment\nHi all!"}, "Hi all!")]
-        [InlineData("root\\subdir\\main.rdo", new[] {"root\\subdir\\main.rdo:#include ..\\other.rdo", "root\\other.rdo:Hi"}, "Hi")]
         public void Include(string mainScript, string[] files, string expected)
         {
             var sut = CreateSut(files);

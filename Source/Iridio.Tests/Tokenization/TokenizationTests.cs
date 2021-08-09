@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Iridio.Tokenization;
 using Xunit;
+using static Iridio.Tokenization.SimpleToken;
 
 namespace Iridio.Tests.Tokenization
 {
@@ -14,26 +15,26 @@ namespace Iridio.Tests.Tokenization
         {
             var sut = Tokenizer.Create();
             var input = File.ReadAllText("TestData\\Inputs\\RealScript.txt");
-            var result = sut.Tokenize(input);
+            sut.Tokenize(input);
         }
 
         [Theory]
-        [InlineData("12", SimpleToken.Integer)]
-        [InlineData("12D", SimpleToken.Double)]
-        [InlineData("\"Hello boy\"", SimpleToken.Text)]
-        [InlineData("\"Hello \"\"boy\"\"\"", SimpleToken.Text)]
-        [InlineData("{", SimpleToken.OpenBrace)]
-        [InlineData("}", SimpleToken.CloseBrace)]
-        [InlineData("'Comment'", SimpleToken.Echo)]
-        public void Tokenize(string input, SimpleToken token)
+        [InlineData("12", Integer)]
+        [InlineData("12D", Double)]
+        [InlineData("\"Hello boy\"", Text)]
+        [InlineData("\"Hello \"\"boy\"\"\"", Text)]
+        [InlineData("{", OpenBrace)]
+        [InlineData("}", CloseBrace)]
+        [InlineData("'Comment'", Echo)]
+        [InlineData("\"This is a string with 'single quotes'\"", Text)]
+        [InlineData("dpp = \"Disk={Disk}, Name='DPP'\";", Identifier, Equal, Text, Semicolon)]
+        public void Tokenize(string input, params SimpleToken[] tokens)
         {
             var sut = Tokenizer.Create();
 
             var tokenList = sut.Tokenize(input);
 
-            var p = tokenList.ConsumeToken();
-            p.Remainder.IsAtEnd.Should().BeTrue();
-            p.Value.Kind.Should().BeEquivalentTo(token);
+            tokenList.Select(token1 => token1.Kind).Should().BeEquivalentTo(tokens);
         }
 
         [Theory]
