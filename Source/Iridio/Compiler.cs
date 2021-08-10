@@ -5,7 +5,7 @@ using Iridio.Preprocessing;
 
 namespace Iridio
 {
-    internal class Compiler : IPathBasedCompiler
+    public class Compiler : IPathBasedCompiler
     {
         private readonly IPreprocessor preprocessor;
         private readonly ISourceCodeCompiler compiler;

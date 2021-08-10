@@ -6,10 +6,10 @@ using Iridio.Parsing.Model;
 
 namespace Iridio.Common
 {
-    public interface IFunction : IFunctionDeclaration
+    public interface IFunction : INamed
     {
         Task<object> Invoke(object[] parameters);
-        IEnumerable<Argument> Arguments { get; }
+        IEnumerable<Parameter> Arguments { get; }
         Type ReturnType { get; }
     }
 }

@@ -7,9 +7,9 @@ namespace Iridio.Preprocessing
 {
     public class Preprocessor : IPreprocessor
     {
-        private readonly IFileSystem fileSystem;
+        private readonly System.IO.Abstractions.IFileSystem fileSystem;
 
-        public Preprocessor(IFileSystem fileSystem)
+        public Preprocessor(System.IO.Abstractions.IFileSystem fileSystem)
         {
             this.fileSystem = fileSystem;
         }
@@ -36,8 +36,7 @@ namespace Iridio.Preprocessing
 
         private IEnumerable<Line> Lines(string path)
         {
-            return fileSystem.Get(path)
-                .Lines()
+            return fileSystem.File.ReadAllLines(path)
                 .Select((s, i) => new Line(s, i + 1, path));
         }
 

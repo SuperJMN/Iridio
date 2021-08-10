@@ -25,8 +25,7 @@ namespace Iridio.Core
 
         public override string ToString()
         {
-            return
-                $"{nameof(Preprocessing.Line)}: {Line}, {nameof(Column)}: {Column}";
+            return $"[{Line.Number}, {Column}]: {Line.Content} - at {Line.Path}";
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

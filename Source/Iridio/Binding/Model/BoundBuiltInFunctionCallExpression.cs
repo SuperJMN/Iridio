@@ -4,10 +4,10 @@ namespace Iridio.Binding.Model
 {
     public class BoundBuiltInFunctionCallExpression : BoundCallExpression
     {
-        public IFunctionDeclaration Function { get; }
+        public INamed Function { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundBuiltInFunctionCallExpression(IFunctionDeclaration function, IEnumerable<BoundExpression> parameters)
+        public BoundBuiltInFunctionCallExpression(INamed function, IEnumerable<BoundExpression> parameters)
         {
             Function = function;
             Parameters = parameters;

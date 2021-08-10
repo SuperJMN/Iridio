@@ -2,9 +2,9 @@
 
 namespace Iridio.Parsing.Model
 {
-    public class Argument
+    public class Parameter
     {
-        public Argument(string name, Type type)
+        public Parameter(string name, Type type)
         {
             Name = name;
             Type = type;

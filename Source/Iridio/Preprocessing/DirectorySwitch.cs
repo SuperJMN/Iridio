@@ -5,21 +5,21 @@ namespace Iridio.Preprocessing
 {
     public class DirectorySwitch : IDisposable
     {
-        private readonly IDirectoryContext directoryContext;
+        private readonly System.IO.Abstractions.IFileSystem fileSystem;
         private readonly string oldDirectory;
 
-        public DirectorySwitch(IFileSystem directoryContext, string directory)
+        public DirectorySwitch(System.IO.Abstractions.IFileSystem fileSystem, string directory)
         {
-            this.directoryContext = directoryContext;
+            this.fileSystem = fileSystem;
             Log.Debug("Switching to " + directory);
-            oldDirectory = directoryContext.WorkingDirectory;
-            directoryContext.WorkingDirectory = directory;
+            oldDirectory = fileSystem.Directory.GetCurrentDirectory();
+            fileSystem.Directory.SetCurrentDirectory(directory);
         }
 
         public void Dispose()
         {
             Log.Debug("Returning to " + oldDirectory);
-            directoryContext.WorkingDirectory = oldDirectory;
+            fileSystem.Directory.SetCurrentDirectory(oldDirectory);
         }
     }
 }

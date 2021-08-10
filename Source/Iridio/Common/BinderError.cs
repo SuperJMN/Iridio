@@ -2,10 +2,6 @@
 {
     public class BinderError
     {
-        public BinderError()
-        {
-        }
-
         public BinderError(ErrorKind kind, string additionalData = null)
         {
             ErrorKind = kind;

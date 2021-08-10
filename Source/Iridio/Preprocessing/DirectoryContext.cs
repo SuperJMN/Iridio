@@ -7,10 +7,10 @@ namespace Iridio.Preprocessing
     {
         private readonly DirectorySwitch dirChange;
 
-        public DirectoryContext(IFileSystem fileSystem, string path)
+        public DirectoryContext(System.IO.Abstractions.IFileSystem fileSystem, string path)
         {
             var dir = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
-            var finalDir = Path.Combine(fileSystem.WorkingDirectory, dir);
+            var finalDir = Path.Combine(fileSystem.Directory.GetCurrentDirectory(), dir);
             FileName = Path.GetFileName(path);
             dirChange = new DirectorySwitch(fileSystem, finalDir);
         }

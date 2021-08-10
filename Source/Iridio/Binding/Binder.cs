@@ -6,25 +6,29 @@ using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Parsing.Model;
-using MoreLinq;
 using Optional.Collections;
 
 namespace Iridio.Binding
 {
     public class Binder : IBinder
     {
-        private readonly IDictionary<string, IFunctionDeclaration> functions;
-        private readonly Collection<BinderError> errors = new Collection<BinderError>();
+        private const string MainProcedureName = "Main";
+        private readonly IDictionary<string, INamed> functions;
+        private readonly Collection<BinderError> errors = new();
 
         private readonly IDictionary<string, BoundProcedure> procedures =
             new Dictionary<string, BoundProcedure>();
 
         private readonly ISet<string> initializedVariables = new HashSet<string>();
 
-        public Binder(IEnumerable<IFunctionDeclaration> functionDeclarations)
+        public Binder(IEnumerable<INamed> externalFunctions)
         {
-            if (functionDeclarations == null) throw new ArgumentNullException(nameof(functionDeclarations));
-            functions = functionDeclarations.ToDictionary(d => d.Name, d => d);
+            if (externalFunctions == null)
+            {
+                throw new ArgumentNullException(nameof(externalFunctions));
+            }
+
+            functions = externalFunctions.ToDictionary(d => d.Name, d => d);
         }
 
         public Result<Script, BinderErrors> Bind(IridioSyntax syntax)
@@ -34,8 +38,8 @@ namespace Iridio.Binding
             errors.Clear();
 
             var boundProcedures = syntax.Procedures.Select(Bind).ToList();
-            var main = boundProcedures.FirstOrNone(b => b.Name == "Main");
-            main.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, "Main procedure is undefined")));
+            var main = boundProcedures.FirstOrNone(b => b.Name == MainProcedureName);
+            main.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, $"'{MainProcedureName}' procedure is undefined")));
 
             if (errors.Any())
             {
@@ -124,13 +128,6 @@ namespace Iridio.Binding
             return new BoundStringExpression(str);
         }
 
-        private void LookupUninitializedReferences(string str)
-        {
-            var references = References.FromString(str);
-            var notInitialized = references.Where(s => !initializedVariables.Contains(s));
-            notInitialized.ForEach(s => AddError(new BinderError(ErrorKind.ReferenceToUninitializedVariable, s)));
-        }
-
         private BoundExpression Bind(IntegerExpression integerExpression)
         {
             return new BoundIntegerExpression(integerExpression.Value);
@@ -138,11 +135,6 @@ namespace Iridio.Binding
 
         private BoundExpression Bind(IdentifierExpression identifierExpression)
         {
-            //if (!initializedVariables.Contains(identifierExpression.Identifier))
-            //{
-            //    AddError(new Error(ErrorKind.ReferenceToUninitializedVariable, identifierExpression.Identifier));
-            //}
-
             return new BoundIdentifier(identifierExpression.Identifier);
         }
 
