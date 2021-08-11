@@ -9,6 +9,7 @@ using Iridio.Preprocessing;
 
 namespace Iridio.Runtime
 {
+    // ReSharper disable once UnusedType.Global
     public class IridioShell : IIridioCore
     {
         private readonly IridioCore iridioCoreCore;

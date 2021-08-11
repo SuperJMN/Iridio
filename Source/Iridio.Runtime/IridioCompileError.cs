@@ -10,5 +10,10 @@ namespace Iridio.Runtime
         {
             CompilerError = compilerError;
         }
+
+        public override string ToString()
+        {
+            return $"Compiler error: {CompilerError}";
+        }
     }
 }

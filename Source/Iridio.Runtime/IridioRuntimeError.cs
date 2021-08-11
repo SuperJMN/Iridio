@@ -8,5 +8,10 @@
         {
             Error = error;
         }
+
+        public override string ToString()
+        {
+            return $"Runtime error: {Error}";
+        }
     }
 }
