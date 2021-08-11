@@ -1,6 +1,6 @@
 ﻿namespace Iridio.Binding
 {
-    public interface IFunctionDeclaration
+    public interface INamed
     {
         string Name { get; }
     }

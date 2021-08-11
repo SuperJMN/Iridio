@@ -22,7 +22,7 @@ namespace Iridio.Tests.Execution
 
         public string Name { get; }
         public Func<T1, T2, T3> Func { get; }
-        public IEnumerable<Argument> Arguments { get; }
+        public IEnumerable<Parameter> Parameters { get; }
         public Type ReturnType { get; }
     }
 }

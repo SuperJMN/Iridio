@@ -25,5 +25,10 @@ namespace Iridio.Preprocessing
             yield return Content;
             yield return Number;
         }
+
+        public override string ToString()
+        {
+            return $"Line {Number}: {Content}";
+        }
     }
 }

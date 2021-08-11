@@ -16,16 +16,5 @@ namespace Iridio.Tests.Execution
             Delegate d = inf.CreateDelegate(intTask);
             var ret =  await (Task<object>) d.Method.Invoke(intTask, new object[] {123});
         }
-
-        //[Fact]
-        //public async Task Run()
-        //{
-        //    IEnumerable<ProcedureDeclaration> funcs = new[] { new ProcedureDeclaration(typeof(IntTask)), new ProcedureDeclaration(typeof(StringTask)), };
-        //    var runner = new Runner(funcs);
-        //    var sourceCodeCompiler = new SourceCodeCompiler(new Parser(), new FileSystemOperations());
-        //    var script = sourceCodeCompiler.Compile("Root.txt");
-        //    var dictionary = new Dictionary<string, object>();
-        //    await runner.Run(script, dictionary);
-        //}
     }
 }
