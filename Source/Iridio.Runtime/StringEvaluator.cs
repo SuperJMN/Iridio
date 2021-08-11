@@ -13,7 +13,7 @@ namespace Iridio.Runtime
         public Result<string, RunError> Evaluate(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
-            var refs = matches.Cast<Match>().Select(x => x.Groups[1].Value);
+            var refs = matches.Select(x => x.Groups[1].Value);
 
             var notFound = refs.Except(dictionary.Keys).ToList();
             if (notFound.Any())
@@ -32,7 +32,7 @@ namespace Iridio.Runtime
         private string Replace(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
-            foreach (var m in matches.Cast<Match>().Reverse())
+            foreach (var m in matches.Reverse())
             {
                 var refName = m.Groups[1].Value;
                 var toReplace = m.Groups[0];

@@ -10,7 +10,7 @@ namespace Iridio.Binding
         public static IEnumerable<string> FromString(string str)
         {
             var matches = Regex.Matches(str, $"{{({Tokenizer.IdentifierRegex})}}");
-            return matches.Cast<Match>().Select(match => match.Groups[1].Value);
+            return matches.Select(match => match.Groups[1].Value);
         }
     }
 }
