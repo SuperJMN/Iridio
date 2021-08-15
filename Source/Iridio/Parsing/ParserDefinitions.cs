@@ -31,7 +31,7 @@ namespace Iridio.Parsing
 
         private static string Unwrap(string str)
         {
-            return str.Substring(1, str.Length-2);
+            return str[1..^1];
         }
 
         private static readonly TokenListParser<SimpleToken, int> Integer =
