@@ -1,5 +1,4 @@
-using Iridio.Tokenization;
-using Superpower.Model;
+using Iridio.Core;
 
 namespace Iridio.Parsing.Model
 {
@@ -7,9 +6,9 @@ namespace Iridio.Parsing.Model
     {
         public string Identifier { get; }
 
-        public IdentifierExpression(Token<SimpleToken> identifier)
+        public IdentifierExpression(string identifier, Position position) : base(position)
         {
-            Identifier = identifier.ToStringValue();
+            Identifier = identifier;
         }
 
         public override string ToString()

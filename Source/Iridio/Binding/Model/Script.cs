@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Iridio.Tokenization;
+using Superpower.Model;
 
 namespace Iridio.Binding.Model
 {
@@ -20,5 +22,7 @@ namespace Iridio.Binding.Model
         {
             visitor.Visit(this);
         }
+
+        public Token<SimpleToken> Token { get; set; }
     }
 }

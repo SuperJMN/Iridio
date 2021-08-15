@@ -1,10 +1,11 @@
 using System.Globalization;
+using Iridio.Core;
 
 namespace Iridio.Parsing.Model
 {
     public class DoubleExpression : Expression
     {
-        public DoubleExpression(in double n)
+        public DoubleExpression(in double n, Position position) : base(position)
         {
             Value = n;
         }

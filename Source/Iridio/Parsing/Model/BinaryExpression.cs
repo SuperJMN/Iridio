@@ -1,3 +1,5 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class BinaryExpression : Expression
@@ -6,7 +8,7 @@ namespace Iridio.Parsing.Model
         public Expression Left { get; }
         public Expression Right { get; }
 
-        public BinaryExpression(BinaryOperator op, Expression left, Expression right)
+        public BinaryExpression(BinaryOperator op, Expression left, Expression right, Position position) : base(position)
         {
             Op = op;
             Left = left;

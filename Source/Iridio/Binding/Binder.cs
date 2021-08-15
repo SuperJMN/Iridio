@@ -5,6 +5,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
+using Iridio.Core;
 using Iridio.Parsing.Model;
 using Optional.Collections;
 
@@ -39,7 +40,9 @@ namespace Iridio.Binding
 
             var boundProcedures = syntax.Procedures.Select(Bind).ToList();
             var main = boundProcedures.FirstOrNone(b => b.Name == MainProcedureName);
-            main.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, $"'{MainProcedureName}' procedure is undefined")));
+            main.MatchNone(() =>
+                errors.Add(new BinderError(ErrorKind.UndefinedMainFunction, Maybe<Position>.None,
+                    $"'{MainProcedureName}' procedure is undefined")));
 
             if (errors.Any())
             {
@@ -54,7 +57,7 @@ namespace Iridio.Binding
         {
             if (functions.ContainsKey(proc.Name))
             {
-                AddError(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Name));
+                AddError(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Position, proc.Name));
             }
 
             var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList()));
@@ -81,9 +84,9 @@ namespace Iridio.Binding
 
         private BoundStatement Bind(AssignmentStatement assignmentStatement)
         {
-            initializedVariables.Add(assignmentStatement.Variable);
+            initializedVariables.Add(assignmentStatement.Target);
 
-            return new BoundAssignmentStatement(assignmentStatement.Variable, Bind(assignmentStatement.Expression));
+            return new BoundAssignmentStatement(assignmentStatement.Target, Bind(assignmentStatement.Expression));
         }
 
         private BoundExpression Bind(Expression expression)
@@ -151,7 +154,8 @@ namespace Iridio.Binding
 
             var funcOrPro = func.Else(() => proc);
 
-            funcOrPro.MatchNone(() => errors.Add(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Name)));
+            funcOrPro.MatchNone(() =>
+                errors.Add(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
 
             return funcOrPro.ValueOr(new BoundEmptyCallExpression());
         }

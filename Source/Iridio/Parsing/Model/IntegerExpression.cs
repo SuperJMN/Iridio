@@ -1,8 +1,10 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class IntegerExpression : Expression
     {
-        public IntegerExpression(in int n)
+        public IntegerExpression(in int n, Position position) : base(position)
         {
             Value = n;
         }

@@ -1,10 +1,12 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class StringExpression : Expression
     {
         public string String { get; }
 
-        public StringExpression(string str)
+        public StringExpression(string str, Position position) : base(position)
         {
             String = str;
         }

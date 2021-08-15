@@ -1,8 +1,10 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class BooleanValueExpression : Expression
     {
-        public BooleanValueExpression(bool value)
+        public BooleanValueExpression(bool value, Position position) : base(position)
         {
             Value = value;
         }

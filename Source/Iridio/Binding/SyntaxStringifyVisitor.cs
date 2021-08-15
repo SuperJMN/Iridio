@@ -18,7 +18,7 @@ namespace Iridio.Binding
 
         public void Visit(AssignmentStatement assignmentStatement)
         {
-            sa.TabPrint(assignmentStatement.Variable + " = ");
+            sa.TabPrint(assignmentStatement.Target + " = ");
             assignmentStatement.Expression.Accept(this);
             sa.Print(";");
         }

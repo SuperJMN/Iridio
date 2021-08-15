@@ -1,10 +1,12 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class Block : Statement
     {
         public Statement[] Statements { get; }
 
-        public Block(Statement[] statements)
+        public Block(Statement[] statements, Position position) : base(position)
         {
             Statements = statements;
         }

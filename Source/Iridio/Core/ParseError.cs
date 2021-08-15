@@ -1,4 +1,7 @@
-﻿namespace Iridio.Core
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace Iridio.Core
 {
     public class ParseError : CompilerError
     {
@@ -16,5 +19,10 @@
         {
             return $"Syntax error at {SourceUnit}: {Message}";
         }
+
+        public override IReadOnlyCollection<RichError> Errors => new ReadOnlyCollection<RichError>(new[]
+        {
+            new RichError(Message, SourceUnit)
+        });
     }
 }

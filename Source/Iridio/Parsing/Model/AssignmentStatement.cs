@@ -1,22 +1,21 @@
-using Iridio.Tokenization;
-using Superpower.Model;
+using Iridio.Core;
 
 namespace Iridio.Parsing.Model
 {
     public class AssignmentStatement : Statement
     {
-        public string Variable { get; }
+        public string Target { get; }
         public Expression Expression { get; }
 
-        public AssignmentStatement(Token<SimpleToken> variable, Expression expression)
+        public AssignmentStatement(string target, Position position, Expression expression) : base(position)
         {
-            Variable = variable.ToStringValue();
+            Target = target;
             Expression = expression;
         }
 
         public override string ToString()
         {
-            return $"{Variable}={Expression}";
+            return $"{Target}={Expression}";
         }
 
         public override void Accept(IExpressionVisitor visitor)
