@@ -8,6 +8,7 @@ using Iridio.Common;
 using Iridio.Core;
 using Iridio.Parsing.Model;
 using Optional.Collections;
+using Zafiro.Core.Patterns;
 
 namespace Iridio.Binding
 {
@@ -151,17 +152,17 @@ namespace Iridio.Binding
         private BoundCallExpression Bind(CallExpression callExpression)
         {
             var parameters = callExpression.Parameters.Select(Bind).ToList();
-            var func = functions.GetValueOrNone(callExpression.Name).Map(f =>
-                (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
-            var proc = procedures.GetValueOrNone(callExpression.Name).Map(procedure =>
-                (BoundCallExpression)new BoundProcedureCallExpression(procedure, parameters, callExpression.Position));
 
-            var funcOrPro = func.Else(() => proc);
+            var f = functions.TryGetValue(callExpression.Name)
+                .Map(f => (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
 
-            funcOrPro.MatchNone(() =>
-                errors.Add(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
+            var p = procedures.TryGetValue(callExpression.Name)
+                .Map(p => (BoundCallExpression)new BoundProcedureCallExpression(p, parameters, callExpression.Position));
 
-            return funcOrPro.ValueOr(new BoundEmptyCallExpression(new Position(0, 0)));
+            var called = f.Or(p);
+            called.ExecuteOnEmpty(() =>
+                AddError(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
+            return called.Unwrap(new BoundEmptyCallExpression(callExpression.Position));
         }
 
         private BoundStatement Bind(IfStatement ifStatement)
@@ -183,6 +184,19 @@ namespace Iridio.Binding
         private BoundStatement Bind(CallStatement callStatement)
         {
             return new BoundCallStatement(Bind(callStatement.Call), callStatement.Position);
+        }
+    }
+
+    public static class FunctionalExtensions
+    {
+        public static Maybe<T> ExecuteOnEmpty<T>(this Maybe<T> maybe, Action action)
+        {
+            if (maybe.HasNoValue)
+            {
+                action();
+            }
+
+            return maybe;
         }
     }
 }
