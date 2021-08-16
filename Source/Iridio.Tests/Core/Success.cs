@@ -11,9 +11,9 @@ using Iridio.Parsing;
 using Iridio.Runtime;
 using Xunit;
 
-namespace Iridio.Tests.Execution
+namespace Iridio.Tests.Core
 {
-    public class IridioCoreTests
+    public class Success : IridioCoreTestsBase
     {
         [Theory]
         [ClassData(typeof(Data))]
@@ -25,17 +25,6 @@ namespace Iridio.Tests.Execution
             result
                 .Should().BeSuccess()
                 .And.Subject.Value.Variables.Should().Contain(expectations);
-        }
-
-        private static IridioCore CreateSut()
-        {
-            var functions = new List<IFunction>
-            {
-                new LambdaFunction<int, int, int>("Sum", (x, y) => x + y)
-            };
-
-            var sut = new IridioCore(new SourceCodeCompiler(new Binder(functions), new Parser()), new ScriptRunner(functions));
-            return sut;
         }
 
         [Fact]
@@ -51,26 +40,6 @@ namespace Iridio.Tests.Execution
             result.Should().BeSuccess();
             message.HasValue.Should().BeTrue();
             message.Value.Should().Be("My message");
-        }
-
-        [Fact]
-        public async Task No_main()
-        {
-            var sut = CreateSut();
-            var result = await sut.Run(SourceCode.FromString("Procedure { }"));
-            result.Should().BeFailure().And.Subject.Error.Errors.Should().HaveCount(1)
-                .And.Subject.First().Message.Should().Contain("Undefined");
-        }
-
-        [Fact]
-        public async Task Undefined_reference()
-        {
-            var sut = CreateSut();
-            var result = await sut.Run(SourceCode.FromString(@"Main { 
-    a = b;
-}"));
-            result.Should().BeFailure().And.Subject.Error.Errors.Should().HaveCount(1)
-                .And.Subject.First().Message.Should().Contain("unset");
         }
 
         private class Data : TheoryData<string, IDictionary<string, object>>

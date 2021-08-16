@@ -12,7 +12,7 @@
         void Visit(BoundCallStatement callStatement);
         void Visit(BoundIdentifier identifier);
         void Visit(BoundStringExpression stringExpression);
-        void Visit(BoundBuiltInFunctionCallExpression functionCallExpression);
+        void Visit(BoundFunctionCallExpression functionCallExpression);
         void Visit(BoundProcedureCallExpression procedureCallExpression);
         void Visit(BoundDoubleExpression doubleExpression);
         void Visit(BoundBinaryExpression binaryExpression);

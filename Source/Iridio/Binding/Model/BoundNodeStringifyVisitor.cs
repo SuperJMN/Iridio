@@ -82,7 +82,7 @@ namespace Iridio.Binding.Model
             sa.Print(";");
         }
 
-        public void Visit(BoundBuiltInFunctionCallExpression functionCallExpression)
+        public void Visit(BoundFunctionCallExpression functionCallExpression)
         {
             sa.Print(functionCallExpression.Function.Name + "(");
             functionCallExpression.Parameters.ToList().ForEach(ex =>

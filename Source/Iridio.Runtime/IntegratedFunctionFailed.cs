@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Iridio.Common;
 using Iridio.Core;
 
@@ -22,10 +21,5 @@ namespace Iridio.Runtime
         {
             return $"Function {Function.Name} threw an exception: '{Exception.Message}'";
         }
-
-        public override IReadOnlyCollection<Error> Errors => new List<Error>
-        {
-            new($"Function {Function.Name} threw an exception: '{Exception.Message}'", Position)
-        };
     }
 }

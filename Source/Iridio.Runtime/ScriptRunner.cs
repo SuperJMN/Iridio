@@ -135,12 +135,12 @@ namespace Iridio.Runtime
                     return Evaluate(boundBooleanValueExpression);
                 case BoundIdentifier boundIdentifier:
                     return Evaluate(boundIdentifier);
-                case BoundBuiltInFunctionCallExpression boundBuiltInFunctionCallExpression:
-                    return await Evaluate(boundBuiltInFunctionCallExpression);
+                case BoundFunctionCallExpression boundFunctionCallExpression:
+                    return await Evaluate(boundFunctionCallExpression);
                 case BoundStringExpression boundStringExpression:
                     return Evaluate(boundStringExpression);
-                case BoundProcedureCallExpression boundCustomCallExpression:
-                    return await Evaluate(boundCustomCallExpression);
+                case BoundProcedureCallExpression boundProcedureCallExpression:
+                    return await Evaluate(boundProcedureCallExpression);
                 case BoundIntegerExpression boundNumericExpression:
                     return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:
@@ -184,7 +184,7 @@ namespace Iridio.Runtime
             var str = boundStringExpression.String;
             var evaluator = new StringEvaluator();
             var either = evaluator.Evaluate(str, variables);
-            return either.Check(Result.Success<object, RunError>);
+            return either.MapError(missing => new ReferenceToUnsetVariable(boundStringExpression.Position, missing.ToArray()));
         }
 
         private async Task<Result<object, RunError>> Evaluate(BoundProcedureCallExpression call)
@@ -193,7 +193,7 @@ namespace Iridio.Runtime
             return execute.Check(Result.Success<object, RunError>);
         }
 
-        private async Task<Result<object, RunError>> Evaluate(BoundBuiltInFunctionCallExpression call)
+        private async Task<Result<object, RunError>> Evaluate(BoundFunctionCallExpression call)
         {
             var function = Maybe.From(functions.FirstOrDefault(f => f.Name == call.Function.Name));
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Iridio.Core;
+﻿using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -11,8 +10,6 @@ namespace Iridio.Runtime
         {
             VariableNames = variableNames;
         }
-
-        public override IReadOnlyCollection<Error> Errors { get; }
 
         public override string ToString()
         {

@@ -4,7 +4,7 @@ using Iridio.Parsing;
 
 namespace Iridio.Runtime
 {
-    public abstract class IridioError : IRichErrors
+    public abstract class IridioError : IErrorList
     {
         public SourceCode SourceCode { get; }
 
@@ -13,6 +13,6 @@ namespace Iridio.Runtime
             SourceCode = sourceCode;
         }
 
-        public abstract IReadOnlyCollection<RichError> Errors { get; }
+        public abstract IReadOnlyCollection<ErrorItem> Errors { get; }
     }
 }

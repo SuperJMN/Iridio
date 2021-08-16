@@ -152,7 +152,7 @@ namespace Iridio.Binding
         {
             var parameters = callExpression.Parameters.Select(Bind).ToList();
             var func = functions.GetValueOrNone(callExpression.Name).Map(f =>
-                (BoundCallExpression)new BoundBuiltInFunctionCallExpression(f, parameters, callExpression.Position));
+                (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
             var proc = procedures.GetValueOrNone(callExpression.Name).Map(procedure =>
                 (BoundCallExpression)new BoundProcedureCallExpression(procedure, parameters, callExpression.Position));
 

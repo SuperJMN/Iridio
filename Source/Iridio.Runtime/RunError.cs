@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using Iridio.Core;
+﻿using Iridio.Core;
 
 namespace Iridio.Runtime
 {
-    public abstract class RunError : IErrors
+    public abstract class RunError
     {
         public Position Position { get; }
 
@@ -11,7 +10,5 @@ namespace Iridio.Runtime
         {
             Position = position;
         }
-
-        public abstract IReadOnlyCollection<Error> Errors { get; }
     }
 }

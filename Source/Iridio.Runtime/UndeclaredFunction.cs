@@ -1,20 +1,14 @@
-﻿using System.Collections.Generic;
-using Iridio.Core;
+﻿using Iridio.Core;
 
 namespace Iridio.Runtime
 {
     public class UndeclaredFunction : RunError
     {
-        public string FunctionName { get; }
-        public Position Position { get; }
+        public string Name { get; }
 
-        public UndeclaredFunction(string functionName, Position position) : base(position)
+        public UndeclaredFunction(string name, Position position) : base(position)
         {
-            FunctionName = functionName;
-            Position = position;
+            Name = name;
         }
-
-        public override IReadOnlyCollection<Error> Errors =>
-            new List<Error> { new($"Function {FunctionName} is not declared", Position) }.AsReadOnly();
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using Iridio.Core;
+﻿using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -12,8 +10,6 @@ namespace Iridio.Runtime
         {
             Message = message;
         }
-
-        public override IReadOnlyCollection<Error> Errors => new List<Error> { new(Message, Maybe<Position>.None) };
 
         public override string ToString()
         {

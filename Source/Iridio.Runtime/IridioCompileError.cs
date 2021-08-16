@@ -18,6 +18,6 @@ namespace Iridio.Runtime
             return $"Compiler error: {CompilerError}";
         }
 
-        public override IReadOnlyCollection<RichError> Errors => CompilerError.Errors;
+        public override IReadOnlyCollection<ErrorItem> Errors => CompilerError.Errors;
     }
 }

@@ -20,8 +20,8 @@ namespace Iridio.Runtime
             return $"Runtime error: {Error}";
         }
 
-        public override IReadOnlyCollection<RichError> Errors => new[]
-                { new RichError(Error.ToString(), Maybe<SourceUnit>.From(SourceUnit.From(Error.Position, SourceCode))) }
+        public override IReadOnlyCollection<ErrorItem> Errors => new[]
+                { new ErrorItem(Error.ToString(), Maybe<SourceUnit>.From(SourceUnit.From(Error.Position, SourceCode))) }
             .ToList()
             .AsReadOnly();
     }

@@ -21,7 +21,7 @@ namespace Iridio.Core
             return string.Join(";", BinderErrors.Select(x => x.ToString()));
         }
 
-        public override IReadOnlyCollection<RichError> Errors => new ReadOnlyCollection<RichError>(BinderErrors
-            .Select(x => new RichError(x.ToString(), x.Position.Map(position => SourceUnit.From(position, SourceCode)))).ToList());
+        public override IReadOnlyCollection<ErrorItem> Errors => new ReadOnlyCollection<ErrorItem>(BinderErrors
+            .Select(x => new ErrorItem(x.ToString(), x.Position.Map(position => SourceUnit.From(position, SourceCode)))).ToList());
     }
 }

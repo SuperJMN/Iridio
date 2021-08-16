@@ -21,9 +21,9 @@ namespace Iridio.Core
             return $"Syntax error at {SourceUnit}: {Message}";
         }
 
-        public override IReadOnlyCollection<RichError> Errors => new ReadOnlyCollection<RichError>(new[]
+        public override IReadOnlyCollection<ErrorItem> Errors => new ReadOnlyCollection<ErrorItem>(new[]
         {
-            new RichError(Message, SourceUnit)
+            new ErrorItem(Message, SourceUnit)
         });
     }
 }
