@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
+using Iridio.Core;
 using Zafiro.Core;
 
 namespace Iridio.Runtime
@@ -197,13 +198,13 @@ namespace Iridio.Runtime
             var function = Maybe.From(functions.FirstOrDefault(f => f.Name == call.Function.Name));
 
             var result = await function
-                .ToResult((RunError) new UndeclaredFunction(call.Function.Name))
-                .Bind(f => Call(f, call.Parameters));
+                .ToResult((RunError)new UndeclaredFunction(call.Function.Name, call.Position))
+                .Bind(f => Call(f, call.Parameters, call.Position));
 
             return result;
         }
 
-        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters)
+        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters, Position callPosition)
         {
             var eitherParameters = await parameters.AsyncSelect(async expression => await Evaluate(expression));
             var combined = eitherParameters.Combine(errors => errors.First());
@@ -217,11 +218,11 @@ namespace Iridio.Runtime
                 switch (ex.InnerException)
                 {
                     case TaskCanceledException tc:
-                        return Result.Failure<object, RunError>(new ExecutionCanceled(tc.Message));
+                        return Result.Failure<object, RunError>(new ExecutionCanceled(tc.Message, callPosition));
                     case Exception inner:
-                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, inner));
+                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, inner, callPosition));
                     default:
-                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, ex));
+                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, ex, callPosition));
                 }
             }
         }
@@ -233,7 +234,7 @@ namespace Iridio.Runtime
                 return Result.Success<object, RunError>(val);
             }
 
-            return Result.Failure<object, RunError>(new ReferenceToUnsetVariable(identifier.Identifier));
+            return Result.Failure<object, RunError>(new ReferenceToUnsetVariable(identifier.Position, identifier.Identifier));
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,12 +8,12 @@ namespace Iridio.Runtime
     {
         public string Message { get; }
 
-        public ExecutionCanceled(string message)
+        public ExecutionCanceled(string message, Position position) : base(position)
         {
             Message = message;
         }
 
-        public override IEnumerable<string> Items => new[] {ToString()};
+        public override IReadOnlyCollection<Error> Errors => new List<Error> { new(Message, Maybe<Position>.None) };
 
         public override string ToString()
         {

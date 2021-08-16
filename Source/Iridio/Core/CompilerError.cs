@@ -1,10 +1,18 @@
 ﻿using System.Collections.Generic;
 using CSharpFunctionalExtensions;
+using Iridio.Parsing;
 
 namespace Iridio.Core
 {
     public abstract class CompilerError : IRichErrors
     {
+        protected CompilerError(SourceCode sourceCode)
+        {
+            SourceCode = sourceCode;
+        }
+
+        public SourceCode SourceCode { get; }
+
         public abstract IReadOnlyCollection<RichError> Errors { get; }
     }
 
@@ -26,8 +34,8 @@ namespace Iridio.Core
             Message = message;
         }
 
-        public Maybe<SourceUnit> SourceUnit { get; set; }
-        public string Message { get; set; }
+        public Maybe<SourceUnit> SourceUnit { get; }
+        public string Message { get; }
     }
 
     public class Error

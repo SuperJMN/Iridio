@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,12 +7,12 @@ namespace Iridio.Runtime
     {
         public string[] VariableNames { get; }
 
-        public ReferenceToUnsetVariable(params string[] variableNames)
+        public ReferenceToUnsetVariable(Position position, params string[] variableNames) : base(position)
         {
             VariableNames = variableNames;
         }
 
-        public override IEnumerable<string> Items => new[] {ToString()};
+        public override IReadOnlyCollection<Error> Errors { get; }
 
         public override string ToString()
         {

@@ -1,4 +1,6 @@
-﻿using Iridio.Core;
+﻿using System.Collections.Generic;
+using Iridio.Core;
+using Iridio.Parsing;
 
 namespace Iridio.Runtime
 {
@@ -6,7 +8,7 @@ namespace Iridio.Runtime
     {
         public CompilerError CompilerError { get; }
 
-        public IridioCompileError(CompilerError compilerError)
+        public IridioCompileError(CompilerError compilerError, SourceCode sourceCode) : base(sourceCode)
         {
             CompilerError = compilerError;
         }
@@ -15,5 +17,7 @@ namespace Iridio.Runtime
         {
             return $"Compiler error: {CompilerError}";
         }
+
+        public override IReadOnlyCollection<RichError> Errors => CompilerError.Errors;
     }
 }

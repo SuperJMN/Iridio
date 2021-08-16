@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
-    public abstract class RunError
+    public abstract class RunError : IErrors
     {
-        public abstract IEnumerable<string> Items { get; }
+        public Position Position { get; }
+
+        protected RunError(Position position)
+        {
+            Position = position;
+        }
+
+        public abstract IReadOnlyCollection<Error> Errors { get; }
     }
 }

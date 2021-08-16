@@ -1,10 +1,12 @@
-﻿namespace Iridio.Binding.Model
+﻿using Iridio.Core;
+
+namespace Iridio.Binding.Model
 {
     public class BoundCallStatement : BoundStatement
     {
         public BoundCallExpression Call { get; }
 
-        public BoundCallStatement(BoundCallExpression call)
+        public BoundCallStatement(BoundCallExpression call, Position position) : base(position)
         {
             Call = call;
         }

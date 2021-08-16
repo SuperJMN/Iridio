@@ -1,10 +1,12 @@
-﻿namespace Iridio.Binding.Model
+﻿using Iridio.Core;
+
+namespace Iridio.Binding.Model
 {
     public class BoundIntegerExpression : BoundExpression
     {
         public int Value { get; }
 
-        public BoundIntegerExpression(int value)
+        public BoundIntegerExpression(int value, Position position) : base(position)
         {
             Value = value;
         }

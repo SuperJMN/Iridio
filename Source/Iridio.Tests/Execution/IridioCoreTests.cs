@@ -19,17 +19,23 @@ namespace Iridio.Tests.Execution
         [ClassData(typeof(Data))]
         public async Task References_have_correct_values_after_execution(string source, IDictionary<string, object> expectations)
         {
+            var sut = CreateSut();
+
+            var result = await sut.Run(SourceCode.FromString(source));
+            result
+                .Should().BeSuccess()
+                .And.Subject.Value.Variables.Should().Contain(expectations);
+        }
+
+        private static IridioCore CreateSut()
+        {
             var functions = new List<IFunction>
             {
                 new LambdaFunction<int, int, int>("Sum", (x, y) => x + y)
             };
 
             var sut = new IridioCore(new SourceCodeCompiler(new Binder(functions), new Parser()), new ScriptRunner(functions));
-
-            var result = await sut.Run(SourceCode.FromString(source));
-            result
-                .Should().BeSuccess()
-                .And.Subject.Value.Variables.Should().Contain(expectations);
+            return sut;
         }
 
         [Fact]
@@ -45,6 +51,26 @@ namespace Iridio.Tests.Execution
             result.Should().BeSuccess();
             message.HasValue.Should().BeTrue();
             message.Value.Should().Be("My message");
+        }
+
+        [Fact]
+        public async Task No_main()
+        {
+            var sut = CreateSut();
+            var result = await sut.Run(SourceCode.FromString("Procedure { }"));
+            result.Should().BeFailure().And.Subject.Error.Errors.Should().HaveCount(1)
+                .And.Subject.First().Message.Should().Contain("Undefined");
+        }
+
+        [Fact]
+        public async Task Undefined_reference()
+        {
+            var sut = CreateSut();
+            var result = await sut.Run(SourceCode.FromString(@"Main { 
+    a = b;
+}"));
+            result.Should().BeFailure().And.Subject.Error.Errors.Should().HaveCount(1)
+                .And.Subject.First().Message.Should().Contain("unset");
         }
 
         private class Data : TheoryData<string, IDictionary<string, object>>

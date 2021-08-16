@@ -1,10 +1,12 @@
-﻿namespace Iridio.Binding.Model
+﻿using Iridio.Core;
+
+namespace Iridio.Binding.Model
 {
     public class BoundBooleanValueExpression : BoundExpression
     {
         public bool Value { get; }
 
-        public BoundBooleanValueExpression(bool value)
+        public BoundBooleanValueExpression(bool value, Position position) : base(position)
         {
             Value = value;
         }

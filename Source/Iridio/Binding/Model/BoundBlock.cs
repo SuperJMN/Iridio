@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -6,14 +7,17 @@ namespace Iridio.Binding.Model
     {
         public ICollection<BoundStatement> Statements { get; }
 
-        public BoundBlock(ICollection<BoundStatement> statements)
+        public BoundBlock(ICollection<BoundStatement> statements, Position position)
         {
             Statements = statements;
+            Position = position;
         }
 
         public void Accept(IBoundNodeVisitor visitor)
         {
             visitor.Visit(this);
         }
+
+        public Position Position { get; }
     }
 }

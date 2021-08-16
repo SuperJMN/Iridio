@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -6,7 +7,7 @@ namespace Iridio.Binding.Model
     {
         public double Value { get; }
 
-        public BoundDoubleExpression(double value)
+        public BoundDoubleExpression(double value, Position position) : base(position)
         {
             Value = value;
         }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -7,7 +8,7 @@ namespace Iridio.Binding.Model
         public INamed Function { get; }
         public IEnumerable<BoundExpression> Parameters { get; }
 
-        public BoundBuiltInFunctionCallExpression(INamed function, IEnumerable<BoundExpression> parameters)
+        public BoundBuiltInFunctionCallExpression(INamed function, IEnumerable<BoundExpression> parameters, Position position) : base(position)
         {
             Function = function;
             Parameters = parameters;

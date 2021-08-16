@@ -20,9 +20,9 @@ namespace Iridio.Runtime
         {
             var match = compiler
                 .Compile(code)
-                .MapError(compilerError => (IridioError)new IridioCompileError(compilerError))
+                .MapError(compilerError => (IridioError)new IridioCompileError(compilerError, code))
                 .Bind(s => runner.Run(s)
-                    .MapError(error => (IridioError)new IridioRuntimeError(error)));
+                    .MapError(error => (IridioError)new IridioRuntimeError(error, code)));
 
             return match;
         }

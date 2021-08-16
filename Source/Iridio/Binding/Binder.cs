@@ -60,7 +60,8 @@ namespace Iridio.Binding
                 AddError(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Position, proc.Name));
             }
 
-            var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList()));
+            var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList(), new Position(0, 0)),
+                new Position(0, 0));
             procedures.Add(proc.Name, boundProcedure);
             return boundProcedure;
         }
@@ -86,7 +87,7 @@ namespace Iridio.Binding
         {
             initializedVariables.Add(assignmentStatement.Target);
 
-            return new BoundAssignmentStatement(assignmentStatement.Target, Bind(assignmentStatement.Expression));
+            return new BoundAssignmentStatement(assignmentStatement.Target, Bind(assignmentStatement.Expression), assignmentStatement.Position);
         }
 
         private BoundExpression Bind(Expression expression)
@@ -107,38 +108,39 @@ namespace Iridio.Binding
 
         private BoundExpression Bind(UnaryExpression unaryExpression)
         {
-            return new BoundUnaryExpression(Bind(unaryExpression.Expression), unaryExpression.Op);
+            return new BoundUnaryExpression(Bind(unaryExpression.Expression), unaryExpression.Op, unaryExpression.Position);
         }
 
         private BoundExpression Bind(BooleanValueExpression booleanValueExpression)
         {
-            return new BoundBooleanValueExpression(booleanValueExpression.Value);
+            return new BoundBooleanValueExpression(booleanValueExpression.Value, booleanValueExpression.Position);
         }
 
         private BoundExpression Bind(BinaryExpression binaryExpression)
         {
-            return new BoundBinaryExpression(Bind(binaryExpression.Left), binaryExpression.Op, Bind(binaryExpression.Right));
+            return new BoundBinaryExpression(Bind(binaryExpression.Left), binaryExpression.Op, Bind(binaryExpression.Right),
+                binaryExpression.Position);
         }
 
         private BoundExpression Bind(DoubleExpression doubleExpression)
         {
-            return new BoundDoubleExpression(doubleExpression.Value);
+            return new BoundDoubleExpression(doubleExpression.Value, doubleExpression.Position);
         }
 
         private BoundExpression Bind(StringExpression stringExpression)
         {
             var str = stringExpression.String;
-            return new BoundStringExpression(str);
+            return new BoundStringExpression(str, stringExpression.Position);
         }
 
         private BoundExpression Bind(IntegerExpression integerExpression)
         {
-            return new BoundIntegerExpression(integerExpression.Value);
+            return new BoundIntegerExpression(integerExpression.Value, integerExpression.Position);
         }
 
         private BoundExpression Bind(IdentifierExpression identifierExpression)
         {
-            return new BoundIdentifier(identifierExpression.Identifier);
+            return new BoundIdentifier(identifierExpression.Identifier, identifierExpression.Position);
         }
 
         private void AddError(BinderError binderError)
@@ -149,35 +151,38 @@ namespace Iridio.Binding
         private BoundCallExpression Bind(CallExpression callExpression)
         {
             var parameters = callExpression.Parameters.Select(Bind).ToList();
-            var func = functions.GetValueOrNone(callExpression.Name).Map(f => (BoundCallExpression)new BoundBuiltInFunctionCallExpression(f, parameters));
-            var proc = procedures.GetValueOrNone(callExpression.Name).Map(procedure => (BoundCallExpression)new BoundProcedureCallExpression(procedure, parameters));
+            var func = functions.GetValueOrNone(callExpression.Name).Map(f =>
+                (BoundCallExpression)new BoundBuiltInFunctionCallExpression(f, parameters, callExpression.Position));
+            var proc = procedures.GetValueOrNone(callExpression.Name).Map(procedure =>
+                (BoundCallExpression)new BoundProcedureCallExpression(procedure, parameters, callExpression.Position));
 
             var funcOrPro = func.Else(() => proc);
 
             funcOrPro.MatchNone(() =>
                 errors.Add(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
 
-            return funcOrPro.ValueOr(new BoundEmptyCallExpression());
+            return funcOrPro.ValueOr(new BoundEmptyCallExpression(new Position(0, 0)));
         }
 
         private BoundStatement Bind(IfStatement ifStatement)
         {
-            return new BoundIfStatement(Bind(ifStatement.Condition), Bind(ifStatement.TrueBlock), ifStatement.FalseBlock.Map(Bind));
+            return new BoundIfStatement(Bind(ifStatement.Condition), Bind(ifStatement.TrueBlock), ifStatement.FalseBlock.Map(Bind),
+                ifStatement.Position);
         }
 
         private BoundBlock Bind(Block block)
         {
-            return new(block.Statements.Select(Bind).ToList());
+            return new BoundBlock(block.Statements.Select(Bind).ToList(), new Position(0, 0));
         }
 
         private BoundStatement Bind(EchoStatement echoStatement)
         {
-            return new BoundEchoStatement(echoStatement.Message);
+            return new BoundEchoStatement(echoStatement.Message, echoStatement.Position);
         }
 
         private BoundStatement Bind(CallStatement callStatement)
         {
-            return new BoundCallStatement(Bind(callStatement.Call));
+            return new BoundCallStatement(Bind(callStatement.Call), callStatement.Position);
         }
     }
 }

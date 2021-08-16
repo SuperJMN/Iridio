@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Iridio.Parsing;
 
 namespace Iridio.Core
 {
     public class ParseError : CompilerError
     {
-        public ParseError(SourceUnit sourceUnit, string errorMessage)
+        public ParseError(SourceUnit sourceUnit, string errorMessage, SourceCode sourceCode) : base(sourceCode)
         {
             Message = errorMessage;
             SourceUnit = sourceUnit;

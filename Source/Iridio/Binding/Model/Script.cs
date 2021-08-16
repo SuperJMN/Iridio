@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Iridio.Tokenization;
 using Superpower.Model;
+using Position = Iridio.Core.Position;
 
 namespace Iridio.Binding.Model
 {
@@ -22,6 +23,8 @@ namespace Iridio.Binding.Model
         {
             visitor.Visit(this);
         }
+
+        public Position Position { get; set; }
 
         public Token<SimpleToken> Token { get; set; }
     }

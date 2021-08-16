@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using Iridio.Core;
 using Zafiro.Core.Mixins;
 
 namespace Iridio.Runtime
@@ -18,7 +19,7 @@ namespace Iridio.Runtime
             var notFound = refs.Except(dictionary.Keys).ToList();
             if (notFound.Any())
             {
-                return new ReferenceToUnsetVariable(notFound.ToArray());
+                return new ReferenceToUnsetVariable(new Position(0, 0), notFound.ToArray());
             }
 
             var replace = Replace(str, dictionary);
@@ -29,7 +30,7 @@ namespace Iridio.Runtime
                 .Replace("}}", "}");
         }
 
-        private string Replace(string str, IDictionary<string, object> dictionary)
+        private static string Replace(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
             foreach (var m in matches.Reverse())

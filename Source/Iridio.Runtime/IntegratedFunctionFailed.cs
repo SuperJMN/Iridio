@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Iridio.Common;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -8,11 +9,13 @@ namespace Iridio.Runtime
     {
         public IFunction Function { get; }
         public Exception Exception { get; }
+        public Position Position { get; }
 
-        public IntegratedFunctionFailed(IFunction function, Exception exception)
+        public IntegratedFunctionFailed(IFunction function, Exception exception, Position position) : base(position)
         {
             Function = function;
             Exception = exception;
+            Position = position;
         }
 
         public override string ToString()
@@ -20,6 +23,9 @@ namespace Iridio.Runtime
             return $"Function {Function.Name} threw an exception: '{Exception.Message}'";
         }
 
-        public override IEnumerable<string> Items => new[] {ToString()};
+        public override IReadOnlyCollection<Error> Errors => new List<Error>
+        {
+            new($"Function {Function.Name} threw an exception: '{Exception.Message}'", Position)
+        };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -6,11 +7,13 @@ namespace Iridio.Binding.Model
     {
         public string Name { get; }
         public BoundBlock Block { get; }
+        public Position Position { get; }
 
-        public BoundProcedure(string name, BoundBlock block)
+        public BoundProcedure(string name, BoundBlock block, Position position)
         {
             Name = name;
             Block = block;
+            Position = position;
         }
 
         public override string ToString()

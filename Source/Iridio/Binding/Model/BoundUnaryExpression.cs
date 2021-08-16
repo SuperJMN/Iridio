@@ -1,4 +1,5 @@
-﻿using Iridio.Parsing.Model;
+﻿using Iridio.Core;
+using Iridio.Parsing.Model;
 
 namespace Iridio.Binding.Model
 {
@@ -7,7 +8,7 @@ namespace Iridio.Binding.Model
         public BoundExpression Expression { get; }
         public UnaryOperator Op { get; }
 
-        public BoundUnaryExpression(BoundExpression expression, UnaryOperator op)
+        public BoundUnaryExpression(BoundExpression expression, UnaryOperator op, Position position) : base(position)
         {
             Expression = expression;
             Op = op;
