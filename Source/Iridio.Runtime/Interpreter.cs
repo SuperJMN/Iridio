@@ -148,7 +148,6 @@ namespace Iridio.Runtime
                     return await EvaluateCallProcedure(boundProcedureSymbolCallExpression);
                 case BoundCallExpression boundCallExpression:
                     return await EvaluateCallExpression(boundCallExpression);
-                    break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:

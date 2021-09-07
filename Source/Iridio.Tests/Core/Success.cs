@@ -69,6 +69,7 @@ namespace Iridio.Tests.Core
                 AddCase("b = 1; if (b == 1)  { a = 2; }  else  { a = 6; }", ("a", 2));
                 AddCase("b = 1; if (b != 1)  { a = 2; }  else  { a = 6; }", ("a", 6));
                 AddCase("b=\"Hello\"; a = \"{b} world!\";", ("a", "Hello world!"));
+                Add("Main {  Proc1(); } Proc1 { a = \"OK\"; }", new Dictionary<string, object> { ["a"] = "OK" });
             }
 
             private void AddCase(string code, params (string, object)[] expectedValues)
