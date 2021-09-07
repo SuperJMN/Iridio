@@ -5,9 +5,9 @@ namespace Iridio.Binding.Model
 {
     public class BoundBlock : IBoundNode
     {
-        public ICollection<BoundStatement> Statements { get; }
+        public IEnumerable<BoundStatement> Statements { get; }
 
-        public BoundBlock(ICollection<BoundStatement> statements, Position position)
+        public BoundBlock(IEnumerable<BoundStatement> statements, Position position)
         {
             Statements = statements;
             Position = position;

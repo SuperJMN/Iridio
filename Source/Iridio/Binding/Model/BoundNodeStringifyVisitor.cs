@@ -124,6 +124,11 @@ namespace Iridio.Binding.Model
             throw new NotImplementedException();
         }
 
+        public void Visit(BoundProcedureSymbolCallExpression procedureCallExpression)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Visit(BoundIdentifier identifier)
         {
             sa.Print(identifier.Identifier);

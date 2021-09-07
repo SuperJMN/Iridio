@@ -2,16 +2,18 @@ using Iridio.Core;
 
 namespace Iridio.Parsing.Model
 {
-    public class Block : Statement
+    public class Block : ISyntax
     {
         public Statement[] Statements { get; }
+        public Position Position { get; }
 
-        public Block(Statement[] statements, Position position) : base(position)
+        public Block(Statement[] statements, Position position)
         {
             Statements = statements;
+            Position = position;
         }
 
-        public override void Accept(IExpressionVisitor visitor)
+        public void Accept(IExpressionVisitor visitor)
         {
             visitor.Visit(this);
         }

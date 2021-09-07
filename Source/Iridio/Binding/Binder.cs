@@ -162,7 +162,7 @@ namespace Iridio.Binding
             var called = f.Or(p);
             called.ExecuteOnEmpty(() =>
                 AddError(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
-            return called.Unwrap(new BoundEmptyCallExpression(callExpression.Position));
+            return called.Unwrap(new BoundNopCallExpression(callExpression.Position));
         }
 
         private BoundStatement Bind(IfStatement ifStatement)

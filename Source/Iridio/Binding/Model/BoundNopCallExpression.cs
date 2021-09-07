@@ -2,13 +2,13 @@
 
 namespace Iridio.Binding.Model
 {
-    internal class BoundEmptyCallExpression : BoundCallExpression
+    internal class BoundNopCallExpression : BoundCallExpression
     {
         public override void Accept(IBoundNodeVisitor visitor)
         {
         }
 
-        public BoundEmptyCallExpression(Position position) : base(position)
+        public BoundNopCallExpression(Position position) : base(position)
         {
         }
     }
