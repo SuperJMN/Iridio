@@ -19,7 +19,7 @@ namespace Iridio.Runtime
         {
             preprocessor = new Preprocessor(new System.IO.Abstractions.FileSystem());
             var compiler = new SourceCodeCompiler(new NewBinder(externalFunctions), new Parser());
-            var runner = new ScriptRunner(externalFunctions);
+            var runner = new Interpreter(externalFunctions);
             iridioCoreCore = new IridioCore(compiler, runner);
         }
 

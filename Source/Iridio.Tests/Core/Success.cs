@@ -31,7 +31,7 @@ namespace Iridio.Tests.Core
         public async Task Messages_are_pushed_from_script()
         {
             var externalFunctions = Array.Empty<IFunction>();
-            var sut = new IridioCore(new SourceCodeCompiler(new NewBinder(externalFunctions), new Parser()), new ScriptRunner(externalFunctions));
+            var sut = new IridioCore(new SourceCodeCompiler(new NewBinder(externalFunctions), new Parser()), new Interpreter(externalFunctions));
             var message = Maybe<string>.None;
             sut.Messages.Subscribe(s => message = Maybe<string>.From(s));
 

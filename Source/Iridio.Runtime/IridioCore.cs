@@ -8,9 +8,9 @@ namespace Iridio.Runtime
     public class IridioCore : IIridio
     {
         private readonly ISourceCodeCompiler compiler;
-        private readonly IScriptRunner runner;
+        private readonly IInterpreter runner;
 
-        public IridioCore(ISourceCodeCompiler compiler, IScriptRunner runner)
+        public IridioCore(ISourceCodeCompiler compiler, IInterpreter runner)
         {
             this.compiler = compiler;
             this.runner = runner;

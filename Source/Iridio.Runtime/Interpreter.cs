@@ -13,14 +13,14 @@ using Zafiro.Core;
 
 namespace Iridio.Runtime
 {
-    public class ScriptRunner : IScriptRunner
+    public class Interpreter : IInterpreter
     {
         private readonly IEnumerable<IFunction> functions;
         private IDictionary<string, object> variables;
         private readonly ISubject<string> messages = new Subject<string>();
         private Dictionary<string, BoundProcedure> procedures;
 
-        public ScriptRunner(IEnumerable<IFunction> functions)
+        public Interpreter(IEnumerable<IFunction> functions)
         {
             this.functions = functions;
         }
