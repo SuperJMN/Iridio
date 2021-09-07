@@ -239,7 +239,7 @@ namespace Iridio.Runtime
             return result;
         }
 
-        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters, Position callPosition)
+        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters, Maybe<Position> callPosition)
         {
             var eitherParameters = await parameters.AsyncSelect(async expression => await Evaluate(expression));
             var combined = eitherParameters.Combine(errors => errors.First());
@@ -250,15 +250,12 @@ namespace Iridio.Runtime
             }
             catch (Exception ex)
             {
-                switch (ex.InnerException)
+                return ex.InnerException switch
                 {
-                    case TaskCanceledException tc:
-                        return Result.Failure<object, RunError>(new ExecutionCanceled(tc.Message, callPosition));
-                    case Exception inner:
-                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, inner, callPosition));
-                    default:
-                        return Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, ex, callPosition));
-                }
+                    TaskCanceledException tc => Result.Failure<object, RunError>(new ExecutionCanceled(tc.Message, callPosition)),
+                    { } inner => Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, inner, callPosition)),
+                    _ => Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, ex, callPosition))
+                };
             }
         }
 

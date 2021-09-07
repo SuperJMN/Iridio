@@ -1,4 +1,5 @@
 ﻿using System;
+using CSharpFunctionalExtensions;
 using Iridio.Common;
 using Iridio.Core;
 
@@ -8,9 +9,9 @@ namespace Iridio.Runtime
     {
         public IFunction Function { get; }
         public Exception Exception { get; }
-        public Position Position { get; }
+        public Maybe<Position> Position { get; }
 
-        public IntegratedFunctionFailed(IFunction function, Exception exception, Position position) : base(position)
+        public IntegratedFunctionFailed(IFunction function, Exception exception, Maybe<Position> position) : base(position)
         {
             Function = function;
             Exception = exception;

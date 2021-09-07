@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Iridio.Core;
 
 namespace Iridio.Binding.Model
@@ -8,10 +9,9 @@ namespace Iridio.Binding.Model
     {
         public IReadOnlyCollection<BoundStatement> Statements { get; }
 
-        public BoundBlock(IEnumerable<BoundStatement> statements, Position position)
+        public BoundBlock(IEnumerable<BoundStatement> statements)
         {
             Statements = statements.ToList();
-            Position = position;
         }
 
         public void Accept(IBoundNodeVisitor visitor)
@@ -19,6 +19,6 @@ namespace Iridio.Binding.Model
             visitor.Visit(this);
         }
 
-        public Position Position { get; }
+        public Maybe<Position> Position => Maybe<Position>.None;
     }
 }

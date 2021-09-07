@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,7 +7,7 @@ namespace Iridio.Runtime
     {
         public string Message { get; }
 
-        public ExecutionCanceled(string message, Position position) : base(position)
+        public ExecutionCanceled(string message, Maybe<Position> position) : base(position)
         {
             Message = message;
         }

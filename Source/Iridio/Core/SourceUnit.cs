@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Iridio.Parsing;
 using Iridio.Preprocessing;
@@ -12,20 +13,39 @@ namespace Iridio.Core
 
         private SourceUnit(Line line, int column)
         {
+            if (column < 0)
+            {
+                throw new InvalidOperationException($"Column cannot be negative: {column}");
+            }
+
+            var contentLength = line.Content.Length;
+            if (column > contentLength)
+            {
+                throw new InvalidOperationException(
+                    $"Column cannot be higher than the number of chars in the line {column} of a maximum of {contentLength} (content: {line.Content})");
+            }
+
             Line = line;
             Column = column;
         }
 
         public static SourceUnit From(Position absolutePosition, SourceCode sourceCode)
         {
-            if (absolutePosition == new Position(0, 0))
+            var lineNumber = absolutePosition.Line - 1;
+
+            if (lineNumber < 0)
             {
-                absolutePosition = new Position(1, 0);
+                throw new InvalidOperationException("Cannot get a negative line");
             }
 
-            var line = sourceCode.Lines[absolutePosition.Line - 1];
-            var location = new SourceUnit(line, absolutePosition.Column);
-            return location;
+            if (lineNumber > sourceCode.Lines.Count)
+            {
+                throw new InvalidOperationException($"Cannot get a line {lineNumber} from source, that has {sourceCode.Lines.Count} lines in total");
+            }
+
+            var line = sourceCode.Lines[lineNumber];
+
+            return new SourceUnit(line, absolutePosition.Column);
         }
 
         public override string ToString()

@@ -61,8 +61,8 @@ namespace Iridio.Binding
                 AddError(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, proc.Position, proc.Name));
             }
 
-            var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList(), new Position(0, 0)),
-                new Position(0, 0));
+            var boundProcedure = new BoundProcedure(proc.Name, new BoundBlock(proc.Block.Statements.Select(Bind).ToList()),
+                proc.Position);
             procedures.Add(proc.Name, boundProcedure);
             return boundProcedure;
         }
@@ -160,8 +160,10 @@ namespace Iridio.Binding
                 .Map(p => (BoundCallExpression)new BoundProcedureCallExpression(p, parameters, callExpression.Position));
 
             var called = f.Or(p);
+
             called.ExecuteOnEmpty(() =>
                 AddError(new BinderError(ErrorKind.UndeclaredFunctionOrProcedure, callExpression.Position, callExpression.Name)));
+
             return called.Unwrap(new BoundNopCallExpression(callExpression.Position));
         }
 
@@ -173,7 +175,7 @@ namespace Iridio.Binding
 
         private BoundBlock Bind(Block block)
         {
-            return new BoundBlock(block.Statements.Select(Bind).ToList(), new Position(0, 0));
+            return new BoundBlock(block.Statements.Select(Bind).ToList());
         }
 
         private BoundStatement Bind(EchoStatement echoStatement)
@@ -184,19 +186,6 @@ namespace Iridio.Binding
         private BoundStatement Bind(CallStatement callStatement)
         {
             return new BoundCallStatement(Bind(callStatement.Call), callStatement.Position);
-        }
-    }
-
-    public static class FunctionalExtensions
-    {
-        public static Maybe<T> ExecuteOnEmpty<T>(this Maybe<T> maybe, Action action)
-        {
-            if (maybe.HasNoValue)
-            {
-                action();
-            }
-
-            return maybe;
         }
     }
 }

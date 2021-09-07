@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -9,7 +10,7 @@ namespace Iridio.Runtime
             return "Cannot find 'Main' procedure";
         }
 
-        public MainProcedureNotFound() : base(new Position(0, 0))
+        public MainProcedureNotFound() : base(Maybe<Position>.None)
         {
         }
     }

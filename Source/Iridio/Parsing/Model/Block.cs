@@ -7,10 +7,9 @@ namespace Iridio.Parsing.Model
         public Statement[] Statements { get; }
         public Position Position { get; }
 
-        public Block(Statement[] statements, Position position)
+        public Block(Statement[] statements)
         {
             Statements = statements;
-            Position = position;
         }
 
         public void Accept(IExpressionVisitor visitor)

@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,7 +7,7 @@ namespace Iridio.Runtime
     {
         public string[] VariableNames { get; }
 
-        public ReferenceToUnsetVariable(Position position, params string[] variableNames) : base(position)
+        public ReferenceToUnsetVariable(Maybe<Position> position, params string[] variableNames) : base(position)
         {
             VariableNames = variableNames;
         }

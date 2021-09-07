@@ -27,9 +27,6 @@ namespace Iridio.Parsing
         private static readonly TokenListParser<SimpleToken, Token<SimpleToken>> Identifier =
             Token.EqualTo(SimpleToken.Identifier);
 
-        private static readonly TokenListParser<SimpleToken, string> Text = Token.EqualTo(SimpleToken.Text)
-            .Select(x => Unwrap(x.ToStringValue()));
-
         private static string Unwrap(string str)
         {
             return str[1..^1];
@@ -55,9 +52,10 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierExpression =
             Identifier.Select(x => (Expression)new IdentifierExpression(x.ToStringValue(), x.Position.ToPosition()));
 
+
         public static readonly TokenListParser<SimpleToken, Expression> BooleanValueExpression =
-            Token.EqualTo(SimpleToken.True).Value((Expression)new BooleanValueExpression(true, new Position(0, 0)))
-                .Or(Token.EqualTo(SimpleToken.False).Value((Expression)new BooleanValueExpression(false, new Position(0, 0))));
+            Token.EqualTo(SimpleToken.True).Select(t => (Expression)new BooleanValueExpression(true, t.Position.ToPosition()))
+                .Or(Token.EqualTo(SimpleToken.False).Select(t => (Expression)new BooleanValueExpression(false, t.Position.ToPosition())));
 
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
             .ManyDelimitedBy(Token.EqualTo(SimpleToken.Comma))
@@ -85,7 +83,7 @@ namespace Iridio.Parsing
             select (Statement)new IfStatement(cond, ifStatements, Maybe<Block>.From(elseStatement), keyword.Position.ToPosition());
 
         public static readonly TokenListParser<SimpleToken, Statement>
-            CallSentence = from expression in Parse.Ref(() => CallExpression)
+            CallStatement = from expression in Parse.Ref(() => CallExpression)
                 select (Statement)new CallStatement((CallExpression)expression, expression.Position);
 
         public static readonly TokenListParser<SimpleToken, Statement> AssignmentSentence =
@@ -93,7 +91,6 @@ namespace Iridio.Parsing
             from eq in Token.EqualTo(SimpleToken.Equal)
             from expr in Expression
             select (Statement)new AssignmentStatement(identifier.ToStringValue(), identifier.Position.ToPosition(), expr);
-
 
         private static readonly TokenListParser<SimpleToken, Expression> Item = CallExpression.Try()
             .Or(IntegerExpression)
@@ -138,7 +135,7 @@ namespace Iridio.Parsing
             });
 
         public static readonly TokenListParser<SimpleToken, Statement> SingleSentence =
-            from s in AssignmentSentence.Try().Or(CallSentence).Try()
+            from s in AssignmentSentence.Try().Or(CallStatement).Try()
             from semicolon in Token.EqualTo(SimpleToken.Semicolon)
             select s;
 
@@ -149,7 +146,7 @@ namespace Iridio.Parsing
         public static readonly TokenListParser<SimpleToken, Block> Block =
             from statements in Statement.Many()
                 .Between(Token.EqualTo(SimpleToken.OpenBrace), Token.EqualTo(SimpleToken.CloseBrace))
-            select new Block(statements, new Position(0, 0));
+            select new Block(statements);
 
         public static TokenListParser<SimpleToken, Procedure> Function =>
             from i in Identifier
@@ -158,7 +155,7 @@ namespace Iridio.Parsing
 
         public static TokenListParser<SimpleToken, IridioSyntax> Parser =>
             (from functions in Function.Many()
-                select new IridioSyntax(functions, new Position(0, 0)))
+                select new IridioSyntax(functions, new Position(1, 1)))
             .AtEnd();
 
         private static Expression MakeBinary(BinaryOperator binaryOperatorName, Expression leftOperand, Expression rightOperand, Position position)

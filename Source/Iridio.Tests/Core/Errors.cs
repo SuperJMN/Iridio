@@ -66,6 +66,20 @@ namespace Iridio.Tests.Core
             CheckErrors(result, "undeclared");
         }
 
+        [Fact]
+        public async Task Duplicate_definition()
+        {
+            var result = await Run(SourceCode.FromString(
+                @"Main 
+{ 
+}
+
+Main 
+{
+}"));
+            CheckErrors(result, "already");
+        }
+
         private static void CheckErrors(Result<ExecutionSummary, IridioError> result, string expectation)
         {
             result.Should().BeFailure()

@@ -1,4 +1,5 @@
 ﻿using System;
+using CSharpFunctionalExtensions;
 using Iridio.Core;
 
 namespace Iridio.Binding.Model
@@ -7,7 +8,7 @@ namespace Iridio.Binding.Model
     {
         public string Name { get; }
         public BoundBlock Block { get; }
-        public Position Position { get; }
+        public Maybe<Position> Position { get; }
 
         public BoundProcedure(string name, BoundBlock block, Position position)
         {

@@ -1,15 +1,16 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
     public abstract class BoundStatement : IBoundNode
     {
-        protected BoundStatement(Position position)
+        protected BoundStatement(Maybe<Position> position)
         {
             Position = position;
         }
 
         public abstract void Accept(IBoundNodeVisitor visitor);
-        public Position Position { get; }
+        public Maybe<Position> Position { get; }
     }
 }

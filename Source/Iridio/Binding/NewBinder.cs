@@ -4,23 +4,10 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
-using Iridio.Core;
 using Iridio.Parsing.Model;
 
 namespace Iridio.Binding
 {
-    public class ProcedureSymbol
-    {
-        public ProcedureSymbol(string name, Position position)
-        {
-            Name = name;
-            Position = position;
-        }
-
-        public string Name { get; }
-        public Position Position { get; }
-    }
-
     public class NewBinder : IBinder
     {
         private readonly ICollection<BinderError> errors = new List<BinderError>();
@@ -60,10 +47,10 @@ namespace Iridio.Binding
                     errors.Add(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, syntax.Position, syntax.Name));
                 }
 
-                if (procedureSymbols.TryGetValue(syntax.Name, out var existingProcedure))
+                if (procedureSymbols.TryFind(syntax.Name).HasValue)
                 {
                     errors.Add(new BinderError(ErrorKind.ProcedureAlreadyDeclared, syntax.Position,
-                        $"Duplicate definition of procedure '{existingProcedure}'"));
+                        $"Duplicate definition of procedure '{syntax.Name}'"));
                 }
                 else
                 {
@@ -85,7 +72,7 @@ namespace Iridio.Binding
 
         private BoundBlock BindBlock(Block block)
         {
-            return new BoundBlock(block.Statements.Select(BindStatement), block.Position);
+            return new BoundBlock(block.Statements.Select(BindStatement));
         }
 
         private BoundStatement BindStatement(Statement st)

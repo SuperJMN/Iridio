@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,7 +7,7 @@ namespace Iridio.Runtime
     {
         public string Name { get; }
 
-        public UndeclaredFunction(string name, Position position) : base(position)
+        public UndeclaredFunction(string name, Maybe<Position> position) : base(position)
         {
             Name = name;
         }

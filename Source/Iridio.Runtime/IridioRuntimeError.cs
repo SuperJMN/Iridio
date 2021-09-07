@@ -21,7 +21,9 @@ namespace Iridio.Runtime
         }
 
         public override IReadOnlyCollection<ErrorItem> Errors => new[]
-                { new ErrorItem(Error.ToString(), Maybe<SourceUnit>.From(SourceUnit.From(Error.Position, SourceCode))) }
+            {
+                new ErrorItem(Error.ToString(), Error.Position.Map(position => SourceUnit.From(position, SourceCode)))
+            }
             .ToList()
             .AsReadOnly();
     }

@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -6,7 +7,7 @@ namespace Iridio.Binding.Model
     {
         public BoundCallExpression Call { get; }
 
-        public BoundCallStatement(BoundCallExpression call, Position position) : base(position)
+        public BoundCallStatement(BoundCallExpression call, Maybe<Position> position) : base(position)
         {
             Call = call;
         }

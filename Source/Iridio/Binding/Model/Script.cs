@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Iridio.Tokenization;
 using Superpower.Model;
 using Position = Iridio.Core.Position;
@@ -25,7 +26,7 @@ namespace Iridio.Binding.Model
             visitor.Visit(this);
         }
 
-        public Position Position { get; set; }
+        public Maybe<Position> Position { get; set; }
 
         public Token<SimpleToken> Token { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Binding.Model
 {
@@ -10,6 +11,6 @@ namespace Iridio.Binding.Model
         }
 
         public abstract void Accept(IBoundNodeVisitor visitor);
-        public Position Position { get; }
+        public Maybe<Position> Position { get; }
     }
 }

@@ -1,12 +1,13 @@
-﻿using Iridio.Core;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
     public abstract class RunError
     {
-        public Position Position { get; }
+        public Maybe<Position> Position { get; }
 
-        protected RunError(Position position)
+        protected RunError(Maybe<Position> position)
         {
             Position = position;
         }
