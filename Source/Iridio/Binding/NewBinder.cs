@@ -6,7 +6,6 @@ using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Core;
 using Iridio.Parsing.Model;
-using Zafiro.Core.Patterns;
 
 namespace Iridio.Binding
 {
@@ -18,7 +17,6 @@ namespace Iridio.Binding
             Position = position;
         }
 
-
         public string Name { get; }
         public Position Position { get; }
     }
@@ -26,8 +24,8 @@ namespace Iridio.Binding
     public class NewBinder : IBinder
     {
         private readonly ICollection<BinderError> errors = new List<BinderError>();
-        private readonly Dictionary<string, ProcedureSymbol> procedures = new();
-        private readonly IDictionary<string, INamed> functions;
+        private readonly Dictionary<string, ProcedureSymbol> procedureSymbols = new();
+        private readonly Dictionary<string, INamed> functions;
 
         public NewBinder(IEnumerable<INamed> externalFunctions)
         {
@@ -43,15 +41,26 @@ namespace Iridio.Binding
         {
             DeclareProcedures(syntax);
 
-            var procedures = BindProcedures(syntax);
-            return new Script(procedures);
+            var script = new Script(BindProcedures(syntax));
+
+            if (errors.Any())
+            {
+                return new BinderErrors(errors);
+            }
+
+            return script;
         }
 
         private void DeclareProcedures(IridioSyntax root)
         {
             foreach (var syntax in root.Procedures)
             {
-                if (procedures.TryGetValue(syntax.Name, out var existingProcedure))
+                if (functions.TryFind(syntax.Name).HasValue)
+                {
+                    errors.Add(new BinderError(ErrorKind.ProcedureNameConflictsWithBuiltInFunction, syntax.Position, syntax.Name));
+                }
+
+                if (procedureSymbols.TryGetValue(syntax.Name, out var existingProcedure))
                 {
                     errors.Add(new BinderError(ErrorKind.ProcedureAlreadyDeclared, syntax.Position,
                         $"Duplicate definition of procedure '{existingProcedure}'"));
@@ -59,7 +68,7 @@ namespace Iridio.Binding
                 else
                 {
                     var symbol = new ProcedureSymbol(syntax.Name, syntax.Position);
-                    procedures.Add(symbol.Name, symbol);
+                    procedureSymbols.Add(symbol.Name, symbol);
                 }
             }
         }
@@ -115,10 +124,10 @@ namespace Iridio.Binding
         {
             var parameters = callExpression.Parameters.Select(BindExpression);
 
-            var f = functions.TryGetValue(callExpression.Name)
+            var f = functions.TryFind(callExpression.Name)
                 .Map(f => (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
 
-            var p = procedures.TryGetValue(callExpression.Name)
+            var p = procedureSymbols.TryFind(callExpression.Name)
                 .Map(p => (BoundCallExpression)new BoundProcedureSymbolCallExpression(p, parameters, callExpression.Position));
 
             var called = f.Or(p);
@@ -138,21 +147,22 @@ namespace Iridio.Binding
             switch (expression)
             {
                 case BinaryExpression binaryExpression:
-                    break;
+                    return new BoundBinaryExpression(BindExpression(binaryExpression.Left), binaryExpression.Op,
+                        BindExpression(binaryExpression.Right), binaryExpression.Position);
                 case BooleanValueExpression booleanValueExpression:
-                    break;
+                    return new BoundBooleanValueExpression(booleanValueExpression.Value, booleanValueExpression.Position);
                 case CallExpression callExpression:
-                    break;
+                    return BindCallExpression(callExpression);
                 case DoubleExpression doubleExpression:
-                    break;
+                    return new BoundDoubleExpression(doubleExpression.Value, doubleExpression.Position);
                 case IdentifierExpression identifierExpression:
-                    break;
+                    return new BoundIdentifier(identifierExpression.Identifier, identifierExpression.Position);
                 case IntegerExpression integerExpression:
-                    break;
+                    return new BoundIntegerExpression(integerExpression.Value, integerExpression.Position);
                 case StringExpression stringExpression:
-                    break;
+                    return new BoundStringExpression(stringExpression.String, stringExpression.Position);
                 case UnaryExpression unaryExpression:
-                    break;
+                    return new BoundUnaryExpression(BindExpression(unaryExpression.Expression), unaryExpression.Op, unaryExpression.Position);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(expression));
             }

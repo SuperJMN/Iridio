@@ -21,7 +21,7 @@ namespace Iridio.Tests.Core
                 new LambdaFunction<Result>("Cancel", () => throw new TaskCanceledException())
             };
 
-            var sut = new IridioCore(new SourceCodeCompiler(new Binder(functions), new Parser()), new ScriptRunner(functions));
+            var sut = new IridioCore(new SourceCodeCompiler(new NewBinder(functions), new Parser()), new ScriptRunner(functions));
             return sut;
         }
 

@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Core;
@@ -17,6 +18,7 @@ namespace Iridio.Runtime
         private readonly IEnumerable<IFunction> functions;
         private IDictionary<string, object> variables;
         private readonly ISubject<string> messages = new Subject<string>();
+        private Dictionary<string, BoundProcedure> procedures;
 
         public ScriptRunner(IEnumerable<IFunction> functions)
         {
@@ -25,6 +27,7 @@ namespace Iridio.Runtime
 
         public Task<Result<ExecutionSummary, RunError>> Run(Script script)
         {
+            procedures = script.Procedures.ToDictionary(x => x.Name, x => x);
             return Execute(script);
         }
 
@@ -46,9 +49,9 @@ namespace Iridio.Runtime
                 .ToResult((RunError) new MainProcedureNotFound());
         }
 
-        private Task<Result<Success, RunError>> Execute(BoundProcedure main)
+        private Task<Result<Success, RunError>> Execute(BoundProcedure procedure)
         {
-            return Execute(main.Block);
+            return Execute(procedure.Block);
         }
 
         private async Task<Result<Success, RunError>> Execute(BoundBlock block)
@@ -87,8 +90,8 @@ namespace Iridio.Runtime
 
         private async Task<Result<Success, RunError>> Execute(BoundCallStatement boundCallStatement)
         {
-            var either = await Evaluate(boundCallStatement.Call);
-            return either.Bind(o => Result.Success<Success, RunError>(Success.Value));
+            var evaluation = await Evaluate(boundCallStatement.Call);
+            return evaluation.Map(_ => Success.Value);
         }
 
         private async Task<Result<Success, RunError>> Execute(BoundIfStatement boundIfStatement)
@@ -141,6 +144,11 @@ namespace Iridio.Runtime
                     return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundProcedureCallExpression:
                     return await Evaluate(boundProcedureCallExpression);
+                case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
+                    return await EvaluateCallProcedure(boundProcedureSymbolCallExpression);
+                case BoundCallExpression boundCallExpression:
+                    return await EvaluateCallExpression(boundCallExpression);
+                    break;
                 case BoundIntegerExpression boundNumericExpression:
                     return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:
@@ -150,6 +158,33 @@ namespace Iridio.Runtime
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private async Task<Result<object, RunError>> EvaluateCallExpression(BoundCallExpression boundCallExpression)
+        {
+            switch (boundCallExpression)
+            {
+                case BoundFunctionCallExpression boundFunctionCallExpression:
+                    return EvaluateFunctionCall(boundFunctionCallExpression.Function);
+                case BoundProcedureCallExpression boundProcedureCallExpression:
+                    break;
+                case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
+                    return EvaluateCallProcedure(boundProcedureSymbolCallExpression);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private Result<object, RunError> EvaluateFunctionCall(INamed function)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<Result<object, RunError>> EvaluateCallProcedure(BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression)
+        {
+            var symbol = boundProcedureSymbolCallExpression.Procedure;
+            var procedure = procedures.TryFind(symbol.Name);
+            return await procedure.Map(proc => Execute(proc));
         }
 
         private async Task<Result<object, RunError>> Evaluate(BoundUnaryExpression boundUnaryExpression)

@@ -16,7 +16,7 @@ namespace Iridio.Tests.Core
         public async Task No_main()
         {
             var result = await Run(SourceCode.FromString("Procedure { }"));
-            CheckErrors(result, "undefined");
+            CheckErrors(result, "Cannot find 'Main'");
         }
 
         [Fact]

@@ -12,7 +12,7 @@ using Zafiro.Core.Patterns;
 
 namespace Iridio.Binding
 {
-    public class Binder : IBinder
+    public class Binder2 : IBinder
     {
         private const string MainProcedureName = "Main";
         private readonly IDictionary<string, INamed> functions;
@@ -23,7 +23,7 @@ namespace Iridio.Binding
 
         private readonly ISet<string> initializedVariables = new HashSet<string>();
 
-        public Binder(IEnumerable<INamed> externalFunctions)
+        public Binder2(IEnumerable<INamed> externalFunctions)
         {
             if (externalFunctions == null)
             {
