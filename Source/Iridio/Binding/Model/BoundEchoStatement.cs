@@ -1,10 +1,12 @@
-﻿namespace Iridio.Binding.Model
+﻿using Iridio.Core;
+
+namespace Iridio.Binding.Model
 {
     public class BoundEchoStatement : BoundStatement
     {
         public string Message { get; }
 
-        public BoundEchoStatement(string message)
+        public BoundEchoStatement(string message, Position position) : base(position)
         {
             Message = message;
         }

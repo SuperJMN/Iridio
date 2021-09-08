@@ -1,16 +1,17 @@
-using Iridio.Tokenization;
-using Superpower.Model;
+using Iridio.Core;
 
 namespace Iridio.Parsing.Model
 {
     public class Procedure : ISyntax
     {
         public string Name { get; }
+        public Position Position { get; }
         public Block Block { get; }
 
-        public Procedure(Token<SimpleToken> name, Block block)
+        public Procedure(string name, Position position, Block block)
         {
-            Name = name.ToStringValue();
+            Name = name;
+            Position = position;
             Block = block;
         }
 

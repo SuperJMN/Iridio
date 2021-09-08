@@ -1,13 +1,15 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
-    public class BooleanValueExpression : Expression
+    public class ConstantExpression : Expression
     {
-        public BooleanValueExpression(bool value)
+        public object Value { get; }
+
+        public ConstantExpression(object value, Position position) : base(position)
         {
             Value = value;
         }
-
-        public bool Value { get; }
 
         public override void Accept(IExpressionVisitor visitor)
         {

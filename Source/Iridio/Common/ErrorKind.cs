@@ -4,6 +4,7 @@
     {
         UndefinedMainFunction,
         UndeclaredFunctionOrProcedure,
-        ProcedureNameConflictsWithBuiltInFunction
+        ProcedureNameConflictsWithBuiltInFunction,
+        ProcedureAlreadyDeclared
     }
 }

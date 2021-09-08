@@ -1,4 +1,5 @@
-﻿using Iridio.Parsing.Model;
+﻿using Iridio.Core;
+using Iridio.Parsing.Model;
 
 namespace Iridio.Binding.Model
 {
@@ -8,7 +9,7 @@ namespace Iridio.Binding.Model
         public BinaryOperator Op { get; }
         public BoundExpression Right { get; }
 
-        public BoundBinaryExpression(BoundExpression left, BinaryOperator op, BoundExpression right)
+        public BoundBinaryExpression(BoundExpression left, BinaryOperator op, BoundExpression right, Position position) : base(position)
         {
             Left = left;
             Op = op;

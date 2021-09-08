@@ -1,21 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
     public class UndeclaredFunction : RunError
     {
-        public string FunctionName { get; }
+        public string Name { get; }
 
-        public UndeclaredFunction(string functionName)
+        public UndeclaredFunction(string name, Maybe<Position> position) : base(position)
         {
-            FunctionName = functionName;
-        }
-
-        public override IEnumerable<string> Items => new[] { ToString() };
-
-        public override string ToString()
-        {
-            return $"Function {FunctionName} is not declared";
+            Name = name;
         }
     }
 }

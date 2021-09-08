@@ -21,12 +21,12 @@ namespace Iridio
         {
             var compileResult = parser
                 .Parse(sourceCode.Text)
-                .MapError(error => (CompilerError) new ParseError(SourceUnit.From(error.Position, sourceCode), error.Message))
+                .MapError(error => (CompilerError)new ParseError(SourceUnit.From(error.Position, sourceCode), error.Message, sourceCode))
                 .Bind(parsed =>
                 {
                     return binder
                         .Bind(parsed)
-                        .MapError(errors => (CompilerError) new BindError(errors));
+                        .MapError(errors => (CompilerError)new BindError(errors, sourceCode));
                 });
 
             return compileResult;

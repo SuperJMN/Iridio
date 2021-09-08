@@ -1,10 +1,12 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class EchoStatement : Statement
     {
         public string Message { get; }
 
-        public EchoStatement(string message)
+        public EchoStatement(string message, Position position) : base(position)
         {
             Message = message;
         }
