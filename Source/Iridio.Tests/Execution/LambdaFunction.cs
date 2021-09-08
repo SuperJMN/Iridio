@@ -6,6 +6,27 @@ using Iridio.Parsing.Model;
 
 namespace Iridio.Tests.Execution
 {
+    public class LambdaFunction<T> : IFunction
+    {
+        public LambdaFunction(string name, Func<T> func)
+        {
+            Name = name;
+            Func = func;
+        }
+
+        public async Task<object> Invoke(object[] parameters)
+        {
+            var result = Func.DynamicInvoke(parameters);
+            return (T)result;
+        }
+
+        public IEnumerable<Parameter> Parameters { get; }
+        public Type ReturnType { get; }
+
+        public string Name { get; }
+        public Func<T> Func { get; }
+    }
+
     public class LambdaFunction<T1, T2, T3> : IFunction
     {
         public LambdaFunction(string name, Func<T1, T2, T3> func)
@@ -21,7 +42,7 @@ namespace Iridio.Tests.Execution
         }
 
         public string Name { get; }
-        public Func<T1, T2, T3> Func { get; }
+        private Func<T1, T2, T3> Func { get; }
         public IEnumerable<Parameter> Parameters { get; }
         public Type ReturnType { get; }
     }

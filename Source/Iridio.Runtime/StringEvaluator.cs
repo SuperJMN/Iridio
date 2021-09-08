@@ -10,7 +10,7 @@ namespace Iridio.Runtime
     {
         private const string Pattern = "(?<=(?<!{)(?:{{)*){([^{}]*)}(?=(?:}})*(?!}))";
 
-        public Result<string, RunError> Evaluate(string str, IDictionary<string, object> dictionary)
+        public Result<string, MissingReferences> Evaluate(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
             var refs = matches.Select(x => x.Groups[1].Value);
@@ -18,7 +18,7 @@ namespace Iridio.Runtime
             var notFound = refs.Except(dictionary.Keys).ToList();
             if (notFound.Any())
             {
-                return new ReferenceToUnsetVariable(notFound.ToArray());
+                return Result.Failure<string, MissingReferences>(new MissingReferences(notFound));
             }
 
             var replace = Replace(str, dictionary);
@@ -29,7 +29,7 @@ namespace Iridio.Runtime
                 .Replace("}}", "}");
         }
 
-        private string Replace(string str, IDictionary<string, object> dictionary)
+        private static string Replace(string str, IDictionary<string, object> dictionary)
         {
             var matches = Regex.Matches(str, Pattern);
             foreach (var m in matches.Reverse())
@@ -41,6 +41,13 @@ namespace Iridio.Runtime
             }
 
             return str;
+        }
+
+        public class MissingReferences : HashSet<string>
+        {
+            public MissingReferences(List<string> notFound) : base(notFound)
+            {
+            }
         }
     }
 }

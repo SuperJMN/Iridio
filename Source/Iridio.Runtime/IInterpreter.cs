@@ -5,7 +5,7 @@ using Iridio.Binding.Model;
 
 namespace Iridio.Runtime
 {
-    public interface IScriptRunner
+    public interface IInterpreter
     {
         Task<Result<ExecutionSummary, RunError>> Run(Script script);
         IObservable<string> Messages { get; }

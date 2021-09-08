@@ -1,6 +1,7 @@
 using System.Linq;
 using Iridio.Tokenization;
 using Superpower.Model;
+using Position = Iridio.Core.Position;
 
 namespace Iridio.Parsing.Model
 {
@@ -9,7 +10,7 @@ namespace Iridio.Parsing.Model
         public string Name { get; }
         public Expression[] Parameters { get; }
 
-        public CallExpression(Token<SimpleToken> name, Expression[] parameters)
+        public CallExpression(Token<SimpleToken> name, Expression[] parameters, Position position) : base(position)
         {
             Name = name.ToStringValue();
             Parameters = parameters;

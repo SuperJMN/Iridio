@@ -1,10 +1,12 @@
+using Iridio.Core;
+
 namespace Iridio.Parsing.Model
 {
     public class CallStatement : Statement
     {
         public CallExpression Call { get; }
 
-        public CallStatement(CallExpression call)
+        public CallStatement(CallExpression call, Position position) : base(position)
         {
             Call = call;
         }

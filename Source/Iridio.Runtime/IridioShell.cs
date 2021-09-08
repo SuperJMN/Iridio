@@ -18,8 +18,8 @@ namespace Iridio.Runtime
         public IridioShell(IList<IFunction> externalFunctions)
         {
             preprocessor = new Preprocessor(new System.IO.Abstractions.FileSystem());
-            var compiler = new SourceCodeCompiler(new Binder(externalFunctions), new Parser());
-            var runner = new ScriptRunner(externalFunctions);
+            var compiler = new SourceCodeCompiler(new NewBinder(externalFunctions), new Parser());
+            var runner = new Interpreter(externalFunctions);
             iridioCoreCore = new IridioCore(compiler, runner);
         }
 

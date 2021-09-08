@@ -1,8 +1,12 @@
-﻿namespace Iridio.Core
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Iridio.Parsing;
+
+namespace Iridio.Core
 {
     public class ParseError : CompilerError
     {
-        public ParseError(SourceUnit sourceUnit, string errorMessage)
+        public ParseError(SourceUnit sourceUnit, string errorMessage, SourceCode sourceCode) : base(sourceCode)
         {
             Message = errorMessage;
             SourceUnit = sourceUnit;
@@ -16,5 +20,10 @@
         {
             return $"Syntax error at {SourceUnit}: {Message}";
         }
+
+        public override IReadOnlyCollection<ErrorItem> Errors => new ReadOnlyCollection<ErrorItem>(new[]
+        {
+            new ErrorItem(Message, SourceUnit)
+        });
     }
 }

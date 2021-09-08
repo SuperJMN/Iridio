@@ -11,20 +11,15 @@ using Iridio.Parsing;
 using Iridio.Runtime;
 using Xunit;
 
-namespace Iridio.Tests.Execution
+namespace Iridio.Tests.Core
 {
-    public class IridioCoreTests
+    public class Success : IridioCoreTestsBase
     {
         [Theory]
         [ClassData(typeof(Data))]
         public async Task References_have_correct_values_after_execution(string source, IDictionary<string, object> expectations)
         {
-            var functions = new List<IFunction>
-            {
-                new LambdaFunction<int, int, int>("Sum", (x, y) => x + y)
-            };
-
-            var sut = new IridioCore(new SourceCodeCompiler(new Binder(functions), new Parser()), new ScriptRunner(functions));
+            var sut = CreateSut();
 
             var result = await sut.Run(SourceCode.FromString(source));
             result
@@ -36,7 +31,7 @@ namespace Iridio.Tests.Execution
         public async Task Messages_are_pushed_from_script()
         {
             var externalFunctions = Array.Empty<IFunction>();
-            var sut = new IridioCore(new SourceCodeCompiler(new Binder(externalFunctions), new Parser()), new ScriptRunner(externalFunctions));
+            var sut = new IridioCore(new SourceCodeCompiler(new NewBinder(externalFunctions), new Parser()), new Interpreter(externalFunctions));
             var message = Maybe<string>.None;
             sut.Messages.Subscribe(s => message = Maybe<string>.From(s));
 
@@ -74,6 +69,7 @@ namespace Iridio.Tests.Execution
                 AddCase("b = 1; if (b == 1)  { a = 2; }  else  { a = 6; }", ("a", 2));
                 AddCase("b = 1; if (b != 1)  { a = 2; }  else  { a = 6; }", ("a", 6));
                 AddCase("b=\"Hello\"; a = \"{b} world!\";", ("a", "Hello world!"));
+                Add("Main {  Proc1(); } Proc1 { a = \"OK\"; }", new Dictionary<string, object> { ["a"] = "OK" });
             }
 
             private void AddCase(string code, params (string, object)[] expectedValues)

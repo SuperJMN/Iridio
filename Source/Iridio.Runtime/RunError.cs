@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
     public abstract class RunError
     {
-        public abstract IEnumerable<string> Items { get; }
+        public Maybe<Position> Position { get; }
+
+        protected RunError(Maybe<Position> position)
+        {
+            Position = position;
+        }
     }
 }

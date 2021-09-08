@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CSharpFunctionalExtensions;
+using Iridio.Core;
 
 namespace Iridio.Runtime
 {
@@ -6,12 +7,10 @@ namespace Iridio.Runtime
     {
         public string Message { get; }
 
-        public ExecutionCanceled(string message)
+        public ExecutionCanceled(string message, Maybe<Position> position) : base(position)
         {
             Message = message;
         }
-
-        public override IEnumerable<string> Items => new[] {ToString()};
 
         public override string ToString()
         {

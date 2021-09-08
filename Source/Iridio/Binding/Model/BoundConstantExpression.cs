@@ -2,11 +2,11 @@
 
 namespace Iridio.Binding.Model
 {
-    public class BoundBooleanValueExpression : BoundExpression
+    public class BoundConstantExpression : BoundExpression
     {
-        public bool Value { get; }
+        public object Value { get; }
 
-        public BoundBooleanValueExpression(bool value, Position position) : base(position)
+        public BoundConstantExpression(object value, Position position) : base(position)
         {
             Value = value;
         }

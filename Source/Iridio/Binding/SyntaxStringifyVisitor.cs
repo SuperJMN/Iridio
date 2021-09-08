@@ -18,14 +18,9 @@ namespace Iridio.Binding
 
         public void Visit(AssignmentStatement assignmentStatement)
         {
-            sa.TabPrint(assignmentStatement.Variable + " = ");
+            sa.TabPrint(assignmentStatement.Target + " = ");
             assignmentStatement.Expression.Accept(this);
             sa.Print(";");
-        }
-
-        public void Visit(DoubleExpression doubleExpression)
-        {
-            sa.Print(doubleExpression.Value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void Visit(BinaryExpression binaryExpression)
@@ -40,9 +35,27 @@ namespace Iridio.Binding
             throw new NotImplementedException();
         }
 
-        public void Visit(BooleanValueExpression booleanValueExpression)
+        public void Visit(ConstantExpression constantExpression)
         {
-            sa.Print(booleanValueExpression.Value.ToString());
+            var v = constantExpression.Value;
+
+            switch (v)
+            {
+                case int i:
+                    sa.Print(i.ToString());
+                    break;
+                case double d:
+                    sa.Print(d.ToString(CultureInfo.InvariantCulture));
+                    break;
+                case bool b:
+                    sa.Print(b.ToString(CultureInfo.InvariantCulture));
+                    break;
+                case string str:
+                    sa.Print($"\"{str}\"");
+                    break;
+                default:
+                    throw new InvalidOperationException($"Invalid constant type {v.GetType()}");
+            }
         }
 
         public void Visit(EchoStatement echo)
@@ -91,11 +104,6 @@ namespace Iridio.Binding
             sa.NewLine();
         }
 
-        public void Visit(IntegerExpression integerExpression)
-        {
-            sa.Print(integerExpression.Value.ToString());
-        }
-
         public void Visit(CallExpression callExpression)
         {
             sa.Print(callExpression.Name + "(");
@@ -112,11 +120,6 @@ namespace Iridio.Binding
             sa.TabPrint("");
             callStatement.Call.Accept(this);
             sa.Print(";");
-        }
-
-        public void Visit(StringExpression stringExpression)
-        {
-            sa.Print("\"" + stringExpression.String + "\"");
         }
 
         public void Visit(IdentifierExpression identifierExpression)
