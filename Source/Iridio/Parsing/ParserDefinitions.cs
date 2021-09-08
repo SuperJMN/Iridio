@@ -33,20 +33,20 @@ namespace Iridio.Parsing
         }
 
         public static readonly TokenListParser<SimpleToken, Expression> TextExpression =
-            Token.EqualTo(SimpleToken.Text).Select(x => (Expression)new StringExpression(Unwrap(x.ToStringValue()), x.Position.ToPosition()));
+            Token.EqualTo(SimpleToken.Text).Select(x => (Expression)new ConstantExpression(Unwrap(x.ToStringValue()), x.Position.ToPosition()));
 
         public static readonly TokenListParser<SimpleToken, Expression> IntegerExpression =
             Token.EqualTo(SimpleToken.Integer).Select(t =>
             {
                 var i = Numerics.IntegerInt32.Parse(t.ToStringValue());
-                return (Expression)new IntegerExpression(i, t.Position.ToPosition());
+                return (Expression)new ConstantExpression(i, t.Position.ToPosition());
             });
 
         public static readonly TokenListParser<SimpleToken, Expression> DoubleExpression =
             Token.EqualTo(SimpleToken.Double).Select(t =>
             {
                 var i = TextParsers.DoubleParser.Parse(t.ToStringValue());
-                return (Expression)new DoubleExpression(i, t.Position.ToPosition());
+                return (Expression)new ConstantExpression(i, t.Position.ToPosition());
             });
 
         public static readonly TokenListParser<SimpleToken, Expression> IdentifierExpression =
@@ -54,8 +54,8 @@ namespace Iridio.Parsing
 
 
         public static readonly TokenListParser<SimpleToken, Expression> BooleanValueExpression =
-            Token.EqualTo(SimpleToken.True).Select(t => (Expression)new BooleanValueExpression(true, t.Position.ToPosition()))
-                .Or(Token.EqualTo(SimpleToken.False).Select(t => (Expression)new BooleanValueExpression(false, t.Position.ToPosition())));
+            Token.EqualTo(SimpleToken.True).Select(t => (Expression)new ConstantExpression(true, t.Position.ToPosition()))
+                .Or(Token.EqualTo(SimpleToken.False).Select(t => (Expression)new ConstantExpression(false, t.Position.ToPosition())));
 
         private static readonly TokenListParser<SimpleToken, Expression[]> Parameters = Parse.Ref(() => Expression)
             .ManyDelimitedBy(Token.EqualTo(SimpleToken.Comma))

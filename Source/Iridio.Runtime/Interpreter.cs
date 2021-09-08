@@ -132,31 +132,44 @@ namespace Iridio.Runtime
         {
             switch (expression)
             {
+                case BoundConstantExpression bce:
+                    return EvaluateConstant(bce);
                 case BoundBinaryExpression boundBinaryExpression:
                     return await Evaluate(boundBinaryExpression);
-                case BoundBooleanValueExpression boundBooleanValueExpression:
-                    return Evaluate(boundBooleanValueExpression);
                 case BoundIdentifier boundIdentifier:
                     return Evaluate(boundIdentifier);
                 case BoundFunctionCallExpression boundFunctionCallExpression:
                     return await Evaluate(boundFunctionCallExpression);
-                case BoundStringExpression boundStringExpression:
-                    return Evaluate(boundStringExpression);
                 case BoundProcedureCallExpression boundProcedureCallExpression:
                     return await Evaluate(boundProcedureCallExpression);
                 case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
                     return await EvaluateCallProcedure(boundProcedureSymbolCallExpression);
                 case BoundCallExpression boundCallExpression:
                     return await EvaluateCallExpression(boundCallExpression);
-                case BoundIntegerExpression boundNumericExpression:
-                    return Result.Success<object, RunError>(boundNumericExpression.Value);
                 case BoundUnaryExpression boundUnaryExpression:
                     return await Evaluate(boundUnaryExpression);
-                case BoundDoubleExpression boundDoubleExpression:
-                    return Result.Success<object, RunError>(boundDoubleExpression.Value);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
+        }
+
+        private Result<object, RunError> EvaluateConstant(BoundConstantExpression bce)
+        {
+            return bce.Value switch
+            {
+                double d => d,
+                int i => i,
+                string str => EvaluateString(str, bce.Position),
+                bool b => b,
+                _ => throw new InvalidOperationException($"Unsupported constant type {bce.Value.GetType()}")
+            };
+        }
+
+        private Result<object, RunError> EvaluateString(string str, Maybe<Position> position)
+        {
+            var evaluator = new StringEvaluator();
+            var either = evaluator.Evaluate(str, variables);
+            return either.MapError(missing => new ReferenceToUnsetVariable(position, missing.ToArray()));
         }
 
         private async Task<Result<object, RunError>> EvaluateCallExpression(BoundCallExpression boundCallExpression)
@@ -211,14 +224,6 @@ namespace Iridio.Runtime
             }
 
             return result;
-        }
-
-        private Result<object, RunError> Evaluate(BoundStringExpression boundStringExpression)
-        {
-            var str = boundStringExpression.String;
-            var evaluator = new StringEvaluator();
-            var either = evaluator.Evaluate(str, variables);
-            return either.MapError(missing => new ReferenceToUnsetVariable(boundStringExpression.Position, missing.ToArray()));
         }
 
         private async Task<Result<object, RunError>> Evaluate(BoundProcedureCallExpression call)

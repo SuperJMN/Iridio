@@ -133,28 +133,20 @@ namespace Iridio.Binding
         {
             switch (expression)
             {
+                case ConstantExpression ce:
+                    return new BoundConstantExpression(ce.Value, ce.Position);
                 case BinaryExpression binaryExpression:
                     return new BoundBinaryExpression(BindExpression(binaryExpression.Left), binaryExpression.Op,
                         BindExpression(binaryExpression.Right), binaryExpression.Position);
-                case BooleanValueExpression booleanValueExpression:
-                    return new BoundBooleanValueExpression(booleanValueExpression.Value, booleanValueExpression.Position);
                 case CallExpression callExpression:
                     return BindCallExpression(callExpression);
-                case DoubleExpression doubleExpression:
-                    return new BoundDoubleExpression(doubleExpression.Value, doubleExpression.Position);
                 case IdentifierExpression identifierExpression:
                     return new BoundIdentifier(identifierExpression.Identifier, identifierExpression.Position);
-                case IntegerExpression integerExpression:
-                    return new BoundIntegerExpression(integerExpression.Value, integerExpression.Position);
-                case StringExpression stringExpression:
-                    return new BoundStringExpression(stringExpression.String, stringExpression.Position);
                 case UnaryExpression unaryExpression:
                     return new BoundUnaryExpression(BindExpression(unaryExpression.Expression), unaryExpression.Op, unaryExpression.Position);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(expression));
             }
-
-            throw new InvalidOperationException();
         }
     }
 }
