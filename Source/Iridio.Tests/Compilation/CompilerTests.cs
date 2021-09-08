@@ -56,7 +56,7 @@ namespace Iridio.Tests.Compilation
         private static SourceCodeCompiler CreateSut()
         {
             var functionDeclarations = Enumerable.Empty<INamed>();
-            var sut = new SourceCodeCompiler(new NewBinder(functionDeclarations), new Parser());
+            var sut = new SourceCodeCompiler(new Binder(functionDeclarations), new Parser());
             return sut;
         }
     }

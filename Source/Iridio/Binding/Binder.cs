@@ -8,13 +8,13 @@ using Iridio.Parsing.Model;
 
 namespace Iridio.Binding
 {
-    public class NewBinder : IBinder
+    public class Binder : IBinder
     {
         private readonly ICollection<BinderError> errors = new List<BinderError>();
         private readonly Dictionary<string, ProcedureSymbol> procedureSymbols = new();
         private readonly Dictionary<string, INamed> functions;
 
-        public NewBinder(IEnumerable<INamed> externalFunctions)
+        public Binder(IEnumerable<INamed> externalFunctions)
         {
             if (externalFunctions == null)
             {
