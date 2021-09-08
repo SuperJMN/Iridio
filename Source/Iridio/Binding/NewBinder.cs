@@ -115,7 +115,7 @@ namespace Iridio.Binding
                 .Map(f => (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
 
             var p = procedureSymbols.TryFind(callExpression.Name)
-                .Map(p => (BoundCallExpression)new BoundProcedureSymbolCallExpression(p, parameters, callExpression.Position));
+                .Map(p => (BoundCallExpression)new BoundProcedureCallExpression(p, parameters, callExpression.Position));
 
             var called = f.Or(p);
             called.ExecuteOnEmpty(() =>
@@ -141,7 +141,7 @@ namespace Iridio.Binding
                 case CallExpression callExpression:
                     return BindCallExpression(callExpression);
                 case IdentifierExpression identifierExpression:
-                    return new BoundIdentifier(identifierExpression.Identifier, identifierExpression.Position);
+                    return new BoundReference(identifierExpression.Identifier, identifierExpression.Position);
                 case UnaryExpression unaryExpression:
                     return new BoundUnaryExpression(BindExpression(unaryExpression.Expression), unaryExpression.Op, unaryExpression.Position);
                 default:

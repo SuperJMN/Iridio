@@ -5,11 +5,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Iridio.Binding;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Core;
-using Zafiro.Core;
 
 namespace Iridio.Runtime
 {
@@ -90,7 +88,7 @@ namespace Iridio.Runtime
 
         private async Task<Result<Success, RunError>> Execute(BoundCallStatement boundCallStatement)
         {
-            var evaluation = await Evaluate(boundCallStatement.Call);
+            var evaluation = await EvaluateExpression(boundCallStatement.Call);
             return evaluation.Map(_ => Success.Value);
         }
 
@@ -108,7 +106,7 @@ namespace Iridio.Runtime
                 var elseExecution = await boundIfStatement.FalseBlock
                     .Map(async block => await Execute(block));
 
-                return elseExecution.Unwrap(r => Success.Value);
+                return elseExecution.Unwrap(_ => Success.Value);
             });
 
             return result;
@@ -116,36 +114,34 @@ namespace Iridio.Runtime
 
         private async Task<Result<bool, RunError>> Eval(BoundExpression condition)
         {
-            return (await Evaluate(condition))
-                .Bind(o => Result.Success<bool, RunError>((bool) o));
+            return (await EvaluateExpression(condition))
+                .Bind(o => Result.Success<bool, RunError>((bool)o));
         }
 
         private async Task<Result<Success, RunError>> Execute(BoundAssignmentStatement boundAssignmentStatement)
         {
-            var evaluation = await Evaluate(boundAssignmentStatement.Expression);
+            var evaluation = await EvaluateExpression(boundAssignmentStatement.Expression);
             return evaluation
                 .Tap(o => variables[boundAssignmentStatement.Variable] = o)
-                .Map(o => Success.Value);
+                .Map(_ => Success.Value);
         }
 
-        private async Task<Result<object, RunError>> Evaluate(BoundExpression expression)
+        private async Task<Result<object, RunError>> EvaluateExpression(BoundExpression expression)
         {
             switch (expression)
             {
                 case BoundConstantExpression bce:
                     return EvaluateConstant(bce);
-                case BoundBinaryExpression boundBinaryExpression:
-                    return await Evaluate(boundBinaryExpression);
-                case BoundIdentifier boundIdentifier:
-                    return Evaluate(boundIdentifier);
-                case BoundFunctionCallExpression boundFunctionCallExpression:
-                    return await Evaluate(boundFunctionCallExpression);
-                case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
-                    return await EvaluateCallProcedure(boundProcedureSymbolCallExpression);
-                case BoundCallExpression boundCallExpression:
-                    return await EvaluateCallExpression(boundCallExpression);
                 case BoundUnaryExpression boundUnaryExpression:
-                    return await Evaluate(boundUnaryExpression);
+                    return await EvaluateUnaryExpression(boundUnaryExpression);
+                case BoundBinaryExpression boundBinaryExpression:
+                    return await EvaluateBinaryExpression(boundBinaryExpression);
+                case BoundReference boundReference:
+                    return EvaluateReference(boundReference);
+                case BoundFunctionCallExpression boundFunctionCallExpression:
+                    return await EvaluateFunction(boundFunctionCallExpression);
+                case BoundProcedureCallExpression boundProcedureSymbolCallExpression:
+                    return await EvaluateProcedure(boundProcedureSymbolCallExpression);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
@@ -170,48 +166,18 @@ namespace Iridio.Runtime
             return either.MapError(missing => new ReferenceToUnsetVariable(position, missing.ToArray()));
         }
 
-        private async Task<Result<object, RunError>> EvaluateCallExpression(BoundCallExpression boundCallExpression)
+        private async Task<Result<object, RunError>> EvaluateUnaryExpression(BoundUnaryExpression boundUnaryExpression)
         {
-            switch (boundCallExpression)
-            {
-                case BoundFunctionCallExpression boundFunctionCallExpression:
-                    return EvaluateFunctionCall(boundFunctionCallExpression.Function);
-                case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
-                    return EvaluateCallProcedure(boundProcedureSymbolCallExpression);
-            }
-
-            throw new InvalidOperationException();
-        }
-
-        private Result<object, RunError> EvaluateFunctionCall(INamed function)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<Result<object, RunError>> EvaluateCallProcedure(BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression)
-        {
-            var symbol = boundProcedureSymbolCallExpression.Procedure;
-            var procedure = procedures.TryFind(symbol.Name);
-            return await procedure.Map(proc => Execute(proc));
-        }
-
-        private async Task<Result<object, RunError>> Evaluate(BoundUnaryExpression boundUnaryExpression)
-        {
-            var result = await Evaluate(boundUnaryExpression.Expression);
+            var result = await EvaluateExpression(boundUnaryExpression.Expression);
 
             return result
                 .Map(o => boundUnaryExpression.Op.Calculate(o));
         }
 
-        private Result<object, RunError> Evaluate(BoundBooleanValueExpression expr)
+        private async Task<Result<object, RunError>> EvaluateBinaryExpression(BoundBinaryExpression boundBinaryExpression)
         {
-            return expr.Value;
-        }
-
-        private async Task<Result<object, RunError>> Evaluate(BoundBinaryExpression boundBinaryExpression)
-        {
-            var leftEither = await Evaluate(boundBinaryExpression.Left);
-            var rightResult = await Evaluate(boundBinaryExpression.Right);
+            var leftEither = await EvaluateExpression(boundBinaryExpression.Left);
+            var rightResult = await EvaluateExpression(boundBinaryExpression.Right);
 
             var result = Result.Combine(e => e.First(), leftEither, rightResult);
             if (result.IsSuccess)
@@ -222,7 +188,14 @@ namespace Iridio.Runtime
             return result;
         }
 
-        private async Task<Result<object, RunError>> Evaluate(BoundFunctionCallExpression call)
+        private async Task<Result<object, RunError>> EvaluateProcedure(BoundProcedureCallExpression boundProcedureCallExpression)
+        {
+            var symbol = boundProcedureCallExpression.ProcedureSymbol;
+            var procedure = procedures.TryFind(symbol.Name);
+            return await procedure.Map(Execute);
+        }
+
+        private async Task<Result<object, RunError>> EvaluateFunction(BoundFunctionCallExpression call)
         {
             var function = Maybe.From(functions.FirstOrDefault(f => f.Name == call.Function.Name));
 
@@ -235,7 +208,7 @@ namespace Iridio.Runtime
 
         private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters, Maybe<Position> callPosition)
         {
-            var eitherParameters = await parameters.AsyncSelect(async expression => await Evaluate(expression));
+            var eitherParameters = await Task.WhenAll(parameters.Select(EvaluateExpression));
             var combined = eitherParameters.Combine(errors => errors.First());
 
             try
@@ -253,14 +226,14 @@ namespace Iridio.Runtime
             }
         }
 
-        private Result<object, RunError> Evaluate(BoundIdentifier identifier)
+        private Result<object, RunError> EvaluateReference(BoundReference reference)
         {
-            if (variables.TryGetValue(identifier.Identifier, out var val))
+            if (variables.TryGetValue(reference.Identifier, out var val))
             {
                 return Result.Success<object, RunError>(val);
             }
 
-            return Result.Failure<object, RunError>(new ReferenceToUnsetVariable(identifier.Position, identifier.Identifier));
+            return Result.Failure<object, RunError>(new ReferenceToUnsetVariable(reference.Position, reference.Identifier));
         }
     }
 }

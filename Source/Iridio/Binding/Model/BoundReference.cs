@@ -2,11 +2,11 @@
 
 namespace Iridio.Binding.Model
 {
-    public class BoundIdentifier : BoundExpression
+    public class BoundReference : BoundExpression
     {
         public string Identifier { get; }
 
-        public BoundIdentifier(string identifier, Position position) : base(position)
+        public BoundReference(string identifier, Position position) : base(position)
         {
             Identifier = identifier;
         }

@@ -9,12 +9,12 @@
         void Visit(BoundProcedure procedure);
         void Visit(BoundBlock block);
         void Visit(BoundCallStatement callStatement);
-        void Visit(BoundIdentifier identifier);
+        void Visit(BoundReference reference);
         void Visit(BoundFunctionCallExpression functionCallExpression);
         void Visit(BoundBinaryExpression binaryExpression);
         void Visit(BoundBooleanValueExpression booleanValueExpression);
         void Visit(BoundUnaryExpression unaryExpression);
-        void Visit(BoundProcedureSymbolCallExpression procedureCallExpression);
+        void Visit(BoundProcedureCallExpression procedureCallExpression);
         void Visit(BoundConstantExpression boundConstantExpression);
     }
 }
