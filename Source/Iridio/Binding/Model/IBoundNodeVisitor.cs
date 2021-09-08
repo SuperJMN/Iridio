@@ -11,7 +11,6 @@
         void Visit(BoundCallStatement callStatement);
         void Visit(BoundIdentifier identifier);
         void Visit(BoundFunctionCallExpression functionCallExpression);
-        void Visit(BoundProcedureCallExpression procedureCallExpression);
         void Visit(BoundBinaryExpression binaryExpression);
         void Visit(BoundBooleanValueExpression booleanValueExpression);
         void Visit(BoundUnaryExpression unaryExpression);

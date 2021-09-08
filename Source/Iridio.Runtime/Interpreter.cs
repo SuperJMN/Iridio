@@ -140,8 +140,6 @@ namespace Iridio.Runtime
                     return Evaluate(boundIdentifier);
                 case BoundFunctionCallExpression boundFunctionCallExpression:
                     return await Evaluate(boundFunctionCallExpression);
-                case BoundProcedureCallExpression boundProcedureCallExpression:
-                    return await Evaluate(boundProcedureCallExpression);
                 case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
                     return await EvaluateCallProcedure(boundProcedureSymbolCallExpression);
                 case BoundCallExpression boundCallExpression:
@@ -178,8 +176,6 @@ namespace Iridio.Runtime
             {
                 case BoundFunctionCallExpression boundFunctionCallExpression:
                     return EvaluateFunctionCall(boundFunctionCallExpression.Function);
-                case BoundProcedureCallExpression boundProcedureCallExpression:
-                    break;
                 case BoundProcedureSymbolCallExpression boundProcedureSymbolCallExpression:
                     return EvaluateCallProcedure(boundProcedureSymbolCallExpression);
             }
@@ -224,12 +220,6 @@ namespace Iridio.Runtime
             }
 
             return result;
-        }
-
-        private async Task<Result<object, RunError>> Evaluate(BoundProcedureCallExpression call)
-        {
-            var execute = await Execute(call.Procedure.Block);
-            return execute.Check(Result.Success<object, RunError>);
         }
 
         private async Task<Result<object, RunError>> Evaluate(BoundFunctionCallExpression call)
