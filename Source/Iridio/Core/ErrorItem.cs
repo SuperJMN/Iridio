@@ -12,5 +12,10 @@ namespace Iridio.Core
 
         public Maybe<SourceUnit> SourceUnit { get; }
         public string Message { get; }
+
+        public override string ToString()
+        {
+            return $"{SourceUnit} {Message}";
+        }
     }
 }

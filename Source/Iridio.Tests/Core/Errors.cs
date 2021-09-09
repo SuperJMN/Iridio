@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
-using FluentAssertions.CSharpFunctionalExtensions;
 using Iridio.Parsing;
 using Iridio.Runtime;
 using Xunit;
@@ -80,13 +78,23 @@ Main
             CheckErrors(result, "already");
         }
 
+        [Fact]
+        public async Task Unset_variable()
+        {
+            var result = await Run(SourceCode.FromString(
+                @"Main 
+            {
+                b = a;
+            }"));
+            CheckErrors(result, "unset");
+        }
+
         private static void CheckErrors(Result<ExecutionSummary, IridioError> result, string expectation)
         {
-            result.Should().BeFailure()
-                .And.Subject.Error.Errors.Select(x => x.Message)
-                .Where(s => s.Contains(expectation, StringComparison.InvariantCultureIgnoreCase))
-                .Should()
-                .NotBeEmpty();
+            var errorString = result.Match(x => "{no errors}", x => string.Join("\n ", x.Errors.Select(item => item.ToString())));
+
+            errorString.Should()
+                .ContainEquivalentOf(expectation);
         }
     }
 }

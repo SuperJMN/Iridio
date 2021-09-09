@@ -50,7 +50,7 @@ namespace Iridio.Core
 
         public override string ToString()
         {
-            return $"[{Line.Number}, {Column}]: {Line.Content} {Line.Path.Unwrap(s => $" - at {s}")}";
+            return $"[{Line.Number}, {Column}] {Line.Content.Trim()} {Line.Path.Unwrap(s => $" - at {s}")}";
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
