@@ -10,9 +10,9 @@ using Iridio.Preprocessing;
 namespace Iridio.Runtime
 {
     // ReSharper disable once UnusedType.Global
-    public class IridioShell : IIridioCore
+    public class IridioShell : IIridioShell
     {
-        private readonly IridioCore iridioCoreCore;
+        private readonly Iridio iridio;
         private readonly Preprocessor preprocessor;
 
         public IridioShell(IList<IFunction> externalFunctions)
@@ -20,15 +20,15 @@ namespace Iridio.Runtime
             preprocessor = new Preprocessor(new System.IO.Abstractions.FileSystem());
             var compiler = new SourceCodeCompiler(new Binder(externalFunctions), new Parser());
             var runner = new Interpreter(externalFunctions);
-            iridioCoreCore = new IridioCore(compiler, runner);
+            iridio = new Iridio(compiler, runner);
         }
 
         public Task<Result<ExecutionSummary, IridioError>> Run(string path)
         {
             var source = preprocessor.Process(path);
-            return iridioCoreCore.Run(source);
+            return iridio.Run(source);
         }
 
-        public IObservable<string> Messages => iridioCoreCore.Messages;
+        public IObservable<string> Messages => iridio.Messages;
     }
 }

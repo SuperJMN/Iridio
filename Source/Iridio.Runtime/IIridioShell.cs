@@ -4,7 +4,7 @@ using CSharpFunctionalExtensions;
 
 namespace Iridio.Runtime
 {
-    public interface IIridioCore
+    public interface IIridioShell
     {
         Task<Result<ExecutionSummary, IridioError>> Run(string path);
         IObservable<string> Messages { get; }

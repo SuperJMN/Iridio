@@ -5,12 +5,12 @@ using Iridio.Parsing;
 
 namespace Iridio.Runtime
 {
-    public class IridioCore : IIridio
+    public class Iridio : IIridio
     {
         private readonly ISourceCodeCompiler compiler;
         private readonly IInterpreter runner;
 
-        public IridioCore(ISourceCodeCompiler compiler, IInterpreter runner)
+        public Iridio(ISourceCodeCompiler compiler, IInterpreter runner)
         {
             this.compiler = compiler;
             this.runner = runner;
