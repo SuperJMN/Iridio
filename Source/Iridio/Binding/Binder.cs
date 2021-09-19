@@ -109,7 +109,7 @@ namespace Iridio.Binding
 
         private BoundCallExpression BindCallExpression(CallExpression callExpression)
         {
-            var parameters = callExpression.Parameters.Select(BindExpression);
+            var parameters = callExpression.Parameters.Select(BindExpression).ToList();
 
             var f = functions.TryFind(callExpression.Name)
                 .Map(f => (BoundCallExpression)new BoundFunctionCallExpression(f, parameters, callExpression.Position));
