@@ -15,5 +15,10 @@ namespace Iridio.Parsing.Model
         {
             visitor.Visit(this);
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

@@ -12,5 +12,10 @@ namespace Iridio.Binding
 
         public string Name { get; }
         public Position Position { get; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

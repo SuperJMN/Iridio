@@ -36,7 +36,7 @@ namespace Iridio.Runtime
             variables = new Dictionary<string, object>();
 
             return await GetMain(script)
-                .Bind(Execute)
+                .Bind(ExecuteProcedure)
                 .Map(_ => new ExecutionSummary(variables));
         }
 
@@ -47,12 +47,13 @@ namespace Iridio.Runtime
                 .ToResult((RunError) new MainProcedureNotFound());
         }
 
-        private Task<Result<Success, RunError>> Execute(BoundProcedure procedure)
+        private async Task<Result<Success, RunError>> ExecuteProcedure(BoundProcedure procedure)
         {
-            return Execute(procedure.Block);
+            var executeProcedure = await ExecuteBlock(procedure.Block);
+            return executeProcedure;
         }
 
-        private async Task<Result<Success, RunError>> Execute(BoundBlock block)
+        private async Task<Result<Success, RunError>> ExecuteBlock(BoundBlock block)
         {
             foreach (var st in block.Statements)
             {
@@ -94,17 +95,17 @@ namespace Iridio.Runtime
 
         private async Task<Result<Success, RunError>> Execute(BoundIfStatement boundIfStatement)
         {
-            var eval = await Eval(boundIfStatement.Condition);
+            var eval = await EvaluateCondition(boundIfStatement.Condition);
 
             var result = await eval.Bind(async isMet =>
             {
                 if (isMet)
                 {
-                    return await Execute(boundIfStatement.TrueBlock);
+                    return await ExecuteBlock(boundIfStatement.TrueBlock);
                 }
 
                 var elseExecution = await boundIfStatement.FalseBlock
-                    .Map(async block => await Execute(block));
+                    .Map(async block => await ExecuteBlock(block));
 
                 return elseExecution.Unwrap(_ => Success.Value);
             });
@@ -112,7 +113,7 @@ namespace Iridio.Runtime
             return result;
         }
 
-        private async Task<Result<bool, RunError>> Eval(BoundExpression condition)
+        private async Task<Result<bool, RunError>> EvaluateCondition(BoundExpression condition)
         {
             return (await EvaluateExpression(condition))
                 .Bind(o => Result.Success<bool, RunError>((bool)o));
@@ -121,7 +122,9 @@ namespace Iridio.Runtime
         private async Task<Result<Success, RunError>> Execute(BoundAssignmentStatement boundAssignmentStatement)
         {
             var evaluation = await EvaluateExpression(boundAssignmentStatement.Expression);
+
             return evaluation
+                .Map(o => o is Result r ? o : o)
                 .Tap(o => variables[boundAssignmentStatement.Variable] = o)
                 .Map(_ => Success.Value);
         }
@@ -141,7 +144,8 @@ namespace Iridio.Runtime
                 case BoundFunctionCallExpression boundFunctionCallExpression:
                     return await EvaluateFunction(boundFunctionCallExpression);
                 case BoundProcedureCallExpression boundProcedureSymbolCallExpression:
-                    return await EvaluateProcedure(boundProcedureSymbolCallExpression);
+                    var procedure = await EvaluateProcedure(boundProcedureSymbolCallExpression);
+                    return procedure;
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
@@ -191,8 +195,10 @@ namespace Iridio.Runtime
         private async Task<Result<object, RunError>> EvaluateProcedure(BoundProcedureCallExpression boundProcedureCallExpression)
         {
             var symbol = boundProcedureCallExpression.ProcedureSymbol;
-            var procedure = procedures.TryFind(symbol.Name);
-            return await procedure.Map(Execute);
+            var procedure = procedures[symbol.Name];
+            var execute = await ExecuteProcedure(procedure);
+            var result = execute.Map(success => (object)success);
+            return result;
         }
 
         private async Task<Result<object, RunError>> EvaluateFunction(BoundFunctionCallExpression call)

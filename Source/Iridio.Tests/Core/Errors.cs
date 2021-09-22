@@ -79,6 +79,22 @@ Main
         }
 
         [Fact]
+        public async Task Call_to_procedure_with_error()
+        {
+            var result = await Run(SourceCode.FromString(
+                @"Main 
+{ 
+    Proc();
+}
+
+Proc 
+{
+    a = ""Hi, I'm {b}"";
+}"));
+            CheckErrors(result, "unset");
+        }
+
+        [Fact]
         public async Task Unset_variable()
         {
             var result = await Run(SourceCode.FromString(
