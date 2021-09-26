@@ -18,5 +18,11 @@ namespace Iridio.Binding.Model
         {
             visitor.Visit(this);
         }
+
+        public override string ToString()
+        {
+            var parameters = string.Join(", ", Parameters);
+            return $"{Function}({parameters})";
+        }
     }
 }

@@ -5,7 +5,6 @@ using System.Linq;
 using Bogus;
 using CSharpFunctionalExtensions;
 using Iridio.Tokenization;
-using Zafiro.Core.Patterns;
 
 namespace Iridio.Tests.Tokenization
 {
@@ -15,18 +14,18 @@ namespace Iridio.Tests.Tokenization
         {
             var random = new Random();
             var faker = new Faker();
-            dictionary = new Dictionary<SimpleToken, Func<string>>()
+            dictionary = new Dictionary<SimpleToken, Func<string>>
             {
-                {SimpleToken.CloseBrace, () => "}"},
-                {SimpleToken.OpenBrace, () => "{"},
-                {SimpleToken.Integer, () => faker.Random.Number(1000).ToString()},
-                {SimpleToken.Semicolon, () => ";"},
-                {SimpleToken.Text, () => "\"" + faker.Random.AlphaNumeric(10) + "\"" },
-                {SimpleToken.Double, () => random.NextDouble().ToString(CultureInfo.InvariantCulture) + "d"},
+                { SimpleToken.CloseBrace, () => "}" },
+                { SimpleToken.OpenBrace, () => "{" },
+                { SimpleToken.Integer, () => faker.Random.Number(1000).ToString() },
+                { SimpleToken.Semicolon, () => ";" },
+                { SimpleToken.Text, () => "\"" + faker.Random.AlphaNumeric(10) + "\"" },
+                { SimpleToken.Double, () => random.NextDouble().ToString(CultureInfo.InvariantCulture) + "d" }
             };
         }
 
-        private readonly IDictionary<SimpleToken, Func<string>> dictionary;
+        private readonly IReadOnlyDictionary<SimpleToken, Func<string>> dictionary;
 
 
         public (string, IEnumerable<SimpleToken>) Generate(int numberOfTokens)
@@ -42,7 +41,7 @@ namespace Iridio.Tests.Tokenization
 
         private string GetString(SimpleToken simpleToken)
         {
-            var value = dictionary.TryGetValue(simpleToken)
+            var value = dictionary.TryFind(simpleToken)
                 .Map(toString => toString())
                 .Unwrap("");
 

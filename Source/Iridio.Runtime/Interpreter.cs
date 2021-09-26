@@ -8,6 +8,7 @@ using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
 using Iridio.Common;
 using Iridio.Core;
+using Zafiro.Reflection;
 
 namespace Iridio.Runtime
 {
@@ -23,8 +24,9 @@ namespace Iridio.Runtime
             this.functions = functions;
         }
 
-        public Task<Result<ExecutionSummary, RunError>> Run(Script script)
+        public Task<Result<ExecutionSummary, RunError>> Run(Script script, IDictionary<string, object> initialState)
         {
+            variables = initialState;
             procedures = script.Procedures.ToDictionary(x => x.Name, x => x);
             return Execute(script);
         }
@@ -33,8 +35,6 @@ namespace Iridio.Runtime
 
         private async Task<Result<ExecutionSummary, RunError>> Execute(Script script)
         {
-            variables = new Dictionary<string, object>();
-
             return await GetMain(script)
                 .Bind(ExecuteProcedure)
                 .Map(_ => new ExecutionSummary(variables));
@@ -124,7 +124,6 @@ namespace Iridio.Runtime
             var evaluation = await EvaluateExpression(boundAssignmentStatement.Expression);
 
             return evaluation
-                .Map(o => o is Result r ? o : o)
                 .Tap(o => variables[boundAssignmentStatement.Variable] = o)
                 .Map(_ => Success.Value);
         }
@@ -144,8 +143,7 @@ namespace Iridio.Runtime
                 case BoundFunctionCallExpression boundFunctionCallExpression:
                     return await EvaluateFunction(boundFunctionCallExpression);
                 case BoundProcedureCallExpression boundProcedureSymbolCallExpression:
-                    var procedure = await EvaluateProcedure(boundProcedureSymbolCallExpression);
-                    return procedure;
+                    return await EvaluateProcedure(boundProcedureSymbolCallExpression);
             }
 
             throw new ArgumentOutOfRangeException(nameof(expression));
@@ -212,14 +210,20 @@ namespace Iridio.Runtime
             return result;
         }
 
-        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameters, Maybe<Position> callPosition)
+        private async Task<Result<object, RunError>> Call(IFunction function, IEnumerable<BoundExpression> parameterExpressions,
+            Maybe<Position> callPosition)
         {
-            var eitherParameters = await Task.WhenAll(parameters.Select(EvaluateExpression));
-            var combined = eitherParameters.Combine(errors => errors.First());
+            var parameters = await Task.WhenAll(parameterExpressions.Select(EvaluateExpression));
+            var combined = parameters.Combine(errors => errors.First());
 
             try
             {
-                return await combined.Map(p => function.Invoke(p.ToArray()));
+                return await combined.Bind(async evaluatedParameters =>
+                {
+                    var value = await function.Invoke(evaluatedParameters.ToArray());
+                    var finalValue = ConvertToFinalValue(value, function, callPosition);
+                    return finalValue;
+                });
             }
             catch (Exception ex)
             {
@@ -230,6 +234,23 @@ namespace Iridio.Runtime
                     _ => Result.Failure<object, RunError>(new IntegratedFunctionFailed(function, ex, callPosition))
                 };
             }
+        }
+
+        private static Result<object, RunError> ConvertToFinalValue(object value, IFunction function, Maybe<Position> callPosition)
+        {
+            if (value is IResult r)
+            {
+                if (r.IsSuccess)
+                {
+                    var innerValue = value.Get<object>("Value");
+                    return Result.Success<object, RunError>(innerValue);
+                }
+
+                var error = value.Get<string>("Error");
+                return Result.Failure<object, RunError>(new FunctionReportedError(function, error, callPosition));
+            }
+
+            return Result.Success<object, RunError>(value);
         }
 
         private Result<object, RunError> EvaluateReference(BoundReference reference)

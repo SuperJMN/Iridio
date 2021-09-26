@@ -21,7 +21,7 @@ namespace Iridio.Tests.Core
         {
             var sut = CreateSut();
 
-            var result = await sut.Run(SourceCode.FromString(source));
+            var result = await sut.Run(SourceCode.FromString(source), new Dictionary<string, object>());
             result
                 .Should().BeSuccess()
                 .And.Subject.Value.Variables.Should().Contain(expectations);
@@ -35,7 +35,7 @@ namespace Iridio.Tests.Core
             var message = Maybe<string>.None;
             sut.Messages.Subscribe(s => message = Maybe<string>.From(s));
 
-            var result = await sut.Run(SourceCode.FromString(GetMain("'My message'")));
+            var result = await sut.Run(SourceCode.FromString(GetMain("'My message'")), new Dictionary<string, object>());
 
             result.Should().BeSuccess();
             message.HasValue.Should().BeTrue();

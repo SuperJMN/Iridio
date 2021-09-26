@@ -29,7 +29,7 @@ namespace Iridio.Tests.Core
         protected static async Task<Result<ExecutionSummary, IridioError>> Run(SourceCode fromString)
         {
             var iridioCore = CreateSut();
-            return await iridioCore.Run(fromString);
+            return await iridioCore.Run(fromString, new Dictionary<string, object>());
         }
     }
 }

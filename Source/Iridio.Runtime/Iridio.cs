@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Iridio.Parsing;
@@ -8,25 +9,25 @@ namespace Iridio.Runtime
     public class Iridio : IIridio
     {
         private readonly ISourceCodeCompiler compiler;
-        private readonly IInterpreter runner;
+        private readonly IInterpreter interpreter;
 
-        public Iridio(ISourceCodeCompiler compiler, IInterpreter runner)
+        public Iridio(ISourceCodeCompiler compiler, IInterpreter interpreter)
         {
             this.compiler = compiler;
-            this.runner = runner;
+            this.interpreter = interpreter;
         }
 
-        public Task<Result<ExecutionSummary, IridioError>> Run(SourceCode code)
+        public Task<Result<ExecutionSummary, IridioError>> Run(SourceCode code, IDictionary<string, object> initialState)
         {
             var match = compiler
                 .Compile(code)
                 .MapError(compilerError => (IridioError)new IridioCompileError(compilerError, code))
-                .Bind(s => runner.Run(s)
+                .Bind(s => interpreter.Run(s, initialState)
                     .MapError(error => (IridioError)new IridioRuntimeError(error, code)));
 
             return match;
         }
 
-        public IObservable<string> Messages => runner.Messages;
+        public IObservable<string> Messages => interpreter.Messages;
     }
 }

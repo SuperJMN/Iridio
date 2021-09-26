@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using FluentAssertions;
@@ -32,7 +33,7 @@ namespace Iridio.Tests.Core
             var sut = CreateSut();
             var result = await sut.Run(SourceCode.FromString(@"Main { 
     a = ""{b}"";
-}"));
+}"), new Dictionary<string, object>());
             CheckErrors(result, "unset");
         }
 

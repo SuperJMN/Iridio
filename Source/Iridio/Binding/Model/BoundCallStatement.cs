@@ -16,5 +16,10 @@ namespace Iridio.Binding.Model
         {
             visitor.Visit(this);
         }
+
+        public override string ToString()
+        {
+            return Call.ToString();
+        }
     }
 }

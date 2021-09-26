@@ -11,5 +11,10 @@ namespace Iridio.Binding.Model
         public BoundNopCallExpression(Position position) : base(position)
         {
         }
+
+        public override string ToString()
+        {
+            return "NOp Call";
+        }
     }
 }

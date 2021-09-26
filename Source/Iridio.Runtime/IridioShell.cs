@@ -23,10 +23,10 @@ namespace Iridio.Runtime
             iridio = new Iridio(compiler, runner);
         }
 
-        public Task<Result<ExecutionSummary, IridioError>> Run(string path)
+        public Task<Result<ExecutionSummary, IridioError>> Run(string path, IDictionary<string, object> initialState)
         {
             var source = preprocessor.Process(path);
-            return iridio.Run(source);
+            return iridio.Run(source, initialState);
         }
 
         public IObservable<string> Messages => iridio.Messages;

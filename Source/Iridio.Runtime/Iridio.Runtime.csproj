@@ -11,9 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.17.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.20.4" />
+    <PackageReference Include="DumpExtensions" Version="2.0.0" />
     <PackageReference Include="morelinq" Version="3.3.2" />
-    <PackageReference Include="Zafiro.Core" Version="2.4.13" />
+    <PackageReference Include="Zafiro.Core" Version="2.4.17" />
+    <PackageReference Include="Zafiro.Reflection" Version="2.4.17" />
   </ItemGroup>
 
   <ItemGroup>
