@@ -17,7 +17,7 @@ namespace Iridio.Parsing
 
         public string Text
         {
-            get { return string.Join("\n", Lines.Where(t => !t.IsComment).Select(x => x.Content)); }
+            get { return string.Join("\n", Lines.Select(line => line.IsComment ? "" : line.Content)); }
         }
 
         public static SourceCode FromString(string source)
