@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Iridio.Tests.Core
 {
-    public class Success : IridioCoreTestsBase
+    public class Success : IridioTestBase
     {
         [Theory]
         [ClassData(typeof(Data))]
@@ -26,6 +26,19 @@ namespace Iridio.Tests.Core
                 .Should().BeSuccess()
                 .And.Subject.Value.Variables.Should().Contain(expectations);
         }
+
+        [Fact]
+        public async Task Run_twice_should_produce_the_same_outcome()
+        {
+            var sut = CreateSut();
+
+            var firstExecution = await sut.Run(SourceCode.FromString("Main { }"), new Dictionary<string, object>());
+            var secondExecution = await sut.Run(SourceCode.FromString("Main { }"), new Dictionary<string, object>());
+            firstExecution
+                .Should().BeSuccess()
+                .And.Subject.Value.Should().BeEquivalentTo(secondExecution.Value);
+        }
+
 
         [Fact]
         public async Task Messages_are_pushed_from_script()

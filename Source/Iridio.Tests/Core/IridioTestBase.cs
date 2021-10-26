@@ -10,7 +10,7 @@ using Iridio.Tests.Execution;
 
 namespace Iridio.Tests.Core
 {
-    public class IridioCoreTestsBase
+    public class IridioTestBase
     {
         protected static Runtime.Iridio CreateSut()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
@@ -26,6 +27,7 @@ namespace Iridio.Binding
 
         public Result<Script, BinderErrors> Bind(IridioSyntax syntax)
         {
+            ClearPreviousState();
             DeclareProcedures(syntax);
 
             var script = new Script(BindProcedures(syntax));
@@ -36,6 +38,12 @@ namespace Iridio.Binding
             }
 
             return script;
+        }
+
+        private void ClearPreviousState()
+        {
+            errors.Clear();
+            procedureSymbols.Clear();
         }
 
         private void DeclareProcedures(IridioSyntax root)

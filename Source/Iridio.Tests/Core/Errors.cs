@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Iridio.Tests.Core
 {
-    public class Errors : IridioCoreTestsBase
+    public class Errors : IridioTestBase
     {
         [Fact]
         public async Task No_main()
