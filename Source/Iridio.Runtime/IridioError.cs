@@ -14,5 +14,10 @@ namespace Iridio.Runtime
         }
 
         public abstract IReadOnlyCollection<ErrorItem> Errors { get; }
+
+        public override string ToString()
+        {
+            return string.Join(";", Errors);
+        }
     }
 }
