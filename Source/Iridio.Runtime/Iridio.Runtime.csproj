@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackageId>Iridio.Runtime</PackageId>
     <Authors>SuperJMN</Authors>
     <Product>Iridio</Product>
@@ -14,8 +14,8 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.24.3" />
     <PackageReference Include="DumpExtensions" Version="2.0.0" />
     <PackageReference Include="morelinq" Version="3.3.2" />
-    <PackageReference Include="Zafiro.Core" Version="2.4.19" />
-    <PackageReference Include="Zafiro.Reflection" Version="2.4.19" />
+    <PackageReference Include="Zafiro.Core" Version="3.0.2" />
+    <PackageReference Include="Zafiro.Reflection" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>

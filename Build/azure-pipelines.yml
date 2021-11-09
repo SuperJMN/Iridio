@@ -12,8 +12,8 @@ pool:
 variables:
   BuildPlatform: 'Any CPU'
   BuildConfiguration: 'Release'
-  Major: 2
-  Minor: 1
+  Major: 3
+  Minor: 0
   Patch: $[counter(variables['Minor'], 0)] # this will reset when we bump Minor
   NugetVersion: $(Major).$(Minor).$(Patch)
   ArtifactName: 'Nuget Packages'
@@ -25,21 +25,20 @@ stages:
     - job: job
       steps:
       - checkout: self
-        submodules: recursive            
-      - task: NuGetToolInstaller@1
-        displayName: 'Install NuGet'
+        submodules: recursive
+      
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '6.0.x'
+
       - task: DotNetCoreCLI@2
         inputs:
-            command: 'pack'
-            packagesToPack: '**/*.csproj'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: NugetVersion
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: 'Source'
-          Contents: '**\Iridio*.nupkg'
-          TargetFolder: '$(build.artifactstagingdirectory)'
-          flattenFolders: true
+          command: 'pack'
+          packagesToPack: '**/*.csproj;!**/*.Tests.csproj'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: 'NugetVersion'
+
       - task: PublishBuildArtifacts@1
         displayName: 'Publish artifact $(ApplicationConfiguration)'
         inputs:
