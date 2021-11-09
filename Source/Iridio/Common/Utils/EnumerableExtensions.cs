@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using CSharpFunctionalExtensions;
 using MoreLinq.Extensions;
-using Optional.Collections;
 
 namespace Iridio.Common.Utils
 {
@@ -12,7 +12,7 @@ namespace Iridio.Common.Utils
             collection.SkipLast(1)
                 .ForEach(nonLast);
 
-            collection.LastOrNone().MatchSome(last);
+            collection.TryLast().Execute(last);
         }
     }
 }
