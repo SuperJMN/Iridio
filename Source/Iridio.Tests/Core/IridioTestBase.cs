@@ -12,7 +12,7 @@ namespace Iridio.Tests.Core
 {
     public class IridioTestBase
     {
-        protected static Runtime.Iridio CreateSut()
+        protected static IridioCore CreateSut()
         {
             var functions = new List<IFunction>
             {
@@ -21,7 +21,7 @@ namespace Iridio.Tests.Core
                 new LambdaFunction<Result>("Cancel", () => throw new TaskCanceledException())
             };
 
-            var sut = new Runtime.Iridio(new SourceCodeCompiler(new Binder(functions), new Parser()), new Interpreter(functions));
+            var sut = new IridioCore(new SourceCodeCompiler(new Binder(functions), new Parser()), new Interpreter(functions));
             return sut;
         }
 

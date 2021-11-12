@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Iridio.Binding;
 using Iridio.Common;
-using Iridio.Parsing;
 using Iridio.Preprocessing;
 
 namespace Iridio.Runtime
@@ -12,23 +10,30 @@ namespace Iridio.Runtime
     // ReSharper disable once UnusedType.Global
     public class IridioShell : IIridioShell
     {
-        private readonly Iridio iridio;
+        private readonly Iridio iridioCore;
         private readonly Preprocessor preprocessor;
 
-        public IridioShell(IList<IFunction> externalFunctions)
+        public IridioShell() : this(new HashSet<IFunction>())
+        {
+        }
+
+        public IridioShell(ISet<IFunction> functions)
         {
             preprocessor = new Preprocessor(new System.IO.Abstractions.FileSystem());
-            var compiler = new SourceCodeCompiler(new Binder(externalFunctions), new Parser());
-            var runner = new Interpreter(externalFunctions);
-            iridio = new Iridio(compiler, runner);
+            iridioCore = new Iridio(functions);
         }
 
         public Task<Result<ExecutionSummary, IridioError>> Run(string path, IDictionary<string, object> initialState)
         {
             var source = preprocessor.Process(path);
-            return iridio.Run(source, initialState);
+            return iridioCore.Run(source, initialState);
         }
 
-        public IObservable<string> Messages => iridio.Messages;
+        public Task<Result<ExecutionSummary, IridioError>> Run(SourceCode source, IDictionary<string, object> initialState)
+        {
+            return iridioCore.Run(source, initialState);
+        }
+
+        public IObservable<string> Messages => iridioCore.Messages;
     }
 }

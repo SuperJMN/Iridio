@@ -4,7 +4,7 @@ using CSharpFunctionalExtensions;
 using Iridio.Preprocessing;
 using Zafiro.Core.Mixins;
 
-namespace Iridio.Parsing
+namespace Iridio
 {
     public class SourceCode
     {
