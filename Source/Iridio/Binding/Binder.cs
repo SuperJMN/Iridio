@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Iridio.Binding.Model;
@@ -15,14 +14,14 @@ namespace Iridio.Binding
         private readonly Dictionary<string, ProcedureSymbol> procedureSymbols = new();
         private readonly Dictionary<string, INamed> functions;
 
-        public Binder(IEnumerable<INamed> externalFunctions)
+        public Binder(IEnumerable<INamed> functions)
         {
-            if (externalFunctions == null)
+            if (functions == null)
             {
-                throw new ArgumentNullException(nameof(externalFunctions));
+                throw new ArgumentNullException(nameof(functions));
             }
 
-            functions = externalFunctions.ToDictionary(d => d.Name, d => d);
+            this.functions = functions.ToDictionary(d => d.Name, d => d);
         }
 
         public Result<Script, BinderErrors> Bind(IridioSyntax syntax)
