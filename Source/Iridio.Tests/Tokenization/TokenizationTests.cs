@@ -21,6 +21,8 @@ namespace Iridio.Tests.Tokenization
         [Theory]
         [InlineData("12", Integer)]
         [InlineData("12D", Double)]
+        [InlineData("12d", Double)]
+        [InlineData("3.14d", Double)]
         [InlineData("\"Hello boy\"", Text)]
         [InlineData("\"Hello \"\"boy\"\"\"", Text)]
         [InlineData("{", OpenBrace)]
